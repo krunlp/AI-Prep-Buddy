@@ -44,6 +44,12 @@ flowchart TD
 
 **Worked example:** A 50M-document internal knowledge base. Query "What's our refund policy for enterprise customers signed before 2023?" → hybrid search catches both semantic matches ("refund policy") and exact terms ("enterprise", "2023") → metadata filter restricts to policy-type documents the requesting user's role can see → re-ranker promotes the specific enterprise-tier clause over general consumer refund text → LLM generates an answer citing the exact clause number → citation validator confirms that clause actually contains the stated terms before returning.
 
+**Real-world industries using this pattern:**
+- **Legal tech** — case law / precedent research assistants grounded in a firm's document repository
+- **Healthcare** — clinical guideline lookup for care teams, grounded in current protocols rather than the model's general training knowledge
+- **Financial services** — compliance/policy Q&A over internal regulatory documentation
+- **Enterprise IT** — internal wiki, runbook, and ticket-history search for support/engineering teams
+
 ---
 
 ## 2. Customer Support Agent with Escalation (Q496)
@@ -74,6 +80,12 @@ flowchart TD
 
 **Worked example:** "Where's my order #4521?" → intent = account action → order-status tool called directly, low-risk read-only action, auto-executed. "I want a $2,000 refund" → intent = account action → refund tool checks policy limit (say $200 auto-approval cap) → exceeds limit → routes to human agent with full context (order history, conversation so far) pre-loaded, rather than the user having to repeat themselves.
 
+**Real-world industries using this pattern:**
+- **Telecom** — billing and plan-change support at high volume with tiered human escalation
+- **E-commerce** — order status, returns, and refund handling integrated with order-management systems
+- **B2B SaaS** — tier-1 support deflection with escalation to customer success for account-specific issues
+- **Banking** — balance inquiries and card-freeze requests, with mandatory human confirmation for anything touching money movement
+
 ---
 
 ## 3. Multi-Agent Orchestration (Q455, Q456, Q472)
@@ -101,6 +113,12 @@ flowchart TD
 **Flow:** The orchestrator decomposes a task into sub-tasks handed to specialized worker agents, each reading/writing to shared state rather than passing messages point-to-point. A critic agent validates the combined output before final aggregation; failures trigger targeted re-planning of just the failed sub-task, not the whole pipeline. A hard step/budget limit bounds worst-case cost regardless of how re-planning goes.
 
 **Worked example:** "Write a competitive analysis of three SaaS products." Orchestrator splits into: Research agent (gathers facts per product via web search/tool calls), Analysis agent (compares features/pricing against shared state), Writing agent (drafts the final report). Critic checks the draft against the original research for unsupported claims. If it flags an unsupported claim about Product B's pricing, only the Research agent re-runs that specific lookup — not the whole pipeline.
+
+**Real-world industries using this pattern:**
+- **Management consulting** — automated first-pass market/competitor research assembled from multiple specialized research agents
+- **Software engineering** — autonomous coding agents that plan, implement, and self-review changes across a codebase
+- **Marketing operations** — campaign content pipelines where research, copywriting, and design-brief agents hand off sequentially
+- **Equity research** — automated financial-report synthesis combining data-gathering, analysis, and writing agents
 
 ---
 
@@ -133,6 +151,12 @@ flowchart TD
 
 **Worked example:** 50 internal teams share one gateway. Team A's "summarize this ticket" requests get classified as simple → routed to a small model at $0.10/1M tokens. Team B's "draft this legal clause" requests get classified as high-stakes → routed to a large model plus a verifier pass checking the output against a compliance rubric before returning. If the primary large-model provider is down, the gateway automatically fails over to a secondary provider — neither team's integration code changes.
 
+**Real-world industries using this pattern:**
+- **Large enterprises with many internal AI features** — a shared platform team serving 20+ product teams through one gateway
+- **Fintech** — cost-sensitive at scale, where routing simple queries to cheap models materially affects unit economics
+- **Big tech internal tooling** — standardizing model access company-wide without every team re-building auth/logging/fallback
+- **Consulting/agencies** — serving multiple end-clients through one controlled, auditable AI access layer
+
 ---
 
 ## 5. Feature Store: Online + Offline Paths (Q559, Q615, Q701)
@@ -163,6 +187,12 @@ flowchart LR
 
 **Worked example:** A "user's 7-day average order value" feature is defined once. The offline store computes it in nightly batch for generating training data (with point-in-time correctness — only orders before each historical training-example date). The online store computes the same definition incrementally from the Kafka order-event stream, so a fraud model scoring a live transaction sees a feature computed identically to what it was trained on.
 
+**Real-world industries using this pattern:**
+- **E-commerce** — real-time personalization features (recently-viewed, propensity-to-buy) at checkout
+- **Ride-sharing** — ETA and dynamic-pricing features requiring both historical training data and real-time serving
+- **Banking** — real-time fraud-scoring features consistent between model training and live transaction scoring
+- **Streaming media** — recommendation features blending long-term taste profiles with in-session behavior
+
 ---
 
 ## 6. Real-Time Fraud Detection (Q557, Q575)
@@ -188,6 +218,12 @@ flowchart TD
 **Flow:** Precomputed/cached features (velocity, device fingerprint) feed a lightweight model chosen specifically to fit the sub-100ms latency budget. Scores route to approve/secondary-check/block tiers. A rule-based fallback exists for if the model service itself is unavailable — fraud detection can't simply fail open. Continuous drift monitoring triggers retraining given how fast fraud patterns evolve.
 
 **Worked example:** A $9,000 transaction from a new device in a new country scores high risk (device + velocity signals both fire) → blocked and routed to a human review queue in under 100ms, while a $12 transaction from a recognized device with normal velocity approves automatically in the same latency budget.
+
+**Real-world industries using this pattern:**
+- **Payments/card networks** — transaction-level fraud scoring industry-wide (Visa/Mastercard-style networks)
+- **Retail banking** — account-takeover and unusual-activity detection
+- **Insurance** — claims-fraud detection at intake
+- **E-commerce** — checkout fraud and stolen-card detection
 
 ---
 
@@ -216,6 +252,12 @@ flowchart TD
 
 **Worked example:** An e-commerce homepage. Candidate generation narrows 2M products to 500 based on the user's embedding similarity to past purchases. The ranking model scores those 500 using richer features (recency, price sensitivity, current session behavior) unavailable to the cheap candidate-generation stage. A final diversity rule ensures the top 20 shown aren't all the same product category, even if the raw ranking model would have clustered them.
 
+**Real-world industries using this pattern:**
+- **E-commerce** — product recommendations on category and checkout pages
+- **Streaming (video/music)** — "recommended for you" and autoplay queues
+- **Social media** — feed ranking balancing engagement and diversity
+- **Job platforms** — candidate-to-job and job-to-candidate matching at scale
+
 ---
 
 ## 8. MLOps CI/CD Pipeline with Eval Gates (Q646, Q663, Q810)
@@ -239,6 +281,12 @@ flowchart LR
 **Flow:** Every prompt, model, or code change touching the AI system runs through the same eval-gated pipeline as standard software: unit tests plus a golden eval suite must pass before merge, then staged rollout (staging → shadow → canary → full) with automated rollback if quality/cost/latency metrics degrade at any stage.
 
 **Worked example:** An engineer tweaks a system prompt to be more concise. CI runs the golden eval suite automatically — if the tweak accidentally drops required disclaimers on 3 test cases, the merge is blocked with a specific failure report, not just a pass/fail flag. Once fixed and merged, the change goes to 5% of production traffic first; if cost drops as intended with no quality regression in monitored metrics, it ramps to 100%.
+
+**Real-world industries using this pattern:**
+- **Regulated fintech** — every prompt/model change subject to compliance-auditable eval gates
+- **Healthcare AI** — clinical-decision-support features requiring documented validation before any production change
+- **Big tech ML platforms** — standard practice for any team shipping frequent model/prompt iterations
+- **Any consumer AI product at scale** — preventing quality regressions from reaching millions of users
 
 ---
 
@@ -264,6 +312,12 @@ flowchart TD
 
 **Worked example:** Primary provider has a regional outage. Health checks detect elevated error rates within seconds and route new requests to the secondary provider automatically — users experience slightly different response style but no visible outage. If both external providers were somehow down, the self-hosted fallback model keeps core functionality alive with a UI banner: "Running in reduced-capacity mode."
 
+**Real-world industries using this pattern:**
+- **Mission-critical SaaS** — any product where an AI feature outage is a support/trust incident
+- **Telemedicine** — AI-assisted triage tools that must degrade gracefully, never fail outright
+- **Financial trading tools** — research/analysis copilots needing near-100% availability during market hours
+- **Government/public-sector digital services** — citizen-facing AI tools under strict uptime expectations
+
 ---
 
 ## 10. Cost-Optimized Serving: Caching + Batching + Quantization (Q502, Q610, Q622)
@@ -285,6 +339,12 @@ flowchart TD
 **Flow:** Cheapest option checked first (exact cache), then semantic cache (catches paraphrased repeats), only falling through to actual inference — which itself uses continuous batching, a quantized model, and paged-attention KV cache management to maximize throughput per GPU-dollar.
 
 **Worked example:** An FAQ-heavy support bot gets "how do I reset my password" 10,000 times a day phrased 50 different ways. Exact-match cache catches identical repeats; semantic cache (embedding similarity above 0.92) catches "I forgot my password, help" as effectively the same query — only genuinely novel queries reach the model, cutting inference volume by ~70% in this example.
+
+**Real-world industries using this pattern:**
+- **High-volume consumer apps** — chatbots/assistants serving millions of similar queries
+- **Customer support platforms** — FAQ-heavy traffic ideal for semantic caching
+- **EdTech** — tutoring apps answering common conceptual questions repeatedly across many students
+- **Developer tools** — coding assistants where common boilerplate requests repeat constantly across users
 
 ---
 
@@ -312,6 +372,12 @@ flowchart TD
 
 **Worked example:** A new prompt variant scores well on the golden dataset and passes judge calibration. In shadow mode it looks fine. In canary (5% traffic), thumbs-down rate ticks up 2x versus control even though offline scores were equal — revealing the offline eval set didn't cover a real usage pattern. The team reverts, adds the missed pattern to the golden dataset, and re-runs the full pipeline before trying again.
 
+**Real-world industries using this pattern:**
+- **Any enterprise shipping LLM features regularly** — the baseline practice for responsible iteration speed
+- **Legal tech** — where an ungated regression could produce a materially wrong legal summary
+- **Healthcare AI** — clinical-facing tools requiring documented, repeatable validation
+- **Regulated fintech** — audit trails showing every production change was validated before shipping
+
 ---
 
 ## 12. Agentic RAG with Self-Correction (Q397, Q402)
@@ -334,6 +400,12 @@ flowchart TD
 **Flow:** Unlike single-shot RAG, the agent decides for itself whether retrieved content is sufficient, reformulating and re-retrieving if not, and self-checks whether its draft answer is actually grounded in what was retrieved before finalizing — trading latency/cost for meaningfully higher reliability on hard multi-hop questions.
 
 **Worked example:** "Which of our three EU offices has the highest attrition, and what's the top cited reason?" First retrieval finds attrition rate documents but not exit-interview reason data. The agent's assessment step recognizes the gap, reformulates a second query specifically for "exit interview reasons," retrieves that separately, and only then generates a combined answer — rather than a single-shot system generating a plausible-but-incomplete answer from the first retrieval alone.
+
+**Real-world industries using this pattern:**
+- **Enterprise knowledge management** — answering multi-hop questions spanning several internal systems
+- **Legal research** — connecting facts across multiple case documents or statutes
+- **Pharma R&D** — literature review requiring synthesis across many papers, not single-document lookup
+- **Management consulting** — client research requiring iterative digging rather than one retrieval pass
 
 ---
 
@@ -359,6 +431,12 @@ flowchart TD
 **Flow:** Users are geo-routed to a fully independent regional stack — model, data store, and logging all contained within that region — with an explicit architectural rule that no user data crosses regions. Only non-sensitive configuration (prompt templates, feature flags) syncs globally.
 
 **Worked example:** An EU customer's document gets processed entirely by EU-hosted model endpoints and stored only in the EU data store, satisfying GDPR data-residency requirements. Even the gateway/logging infrastructure is regionally scoped — a common failure mode this design explicitly avoids is a "global" logging pipeline that inadvertently pipes EU request content through a US-based observability tool.
+
+**Real-world industries using this pattern:**
+- **Global SaaS companies** — serving both EU and US customers under different data-residency regimes
+- **Healthcare** — HIPAA (US) and GDPR (EU) compliance simultaneously for a multinational health platform
+- **Banking** — cross-border financial services with strict national data-sovereignty rules
+- **Government contracts** — sovereign-cloud requirements for public-sector deployments
 
 ---
 
@@ -386,6 +464,12 @@ flowchart TD
 
 **Worked example:** A PR removes a null check on a user-input field. The agent flags it as blocking (potential crash/security issue) with an inline comment explaining the specific risk; a PR that just uses inconsistent variable naming gets a non-blocking suggestion. Merge is only gated on the blocking category, keeping the bar high without slowing down every PR with nitpicks.
 
+**Real-world industries using this pattern:**
+- **Software product companies** — standardizing review quality across a large, distributed engineering org
+- **DevOps/platform engineering teams** — enforcing infra-as-code and security review standards automatically
+- **Open-source projects** — triaging high PR volume from external contributors with limited maintainer time
+- **Fintech engineering** — enforcing compliance-sensitive coding standards (PCI-DSS, SOX) automatically
+
 ---
 
 ## 15. Voice Assistant Pipeline: ASR → LLM → TTS (Q508)
@@ -405,6 +489,12 @@ flowchart LR
 
 **Worked example:** ASR streams partial transcripts as the user speaks; the system starts a speculative LLM pass on the likely-final partial text before the user even finishes talking, so by the time the final transcript arrives, generation is already partway done — TTS then starts streaming audio from the first generated sentence rather than waiting for the full response, keeping perceived latency under ~1.5s end-to-end.
 
+**Real-world industries using this pattern:**
+- **Call centers** — IVR replacement and first-line phone support
+- **Automotive** — in-car voice assistants for navigation, calls, and vehicle controls
+- **Smart home** — voice-controlled device management
+- **Healthcare** — nurse-triage phone lines handling routine symptom-intake calls
+
 ---
 
 ## 16. Safe Natural-Language-to-SQL (Q513)
@@ -422,6 +512,12 @@ flowchart TD
 ```
 
 **Worked example:** "Show me revenue by region last quarter" generates a `SELECT` query scoped to approved tables. If the LLM hallucinates a `DELETE` or references an unapproved `salaries` table, the query analyzer rejects it before execution — never trusting the LLM's output as inherently safe SQL, only as a draft to be validated against an explicit allowlist.
+
+**Real-world industries using this pattern:**
+- **Business intelligence teams** — letting non-SQL-fluent stakeholders query dashboards in plain language
+- **Retail/e-commerce** — ad hoc sales and inventory questions from merchandising teams
+- **Internal data platforms** — self-serve analytics without needing a data analyst for every question
+- **SaaS analytics products** — natural-language query as a customer-facing product feature
 
 ---
 
@@ -441,6 +537,12 @@ flowchart TD
 
 **Worked example:** Obvious spam/known-slur content is auto-blocked by the fast classifier in milliseconds at huge volume. Borderline sarcasm or context-dependent content escalates to the LLM judge, which reasons about context the fast classifier can't. Only the hardest remaining cases reach a human — and every human decision becomes future training/calibration data for the earlier tiers.
 
+**Real-world industries using this pattern:**
+- **Social media platforms** — comment and post moderation at massive scale
+- **Online marketplaces** — fake/fraudulent listing detection
+- **Gaming** — in-game chat moderation for harassment and toxicity
+- **Dating apps** — profile and message screening for safety
+
 ---
 
 ## 18. Human-Approved Knowledge Base Editing (Q516)
@@ -459,6 +561,12 @@ flowchart TD
 ```
 
 **Worked example:** A product spec doc changes upstream; the AI detects the relevant KB article is now stale, proposes a specific diff with the source citation, and queues it. A human reviewer either approves as-is, tweaks the wording, or rejects if the AI misread the change — nothing reaches the live KB without that explicit human step, and every publish is traceable to whether it was AI-original or human-modified.
+
+**Real-world industries using this pattern:**
+- **Enterprise knowledge management** — keeping internal documentation synced with changing source systems
+- **Customer support content ops** — keeping help-center articles current as product features change
+- **Legal document management** — controlled updates to policy/compliance documents
+- **HR** — keeping benefits and policy documentation current with human sign-off given legal sensitivity
 
 ---
 
@@ -481,6 +589,12 @@ flowchart TD
 
 **Worked example:** Invoices auto-route to an invoice-specific schema; extracted totals get validated against expected numeric ranges and currency formats. A total that's wildly out of range (a $50 invoice extracted as $50,000) fails validation and routes to human review rather than silently propagating a likely extraction error downstream.
 
+**Real-world industries using this pattern:**
+- **Insurance** — claims-form and supporting-document data extraction
+- **Accounts payable** — invoice processing and PO matching at scale
+- **Legal** — contract metadata extraction (parties, dates, obligations) for contract management systems
+- **Healthcare** — digitizing structured fields from scanned medical records/intake forms
+
 ---
 
 ## 20. PII Redaction Before External LLM Calls (Q534)
@@ -498,6 +612,12 @@ flowchart TD
 ```
 
 **Worked example:** "Draft a follow-up email to John Smith about his $45,000 loan application" gets tokenized to "Draft a follow-up email to PERSON_1 about his AMOUNT_1 loan application" before ever leaving your infrastructure. The external provider never sees the real name or amount; the response is re-hydrated with the real values only after returning, inside your trusted boundary.
+
+**Real-world industries using this pattern:**
+- **Healthcare** — HIPAA-mandated PHI protection before any external AI service call
+- **Financial services** — protecting account numbers and SSNs in customer service AI tooling
+- **HR tech** — protecting employee PII in AI-assisted HR workflows
+- **Legal services** — protecting client-privileged information sent to any third-party AI tool
 
 ---
 
@@ -519,6 +639,12 @@ flowchart TD
 
 **Worked example:** A declined application automatically generates a SHAP-based explanation identifying the top 3-4 factors driving the decline (e.g., debt-to-income ratio, credit history length) — required for a compliant adverse-action notice, not just a black-box "declined" with no reasoning, and every decision is logged for the independent model risk validation team's periodic review.
 
+**Real-world industries using this pattern:**
+- **Retail banking** — traditional loan and credit-card underwriting
+- **Fintech/BNPL (buy-now-pay-later)** — fast automated credit decisions at checkout
+- **Credit card issuers** — application approval and credit-limit decisions
+- **Mortgage lending** — underwriting with mandated adverse-action explainability
+
 ---
 
 ## 22. Dynamic Pricing Engine (Q564)
@@ -538,6 +664,12 @@ flowchart TD
 
 **Worked example:** A surge in demand pushes the raw model output to 3x normal price; the rate-of-change guardrail caps the actual applied increase to a smaller step (e.g., max 1.5x per time window) to avoid erratic, customer-hostile pricing swings, even though the "purely optimal" model output would have gone higher.
 
+**Real-world industries using this pattern:**
+- **Ride-sharing** — surge pricing balancing driver supply and rider demand
+- **Airlines/hospitality** — dynamic fare and room-rate pricing
+- **E-commerce** — flash-sale and demand-responsive pricing
+- **Ticketing/live events** — dynamic ticket pricing based on real-time demand
+
 ---
 
 ## 23. Ad CTR Prediction at Auction Scale (Q566)
@@ -556,6 +688,12 @@ flowchart TD
 
 **Worked example:** Given the sub-100ms auction latency budget, most feature computation happens ahead of the request (precomputed user/ad embeddings refreshed periodically), leaving only a fast forward pass through the model at request time — real-time feature computation is reserved only for the few signals that genuinely can't be precomputed (like current page context).
 
+**Real-world industries using this pattern:**
+- **Ad tech/programmatic advertising** — the core CTR-prediction problem across the industry
+- **Social media platforms** — feed and story ad ranking
+- **Search engines** — sponsored search result ranking
+- **Retail media networks** — on-site sponsored product placement (Amazon Ads-style)
+
 ---
 
 ## 24. Visual Product Search (Q568)
@@ -572,6 +710,12 @@ flowchart TD
 ```
 
 **Worked example:** A user photographs a pair of shoes seen on the street. The vision encoder (fine-tuned specifically on the catalog's product photography style) embeds it, ANN search finds visually similar indexed products, and metadata filtering excludes out-of-stock or wrong-category matches before the final ranked results are shown.
+
+**Real-world industries using this pattern:**
+- **Fashion/apparel retail** — "shop this look" and photo-based product discovery
+- **Home goods/furniture** — finding similar furniture from a photo of a room
+- **Real estate** — visual property search by architectural style or features
+- **Automotive parts** — identifying a part from a photo for compatible replacement search
 
 ---
 
@@ -592,6 +736,12 @@ flowchart TD
 
 **Worked example:** Every bid request must be answered within ~100ms, so the model is deliberately lightweight — a heavier model would simply miss the auction deadline. Budget pacing is checked before even bidding, since winning too many auctions too early in a budget period at inflated prices is its own failure mode independent of prediction accuracy.
 
+**Real-world industries using this pattern:**
+- **Programmatic ad exchanges** — the foundational RTB use case across the ad-tech industry
+- **Demand-side/supply-side platforms (DSPs/SSPs)** — core infrastructure for buying and selling impressions
+- **Retail media** — real-time bidding for on-site ad placements
+- **Mobile app install advertising** — bidding for user-acquisition ad inventory
+
 ---
 
 ## 26. Predictive Maintenance from Sensor Data (Q578)
@@ -609,6 +759,12 @@ flowchart TD
 ```
 
 **Worked example:** A compressor's vibration sensor shows a frequency-domain pattern historically correlated with bearing failure within 2 weeks. The model flags medium risk — not urgent enough for an emergency shutdown (high false-positive cost: unnecessary downtime) but enough to schedule maintenance at the next planned window, balancing the two asymmetric costs explicitly.
+
+**Real-world industries using this pattern:**
+- **Manufacturing** — predicting equipment failure on production lines before costly downtime
+- **Aviation** — aircraft component health monitoring between scheduled maintenance windows
+- **Energy/utilities** — turbine and grid-equipment failure prediction
+- **Fleet/logistics** — predicting vehicle maintenance needs across a delivery fleet
 
 ---
 
@@ -630,6 +786,12 @@ flowchart TD
 
 **Worked example:** A straightforward $500 windshield claim with a clean policy history fast-tracks through automated processing. A $40,000 claim with inconsistencies between the adjuster's notes and submitted photos routes to a specialist with the specific flagged discrepancies highlighted — the model surfaces reasoning for the human, not just a black-box risk score.
 
+**Real-world industries using this pattern:**
+- **Auto insurance** — claims intake and fraud flagging after accidents
+- **Health insurance** — claims triage and anomaly detection
+- **Property/casualty insurance** — damage-claim assessment combining photos and adjuster notes
+- **Workers' compensation** — claim complexity routing to appropriate specialist reviewers
+
 ---
 
 ## 28. Low-Code AI Platform for Non-Technical Users (Q538)
@@ -647,6 +809,12 @@ flowchart TD
 ```
 
 **Worked example:** A PM builds a "summarize customer feedback" tool using a pre-approved template rather than a blank prompt box — they can configure tone and input source but can't remove the safety guardrails or grant it write-access tools. It still must pass the automated eval suite before going live, and once live it's monitored with the exact same cost/quality observability as anything engineers built directly.
+
+**Real-world industries using this pattern:**
+- **Enterprise internal tools** — letting non-engineering teams build safe, scoped AI utilities
+- **Marketing operations** — campaign-content generation tools built by marketers, not engineers
+- **Customer success** — account-health-summary tools built by CS ops teams
+- **HR/People ops** — policy-Q&A or onboarding-assistant tools built without engineering involvement
 
 ---
 
