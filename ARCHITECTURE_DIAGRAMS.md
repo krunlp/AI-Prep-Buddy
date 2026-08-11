@@ -810,3 +810,290 @@ flowchart TD
 ---
 
 *Coverage note: 28 diagrams now cover the large majority of distinct architectural patterns across Sections 13, 14, and 27 (~135 system-design questions total). Remaining uncovered questions are largely close variants of patterns already diagrammed above (e.g., Q567 autocomplete is a lighter version of Q574's real-time-bidding latency-budget pattern; Q572 video recommendation reuses the two-stage recsys pattern in diagram 7 with a diversity re-ranking layer). Ask for any specific remaining question's diagram individually if a variant isn't obviously covered by an existing pattern.*
+
+---
+
+## 29. Tiered Document Summarization Pipeline (Q498)
+
+```mermaid
+flowchart TD
+    DOC[Incoming Document] --> LENGTH{Length/Complexity Check}
+    LENGTH -->|Short/simple| SMALL[Small Model: single pass]
+    LENGTH -->|Long/complex| CHUNK[Chunk Document]
+    CHUNK --> SMALLDRAFT[Small Model: per-chunk draft summaries]
+    SMALLDRAFT --> COMBINE[Combine Draft Summaries]
+    COMBINE --> LARGE[Large Model: final polish pass]
+    SMALL --> CACHE[Cache by Document Hash]
+    LARGE --> CACHE
+    CACHE --> OUTPUT[Return Summary]
+```
+
+**Flow:** A cheap small model handles the bulk of volume — either directly for short documents or as a first-pass drafter per chunk for long ones — with the expensive large model reserved only for the final polish/combination step, and results cached by content hash to avoid ever reprocessing identical documents.
+
+**Real-world industries using this pattern:**
+- **Legal** — summarizing lengthy filings where only the final synthesis needs top-tier model quality
+- **Media/publishing** — article and transcript summarization at newsroom volume
+- **Enterprise document management** — summarizing internal reports at scale
+- **Customer support** — summarizing long support-ticket threads for handoff between agents
+
+---
+
+## 30. Terminology-Consistent Translation (Q507)
+
+```mermaid
+flowchart TD
+    SOURCE[Source Text] --> GLOSSARY[Inject Domain Glossary into Prompt]
+    SOURCE --> PRIORRAG[RAG: Retrieve Prior Approved Translations]
+    GLOSSARY --> LLM[LLM Translation]
+    PRIORRAG --> LLM
+    LLM --> DRAFT[Draft Translation]
+    DRAFT --> QACHECK{QA Pass}
+    QACHECK -->|Back-translation matches| AUTO[Auto-Approve]
+    QACHECK -->|Mismatch or critical content| HUMAN[Human Reviewer]
+    HUMAN --> APPROVED[Approved Translation]
+    APPROVED -.adds to glossary/memory.-> PRIORRAG
+```
+
+**Flow:** A maintained glossary and a retrieval store of prior approved translations both feed the prompt, keeping terminology consistent across documents translated at different times; a back-translation QA check auto-approves high-confidence output and routes anything critical or mismatched to human review, with approved translations feeding back into the memory store for future consistency.
+
+**Real-world industries using this pattern:**
+- **Pharmaceutical/medical device** — regulatory document translation requiring exact terminology consistency
+- **Legal** — contract translation where term consistency has legal weight
+- **Global e-commerce** — product catalog translation at scale across many languages
+- **Technical documentation** — software/hardware manual translation maintaining consistent terms across versions
+
+---
+
+## 31. Multi-Source "Ask Your Company's Data" Assistant (Q509)
+
+```mermaid
+flowchart TD
+    QUERY[User Query] --> ROUTE[Query Router / Classifier]
+    ROUTE --> DOCS[Docs Connector: RAG]
+    ROUTE --> TICKETS[Tickets Connector: RAG]
+    ROUTE --> DB[Database Connector: NL-to-SQL]
+    DOCS --> ACL1[Access Control per Source]
+    TICKETS --> ACL2[Access Control per Source]
+    DB --> ACL3[Access Control per Source]
+    ACL1 --> AGGREGATE[Aggregate + Re-rank Across Sources]
+    ACL2 --> AGGREGATE
+    ACL3 --> AGGREGATE
+    AGGREGATE --> ATTRIBUTE[Attribute Answer to Source System]
+    ATTRIBUTE --> RESPONSE[Response to User]
+```
+
+**Flow:** A router classifies which source(s) a query likely needs, each source has its own connector respecting that system's native access control, and results are aggregated and re-ranked across sources — critically, every part of the final answer is attributed back to its originating system so the user can trust and verify it.
+
+**Real-world industries using this pattern:**
+- **Enterprise software** — unified internal assistants spanning docs, CRM, ticketing, and databases
+- **Consulting** — cross-referencing client data across multiple disconnected systems
+- **Financial services** — combining policy documents, transaction data, and case history for advisor tools
+- **Healthcare systems** — combining clinical notes, lab systems, and scheduling data for care coordination
+
+---
+
+## 32. Code Generation with Test-Driven Validation (Q515)
+
+```mermaid
+flowchart TD
+    SPEC[Task Spec + Existing Tests] --> LLM[LLM: Generate Code]
+    LLM --> SANDBOX[Execute in Sandbox]
+    SANDBOX --> TESTRUN[Run Test Suite]
+    TESTRUN -->|Pass| HUMANREVIEW[Human Code Review Required]
+    TESTRUN -->|Fail| FEEDBACK[Feed Failure Output Back to LLM]
+    FEEDBACK --> LLM
+    LLM -.retry limit reached.-> ESCALATE[Escalate to Human Developer]
+    HUMANREVIEW --> MERGE[Merge]
+```
+
+**Flow:** Generated code is never trusted on its own — it's executed against a real test suite in a sandbox, with failures fed back to the model for iterative correction up to a retry limit, and even passing code still requires human review before merge, since passing tests doesn't guarantee good design or catch untested edge cases.
+
+**Real-world industries using this pattern:**
+- **Software engineering** — AI pair-programming and autonomous coding agents
+- **Fintech** — auto-generating boilerplate/CRUD code under strict test-coverage requirements
+- **Game development** — generating scripted behavior/logic validated against gameplay tests
+- **DevOps** — generating infrastructure-as-code validated against policy/compliance tests before apply
+
+---
+
+## 33. Fraud-Narrative Summarizer with Strict Factuality (Q521)
+
+```mermaid
+flowchart TD
+    CASEDATA[Structured Case Data] --> CONSTRAIN[LLM Constrained: no external knowledge]
+    CONSTRAIN --> DRAFT[Draft Narrative]
+    DRAFT --> LINK[Structured Output: each claim linked to source field]
+    LINK --> GROUND[Groundedness Check: claim vs source field]
+    GROUND -->|Fails| REJECT[Reject / Regenerate]
+    GROUND -->|Passes| FLAG[Flag as AI-Generated - Requires Verification]
+    FLAG --> INVESTIGATOR[Investigator Review]
+```
+
+**Flow:** The model is explicitly restricted to summarizing only the provided case data (no general knowledge that could introduce unsupported claims), every claim in the output is structurally linked back to its source field, and a groundedness check validates that link before the narrative ever reaches an investigator — who still must treat it as a draft requiring verification, not a finding.
+
+**Real-world industries using this pattern:**
+- **Banking/payments** — fraud case summaries for investigation teams
+- **Insurance** — claims-fraud narrative generation for adjusters
+- **Compliance/AML** — suspicious-activity report drafting for regulatory filing
+- **Law enforcement-adjacent fintech** — case-file summarization for referral to authorities
+
+---
+
+## 34. A/B Testing LLM Providers on Live Traffic (Q526)
+
+```mermaid
+flowchart TD
+    TRAFFIC[Production Traffic] --> SPLIT{Randomized Split}
+    SPLIT -->|95%| CONTROL[Current Provider]
+    SPLIT -->|5%| CHALLENGER[Alternative Provider]
+    CONTROL --> METRICS[Quality / Latency / Cost Metrics]
+    CHALLENGER --> METRICS
+    METRICS --> COMPARE{Statistically Significant Improvement?}
+    COMPARE -->|Yes, no regressions| RAMP[Ramp Up Gradually]
+    COMPARE -->|No or regression| HOLD[Hold or Revert]
+    RAMP --> FULL[Full Cutover]
+```
+
+**Flow:** A small, randomized slice of real traffic goes to the alternative provider behind the same gateway abstraction, with quality/latency/cost tracked in parallel to the control group — ramping only happens on statistically significant improvement with no safety/quality regressions, never on a single favorable metric alone.
+
+**Real-world industries using this pattern:**
+- **Any multi-provider AI platform** — de-risking a switch between OpenAI/Anthropic/Google-style providers
+- **Cost-sensitive consumer apps** — validating a cheaper provider maintains quality before full migration
+- **Enterprise SaaS** — validating a new provider meets compliance/quality bars before contractual commitment
+- **Customer support platforms** — testing provider quality specifically on real, messy customer language
+
+---
+
+## 35. Strict Latency-SLA Multi-Call Pipeline (Q540)
+
+```mermaid
+flowchart TD
+    REQUEST[Request: 2s Total Budget] --> BUDGET[Deadline Propagation: 2000ms]
+    BUDGET --> STEP1[Step 1: Retrieval - budget 300ms]
+    STEP1 --> STEP2[Step 2: Parallel Calls where possible]
+    STEP2 --> LLMCALL1[LLM Call A - budget 800ms]
+    STEP2 --> LLMCALL2[LLM Call B - budget 800ms]
+    LLMCALL1 --> MERGE[Merge Results]
+    LLMCALL2 --> MERGE
+    MERGE --> STEP3[Step 3: Final Format - budget 100ms]
+    STEP3 --> CHECK{Total Under Budget?}
+    CHECK -->|Yes| RESPOND[Respond]
+    CHECK -->|No, exceeded| FALLBACK[Return Fastest Partial/Cached Result]
+```
+
+**Flow:** The total latency budget is explicitly divided and propagated across every pipeline stage, independent steps are parallelized rather than chained sequentially wherever possible, and a hard fallback (partial or cached result) triggers if the pipeline is at risk of exceeding the deadline — preventing one slow stage from silently blowing the entire SLA.
+
+**Real-world industries using this pattern:**
+- **Real-time customer-facing chat** — any product with a hard perceived-responsiveness requirement
+- **Ad tech** — any LLM-assisted step inserted into a latency-critical auction path
+- **Trading/finance tools** — real-time analysis features under strict responsiveness expectations
+- **Gaming** — in-game AI NPC dialogue generation under frame-time-adjacent latency budgets
+
+---
+
+## 36. Model Monitoring: Drift and Performance Decay (Q561)
+
+```mermaid
+flowchart TD
+    PROD[Production Predictions] --> INPUTDIST[Input Feature Distribution]
+    PROD --> PREDDIST[Prediction Distribution]
+    GROUNDTRUTH[Ground Truth - delayed] --> PERFMETRIC[Performance Metrics]
+    INPUTDIST --> COMPARE1{Statistical Distance vs Training Baseline}
+    PREDDIST --> COMPARE2{Statistical Distance vs Training Baseline}
+    PERFMETRIC --> COMPARE3{Below Threshold?}
+    COMPARE1 -->|Drift detected| ALERT[Alert: Data Drift]
+    COMPARE2 -->|Drift detected| ALERT2[Alert: Prediction Drift]
+    COMPARE3 -->|Degraded| ALERT3[Alert: Performance Decay]
+    ALERT --> INVESTIGATE[Investigate Root Cause]
+    ALERT2 --> INVESTIGATE
+    ALERT3 --> INVESTIGATE
+    INVESTIGATE --> RETRAIN[Retrain / Rollback Decision]
+```
+
+**Flow:** Three independent signals are tracked in parallel — whether inputs look statistically different from training data, whether predictions look different, and (once ground truth eventually arrives) whether actual performance has degraded — since each can fail independently and each points toward a different root cause and remediation.
+
+**Real-world industries using this pattern:**
+- **Banking/lending** — regulatory requirement to monitor model performance continuously, not just at validation
+- **E-commerce** — catching recommendation-model degradation as catalog/behavior shifts
+- **Fraud detection** — catching when fraud patterns evolve faster than the model was trained for
+- **Healthcare AI** — mandatory ongoing performance monitoring for clinical-decision-support tools
+
+---
+
+## 37. Fair Job-Candidate Matching (Q580)
+
+```mermaid
+flowchart TD
+    RESUME[Candidate Data] --> FEATURES[Job-Relevant Features Only]
+    FEATURES --> EXCLUDE[Explicitly Exclude Protected-Class Proxies]
+    EXCLUDE --> MODEL[Matching Model]
+    MODEL --> SCORE[Match Score]
+    SCORE --> FAIRNESSCHECK{Disparate Impact Test Across Groups}
+    FAIRNESSCHECK -->|Pass| RANKED[Ranked Candidate List]
+    FAIRNESSCHECK -->|Fail| REMEDIATE[Remediate Model Before Use]
+    RANKED --> HUMAN[Human Recruiter: Final Decision]
+    HUMAN -.never fully automated.-> DECISION[Hiring Decision]
+```
+
+**Flow:** Feature engineering explicitly excludes protected-class-correlated signals, the model's outputs are tested for disparate impact across demographic groups before ever being used, and — regardless of how well it scores — a human recruiter remains the final decision-maker given both the legal risk and ethical stakes of fully automating hiring.
+
+**Real-world industries using this pattern:**
+- **HR tech / recruiting platforms** — resume screening and candidate matching tools
+- **Staffing agencies** — high-volume candidate-to-role matching
+- **Enterprise talent acquisition** — internal mobility and role-matching tools
+- **Gig economy platforms** — worker-to-job matching under fairness scrutiny
+
+---
+
+## 38. Coordinated Bot Network Detection (Q587)
+
+```mermaid
+flowchart TD
+    ACCOUNTS[Account Activity Stream] --> BEHAVIOR[Per-Account Behavioral Features]
+    ACCOUNTS --> GRAPH[Interaction Graph Construction]
+    GRAPH --> CLUSTER[Graph Clustering: coordinated groups]
+    BEHAVIOR --> ANOMALY[Per-Account Anomaly Score]
+    CLUSTER --> CORRELATE{Cluster Shows Coordinated Pattern?}
+    ANOMALY --> CORRELATE
+    CORRELATE -->|Yes| FLAG[Flag Entire Cluster]
+    CORRELATE -->|No| MONITOR[Continue Monitoring]
+    FLAG --> REVIEW[Human Review / Automated Action]
+    REVIEW -.evolving tactics.-> RETRAIN[Continuous Model Adaptation]
+```
+
+**Flow:** Individual accounts might look unremarkable in isolation, so behavioral signals are combined with graph-based clustering to detect coordinated patterns across many accounts simultaneously — a single suspicious account triggers investigation of its whole connected cluster, not just itself.
+
+**Real-world industries using this pattern:**
+- **Social media platforms** — coordinated inauthentic behavior and bot-farm detection
+- **E-commerce marketplaces** — fake-review-ring detection
+- **Ticketing platforms** — bot-driven scalping detection
+- **Ad tech** — click-fraud ring detection across seemingly unrelated accounts
+
+---
+
+## 39. High-Concurrency Experimentation Platform (Q597)
+
+```mermaid
+flowchart TD
+    EXPREQUEST[New Experiment Request] --> REGISTRY[Centralized Experiment Registry]
+    REGISTRY --> CONFLICT{Conflicts with Active Experiment on Same Surface?}
+    CONFLICT -->|Yes| REJECT[Reject / Require Coordination]
+    CONFLICT -->|No| BUCKET[User Bucketing: consistent hash-based]
+    BUCKET --> ASSIGN[Assign to Variant]
+    ASSIGN --> COLLECT[Collect Metrics per Experiment]
+    COLLECT --> GUARDRAIL{Guardrail Metrics OK?}
+    GUARDRAIL -->|Breached| AUTOSTOP[Auto-Stop Experiment]
+    GUARDRAIL -->|OK| ANALYSIS[Statistical Analysis Dashboard]
+```
+
+**Flow:** A centralized registry prevents two teams from unknowingly running conflicting experiments on the same surface; consistent hash-based bucketing ensures a given user reliably sees the same variant across sessions; and automated guardrail-metric monitoring can stop a harmful experiment immediately rather than waiting for a human to notice.
+
+**Real-world industries using this pattern:**
+- **Big tech / consumer platforms** — running thousands of concurrent product experiments
+- **E-commerce** — pricing, layout, and recommendation experiments run simultaneously
+- **SaaS products** — onboarding-flow and feature-adoption experiments at scale
+- **Streaming platforms** — content-ranking and UI experiments across large user bases
+
+---
+
+*Section 13/14 diagram coverage is now substantially complete — 39 diagrams total. Remaining un-diagrammed questions in those sections are close variants of an already-diagrammed pattern (e.g., Q591 bid optimization ≈ diagram 25's RTB pattern; Q592 toxic-content moderation ≈ diagram 17; Q595 session freshness ≈ diagram 7 with a recency-weighting layer). Ask for any specific one individually if not obviously covered.*

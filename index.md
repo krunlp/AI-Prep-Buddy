@@ -20,8 +20,13 @@ A complete interview-prep bank for AI/ML system design and architecture roles �
 </a>
 
 <a href="diagrams.html" style="flex:1; min-width:220px; padding:1.2rem; border:1px solid #d1d5da; border-radius:8px; text-decoration:none; color:inherit; display:block;">
-<h3>🏗️ Architecture Diagrams</h3>
-<p>13 rendered architecture diagrams (RAG, agents, LLM gateway, feature stores, fraud detection, MLOps CI/CD, and more) with flow explanations and worked examples.</p>
+<h3>🏗️ System-Design Diagrams</h3>
+<p>39 rendered architecture diagrams (RAG, agents, LLM gateway, feature stores, fraud detection, MLOps CI/CD, and more) with flow explanations, worked examples, and real-world industry use cases.</p>
+</a>
+
+<a href="patterns.html" style="flex:1; min-width:220px; padding:1.2rem; border:1px solid #d1d5da; border-radius:8px; text-decoration:none; color:inherit; display:block;">
+<h3>🧩 Design Patterns Catalog</h3>
+<p>19 conceptual pattern diagrams spanning transformer internals, training/alignment, prompting/reasoning, agent architecture, MLOps, and safety — the patterns behind Sections 1–12 and 15–28.</p>
 </a>
 
 </div>
