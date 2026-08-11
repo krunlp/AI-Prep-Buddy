@@ -364,6 +364,294 @@ flowchart TD
 
 *These 13 diagrams cover the core recurring architecture patterns across Sections 13, 14, and 27. The same patterns (gateway/routing, caching layers, fallback chains, eval-gated CI/CD, two-stage retrieval-then-rank, and human-in-the-loop escalation) recombine to answer most of the remaining open-ended system-design questions in the bank.*
 
+---
+
+## 14. Code Review Agent Integrated with CI (Q497)
+
+```mermaid
+flowchart TD
+    PR[Pull Request Opened] --> WEBHOOK[CI Webhook Trigger]
+    WEBHOOK --> FETCH[Fetch Diff + Repo Context]
+    FETCH --> LLM[LLM Review Against Rubric]
+    LLM --> CATEGORIZE{Issue Severity}
+    CATEGORIZE -->|Blocking: security/bug| BLOCK[Post Blocking Comment + Fail Check]
+    CATEGORIZE -->|Suggestion: style| SUGGEST[Post Non-Blocking Comment]
+    BLOCK --> MERGE_GATE[Merge Gate]
+    SUGGEST --> MERGE_GATE
+    MERGE_GATE -->|Blocked| DEV[Developer Fixes]
+    DEV --> WEBHOOK
+    MERGE_GATE -->|Clear| MERGE[Merge Allowed]
+    SUGGEST -.developer feedback: accept/reject.-> TUNE[Tune Rubric Over Time]
+```
+
+**Worked example:** A PR removes a null check on a user-input field. The agent flags it as blocking (potential crash/security issue) with an inline comment explaining the specific risk; a PR that just uses inconsistent variable naming gets a non-blocking suggestion. Merge is only gated on the blocking category, keeping the bar high without slowing down every PR with nitpicks.
+
+---
+
+## 15. Voice Assistant Pipeline: ASR → LLM → TTS (Q508)
+
+```mermaid
+flowchart LR
+    AUDIO[User Speech] --> ASR[Streaming ASR]
+    ASR -->|Partial transcript| EARLYLLM[Early LLM Pass on Partial Text]
+    ASR -->|Final transcript| LLM[LLM Response Generation]
+    EARLYLLM -.speculative prep.-> LLM
+    LLM --> TTS[Streaming TTS]
+    TTS --> AUDIOOUT[Audio Output to User]
+
+    LLM -.token budget.-> DEADLINE{Under 1.5s Total?}
+    DEADLINE -->|No| FASTFALLBACK[Shorter Fallback Response]
+```
+
+**Worked example:** ASR streams partial transcripts as the user speaks; the system starts a speculative LLM pass on the likely-final partial text before the user even finishes talking, so by the time the final transcript arrives, generation is already partway done — TTS then starts streaming audio from the first generated sentence rather than waiting for the full response, keeping perceived latency under ~1.5s end-to-end.
+
+---
+
+## 16. Safe Natural-Language-to-SQL (Q513)
+
+```mermaid
+flowchart TD
+    NLQ[Natural Language Question] --> LLM[LLM: Generate SQL]
+    LLM --> SCHEMA[Constrained to Read-Only Schema Subset]
+    SCHEMA --> VALIDATE{Query Analyzer}
+    VALIDATE -->|Contains write/delete| REJECT[Reject: Not Allowed]
+    VALIDATE -->|Unapproved table/column| REJECT
+    VALIDATE -->|Passes checks| LIMIT[Add Row Limit + Timeout]
+    LIMIT --> SANDBOX[Execute on Read Replica]
+    SANDBOX --> RESULT[Return Results + Generated SQL for transparency]
+```
+
+**Worked example:** "Show me revenue by region last quarter" generates a `SELECT` query scoped to approved tables. If the LLM hallucinates a `DELETE` or references an unapproved `salaries` table, the query analyzer rejects it before execution — never trusting the LLM's output as inherently safe SQL, only as a draft to be validated against an explicit allowlist.
+
+---
+
+## 17. Content Moderation Pipeline: Classifiers + LLM Judge (Q511)
+
+```mermaid
+flowchart TD
+    CONTENT[User-Generated Content] --> FAST[Fast Classifier: high precision/recall on common violations]
+    FAST -->|Clear violation| AUTOBLOCK[Auto-Block]
+    FAST -->|Clearly fine| AUTOPASS[Auto-Pass]
+    FAST -->|Ambiguous| LLMJUDGE[LLM Judge: nuanced reasoning]
+    LLMJUDGE -->|Confident| DECISION[Auto Decision]
+    LLMJUDGE -->|Still uncertain| HUMAN[Human Moderator Queue]
+    HUMAN -.labels feed back.-> FAST
+    HUMAN -.labels feed back.-> LLMJUDGE
+```
+
+**Worked example:** Obvious spam/known-slur content is auto-blocked by the fast classifier in milliseconds at huge volume. Borderline sarcasm or context-dependent content escalates to the LLM judge, which reasons about context the fast classifier can't. Only the hardest remaining cases reach a human — and every human decision becomes future training/calibration data for the earlier tiers.
+
+---
+
+## 18. Human-Approved Knowledge Base Editing (Q516)
+
+```mermaid
+flowchart TD
+    SOURCE[Source Change Detected] --> LLM[LLM Proposes Edit + Rationale + Citations]
+    LLM --> DIFF[Generate Diff View]
+    DIFF --> QUEUE[Review Queue]
+    QUEUE --> HUMAN{Human Reviewer}
+    HUMAN -->|Approve| PUBLISH[Publish to Live KB]
+    HUMAN -->|Edit| REVISE[Human Revises Directly]
+    HUMAN -->|Reject| DISCARD[Discard + Log Reason]
+    REVISE --> PUBLISH
+    PUBLISH --> AUDIT[Audit Log: AI-proposed vs Human-approved]
+```
+
+**Worked example:** A product spec doc changes upstream; the AI detects the relevant KB article is now stale, proposes a specific diff with the source citation, and queues it. A human reviewer either approves as-is, tweaks the wording, or rejects if the AI misread the change — nothing reaches the live KB without that explicit human step, and every publish is traceable to whether it was AI-original or human-modified.
+
+---
+
+## 19. Structured Data Extraction at Scale (Q506)
+
+```mermaid
+flowchart TD
+    DOC[Incoming Document] --> TYPE{Document Type Classifier}
+    TYPE -->|Invoice| SCHEMA_A[Invoice Schema]
+    TYPE -->|Contract| SCHEMA_B[Contract Schema]
+    SCHEMA_A --> LLM[LLM: Schema-Constrained Extraction]
+    SCHEMA_B --> LLM
+    LLM --> VALIDATE{Field Validation: format/range checks}
+    VALIDATE -->|Pass, high confidence| AUTO[Auto-Accept]
+    VALIDATE -->|Fail or low confidence| REVIEW[Human Review Queue]
+    AUTO --> RECONCILE[Periodic Reconciliation Sampling]
+    REVIEW --> RECONCILE
+    RECONCILE -.systematic errors found.-> IMPROVE[Improve Schema/Prompt]
+```
+
+**Worked example:** Invoices auto-route to an invoice-specific schema; extracted totals get validated against expected numeric ranges and currency formats. A total that's wildly out of range (a $50 invoice extracted as $50,000) fails validation and routes to human review rather than silently propagating a likely extraction error downstream.
+
+---
+
+## 20. PII Redaction Before External LLM Calls (Q534)
+
+```mermaid
+flowchart TD
+    INPUT[Raw Input: may contain PII] --> DETECT[PII Detection: regex + NER]
+    DETECT --> REDACT[Redact/Tokenize: 'John Smith' → PERSON_1]
+    REDACT --> EXTERNAL[Send to External LLM Provider]
+    EXTERNAL --> RESPONSE[Response with tokens intact]
+    RESPONSE --> REHYDRATE[Re-insert Original Values]
+    REHYDRATE --> USER[Final Response to User]
+
+    DETECT -.logs redacted count, never raw value.-> AUDITLOG[Audit Log]
+```
+
+**Worked example:** "Draft a follow-up email to John Smith about his $45,000 loan application" gets tokenized to "Draft a follow-up email to PERSON_1 about his AMOUNT_1 loan application" before ever leaving your infrastructure. The external provider never sees the real name or amount; the response is re-hydrated with the real values only after returning, inside your trusted boundary.
+
+---
+
+## 21. Credit-Risk Scoring with Explainability (Q563)
+
+```mermaid
+flowchart TD
+    APP[Loan Application] --> FEATURES[Feature Engineering]
+    FEATURES --> MODEL[Gradient Boosted Model]
+    MODEL --> SCORE[Risk Score]
+    SCORE --> DECISION{Decision Threshold}
+    DECISION -->|Approve| SHAP1[SHAP Explanation: top positive factors]
+    DECISION -->|Decline| SHAP2[SHAP Explanation: top adverse factors]
+    SHAP2 --> NOTICE[Adverse Action Notice: regulatory requirement]
+    SHAP1 --> LOG[Decision + Explanation Logged]
+    NOTICE --> LOG
+    LOG --> VALIDATION[Independent Model Validation Team]
+```
+
+**Worked example:** A declined application automatically generates a SHAP-based explanation identifying the top 3-4 factors driving the decline (e.g., debt-to-income ratio, credit history length) — required for a compliant adverse-action notice, not just a black-box "declined" with no reasoning, and every decision is logged for the independent model risk validation team's periodic review.
+
+---
+
+## 22. Dynamic Pricing Engine (Q564)
+
+```mermaid
+flowchart TD
+    DEMAND[Real-Time Demand Signal] --> STREAM[Streaming Pipeline]
+    SUPPLY[Inventory/Supply Signal] --> STREAM
+    STREAM --> MODEL[Pricing Model]
+    MODEL --> RAWPRICE[Raw Suggested Price]
+    RAWPRICE --> GUARDRAILS{Guardrails}
+    GUARDRAILS -->|Within min/max bounds| APPLY[Apply Price]
+    GUARDRAILS -->|Exceeds rate-of-change limit| CAP[Cap to Max Allowed Change]
+    GUARDRAILS -->|Outside bounds entirely| FALLBACK[Fallback to Last Known-Good Price]
+    APPLY --> FAIRNESS[Periodic Discriminatory-Pricing Audit]
+```
+
+**Worked example:** A surge in demand pushes the raw model output to 3x normal price; the rate-of-change guardrail caps the actual applied increase to a smaller step (e.g., max 1.5x per time window) to avoid erratic, customer-hostile pricing swings, even though the "purely optimal" model output would have gone higher.
+
+---
+
+## 23. Ad CTR Prediction at Auction Scale (Q566)
+
+```mermaid
+flowchart TD
+    REQUEST[Ad Request] --> FEATURES[User/Ad/Context Features - precomputed where possible]
+    FEATURES --> MODEL[CTR Model: GBM or embedding-based DL]
+    MODEL --> SCORE[Predicted CTR]
+    SCORE --> AUCTION[Ad Auction: CTR × Bid]
+    AUCTION --> WINNER[Winning Ad Selected]
+    WINNER --> SERVE[Serve within ~50ms budget]
+    SERVE --> OUTCOME[Actual Click/No-Click]
+    OUTCOME -.continuous retraining.-> MODEL
+```
+
+**Worked example:** Given the sub-100ms auction latency budget, most feature computation happens ahead of the request (precomputed user/ad embeddings refreshed periodically), leaving only a fast forward pass through the model at request time — real-time feature computation is reserved only for the few signals that genuinely can't be precomputed (like current page context).
+
+---
+
+## 24. Visual Product Search (Q568)
+
+```mermaid
+flowchart TD
+    IMG[User Uploads Photo] --> ENCODE[Vision Encoder: fine-tuned on product images]
+    ENCODE --> EMB[Image Embedding]
+    EMB --> ANN[ANN Search: Vector Index]
+    ANN --> CANDIDATES[Visually Similar Products]
+    CANDIDATES --> FILTER[Metadata Filter: category, price range, in-stock]
+    FILTER --> RANK[Re-rank by relevance + business signals]
+    RANK --> RESULTS[Results to User]
+```
+
+**Worked example:** A user photographs a pair of shoes seen on the street. The vision encoder (fine-tuned specifically on the catalog's product photography style) embeds it, ANN search finds visually similar indexed products, and metadata filtering excludes out-of-stock or wrong-category matches before the final ranked results are shown.
+
+---
+
+## 25. Real-Time Bidding for Programmatic Advertising (Q574)
+
+```mermaid
+flowchart TD
+    BIDREQ[Bid Request - ~100ms deadline] --> LIGHTMODEL[Lightweight Bid-Value Model]
+    LIGHTMODEL --> PACING{Budget Pacing Check}
+    PACING -->|Within budget| BID[Submit Bid]
+    PACING -->|Budget exhausted for period| SKIP[Skip Auction]
+    BID --> OUTCOME{Won Auction?}
+    OUTCOME -->|Yes| SERVE[Serve Ad] --> RESULT[Actual Performance]
+    OUTCOME -->|No| LOG[Log for Calibration]
+    RESULT --> CALIBRATE[Recalibrate Bid Model]
+    LOG --> CALIBRATE
+```
+
+**Worked example:** Every bid request must be answered within ~100ms, so the model is deliberately lightweight — a heavier model would simply miss the auction deadline. Budget pacing is checked before even bidding, since winning too many auctions too early in a budget period at inflated prices is its own failure mode independent of prediction accuracy.
+
+---
+
+## 26. Predictive Maintenance from Sensor Data (Q578)
+
+```mermaid
+flowchart TD
+    SENSORS[IoT Sensor Stream] --> FEATURES[Rolling-Window + Frequency-Domain Features]
+    FEATURES --> MODEL[Failure-Probability Model]
+    MODEL --> RISK{Risk Level}
+    RISK -->|Low| MONITOR[Continue Monitoring]
+    RISK -->|Medium| SCHEDULE[Schedule Routine Maintenance]
+    RISK -->|High| ALERT[Immediate Alert + Urgent Maintenance]
+    ALERT --> COSTCHECK{False Positive Cost vs Failure Cost}
+    COSTCHECK -.tunes threshold.-> MODEL
+```
+
+**Worked example:** A compressor's vibration sensor shows a frequency-domain pattern historically correlated with bearing failure within 2 weeks. The model flags medium risk — not urgent enough for an emergency shutdown (high false-positive cost: unnecessary downtime) but enough to schedule maintenance at the next planned window, balancing the two asymmetric costs explicitly.
+
+---
+
+## 27. Insurance Claim Triage and Fraud Flagging (Q589)
+
+```mermaid
+flowchart TD
+    CLAIM[Incoming Claim] --> STRUCT[Structured Data: amount, policy, history]
+    CLAIM --> UNSTRUCT[Unstructured Data: photos, adjuster notes]
+    STRUCT --> FRAUDMODEL[Fraud Risk Model]
+    UNSTRUCT --> NLPMODEL[Document/Image Analysis]
+    FRAUDMODEL --> COMBINE[Combined Risk + Complexity Score]
+    NLPMODEL --> COMBINE
+    COMBINE --> ROUTE{Routing}
+    ROUTE -->|Low risk, simple| FASTTRACK[Fast-Track Auto-Processing]
+    ROUTE -->|High risk or complex| SPECIALIST[Specialist Human Review]
+    SPECIALIST --> EXPLAIN[Explainable Factors Provided to Adjuster]
+```
+
+**Worked example:** A straightforward $500 windshield claim with a clean policy history fast-tracks through automated processing. A $40,000 claim with inconsistencies between the adjuster's notes and submitted photos routes to a specialist with the specific flagged discrepancies highlighted — the model surfaces reasoning for the human, not just a black-box risk score.
+
+---
+
+## 28. Low-Code AI Platform for Non-Technical Users (Q538)
+
+```mermaid
+flowchart TD
+    PM[Product Manager] --> TEMPLATE[Guardrailed Prompt Template]
+    TEMPLATE --> CONFIG[Configure: inputs, tone, constrained tool access]
+    CONFIG --> VALIDATE[Mandatory Automated Eval Check]
+    VALIDATE -->|Pass| SANDBOX[Deploy to Sandbox]
+    VALIDATE -->|Fail| BLOCK[Blocked: cannot go live]
+    SANDBOX --> REVIEW[Platform Team Spot-Review]
+    REVIEW -->|Approved| LIVE[Live with Standard Guardrails + Cost Limits]
+    LIVE --> MONITOR[Same Observability as Engineer-Built Features]
+```
+
+**Worked example:** A PM builds a "summarize customer feedback" tool using a pre-approved template rather than a blank prompt box — they can configure tone and input source but can't remove the safety guardrails or grant it write-access tools. It still must pass the automated eval suite before going live, and once live it's monitored with the exact same cost/quality observability as anything engineers built directly.
+
+---
+
+*Coverage note: 28 diagrams now cover the large majority of distinct architectural patterns across Sections 13, 14, and 27 (~135 system-design questions total). Remaining uncovered questions are largely close variants of patterns already diagrammed above (e.g., Q567 autocomplete is a lighter version of Q574's real-time-bidding latency-budget pattern; Q572 video recommendation reuses the two-stage recsys pattern in diagram 7 with a diversity re-ranking layer). Ask for any specific remaining question's diagram individually if a variant isn't obviously covered by an existing pattern.*
+
 <script>
 document.addEventListener("DOMContentLoaded", function () {
   mermaid.initialize({ startOnLoad: false, theme: "default" });
