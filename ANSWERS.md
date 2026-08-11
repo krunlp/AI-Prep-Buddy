@@ -1912,3 +1912,385 @@ Give something concrete and specific (e.g., underestimating how much eval infras
 **904. Balancing transparency/trust against product friction.** Disclose AI use clearly where it materially affects user trust or decision-making (especially in consequential contexts), but avoid excessive disclosure friction for low-stakes uses where it would degrade UX without meaningfully improving informed consent — calibrate disclosure prominence to the stakes involved.
 
 **905. User reporting for unsafe/incorrect outputs.** Provide an easily accessible in-product reporting mechanism tied to the specific interaction, route reports into a review queue with clear triage/escalation paths, and feed validated reports back into the eval suite and guardrail improvements to close the loop.
+
+## Section 23 — Governance, Ethics & Responsible AI
+
+**906. Bias detection/mitigation for high-stakes models.** Test for disparate outcomes across protected/sensitive groups before launch using fairness metrics, use techniques like reweighting or adversarial debiasing during training if disparities are found, and monitor for bias drift continuously in production, not just at initial validation.
+
+**907. Demographic parity vs equalized odds vs equal opportunity.** Demographic parity requires equal positive-prediction rates across groups; equalized odds requires equal true-positive and false-positive rates across groups; equal opportunity requires equal true-positive rates only — mathematically, satisfying all simultaneously is generally impossible except in trivial cases, forcing an explicit values-based choice of which fairness definition matters most for the specific decision.
+
+**908. Disparate impact testing.** Compare outcome rates (approval, selection, flagging) across protected groups, commonly checking whether any group's rate falls meaningfully below others (e.g., the "four-fifths rule" heuristic in US employment law), before launch and on an ongoing basis.
+
+**909. Fairness audit process for a high-stakes model.** Define relevant protected groups and fairness metrics upfront with legal/ethics stakeholders, run systematic evaluation across those groups on both historical and current data, document findings and remediation steps, and repeat periodically as data/model/population shifts over time.
+
+**910. Framework for human-in-the-loop necessity.** Base it on the decision's reversibility, potential harm severity, and current model confidence/accuracy for that decision type — irreversible, high-harm, or lower-confidence decisions warrant mandatory human review; reversible, low-harm, high-confidence decisions can be more safely automated.
+
+**911. Evaluating third-party model/vendor compliance.** Verify SOC2/ISO certifications, review data-handling/training-data-usage terms in the contract explicitly (not just marketing claims), confirm data residency commitments match your regulatory requirements, and require contractual breach notification and audit rights.
+
+**912. PII handling through an LLM pipeline end to end.** Detect/redact PII at ingestion before it reaches any model call, minimize what's logged (redact in logs too), apply strict access controls on any store retaining raw sensitive data, and ensure output is also screened for inadvertent PII generation/leakage.
+
+**913. SHAP vs LIME.** SHAP provides theoretically grounded, globally consistent per-feature attribution based on game-theoretic Shapley values (more computationally expensive, more rigorous); LIME approximates local model behavior with a simpler interpretable surrogate model around a specific prediction (faster, less theoretically grounded, can be less stable across similar inputs).
+
+**914. Interpretability vs explainability / regulatory need.** Interpretability means the model's mechanism is inherently understandable (e.g., a shallow decision tree); explainability means generating a post-hoc explanation for an inherently complex/black-box model's decision — regulations requiring individualized decision explanations (e.g., adverse action notices in credit) often specifically require the latter at minimum, sometimes push toward requiring the former for the highest-risk decisions.
+
+**915. EU AI Act risk-based classification (high-level).** Classifies AI systems by risk tier (unacceptable, high-risk, limited-risk, minimal-risk) with escalating compliance obligations; high-risk classification (e.g., hiring, credit, biometric ID) triggers requirements like risk management systems, documentation, human oversight, and conformity assessment — architecturally this means building in audit trails, explainability, and human-oversight capability from the start for any use case that could fall into high-risk categories.
+
+**916. Model documentation for audit readiness.** Model cards documenting intended use, limitations, and eval results, plus datasheets for datasets documenting provenance and known biases — maintained as living documents updated with each model version, not written once and forgotten.
+
+**917. Who owns algorithmic accountability.** Best structured as a shared responsibility with clear RACI: legal/compliance owns regulatory interpretation, product/engineering owns implementation and technical safeguards, and a cross-functional responsible-AI function (where it exists) owns the overall governance process connecting them — accountability diffused with no clear owner is the actual risk.
+
+**918. Handling discovered production bias.** Assess severity/scope immediately, consider whether to pause the affected feature while investigating, communicate transparently with affected stakeholders per legal/policy requirements, remediate the model/pipeline, and add the case to the ongoing fairness monitoring/eval suite to prevent recurrence.
+
+**919. Consent/data-usage transparency for training data.** Clearly disclose to users if/how their data may be used for model training or improvement, honor opt-out preferences where offered/required, and ensure actual data pipeline practices match what's disclosed in privacy policies rather than diverging in implementation.
+
+**920. Responsible-AI review board intake process.** Define a lightweight initial screening (risk-tier self-assessment) routing low-risk features to fast-track approval and high-risk features to full review, with clear documentation requirements (use case, data, eval results, mitigation plans) scaled to the assessed risk level.
+
+**921. Operationalizing "right to explanation."** Design the system to generate individualized, understandable explanations for consequential automated decisions (via inherently interpretable models or validated post-hoc explanation methods), and build a process for users to request and receive that explanation, not just a technical capability that's never actually surfaced.
+
+**922. Balancing performance vs fairness constraints.** Treat fairness as a hard constraint (not just another metric to trade off informally) for high-stakes use cases — explicitly optimize for best performance subject to fairness constraints being met, and involve legal/ethics stakeholders in the tradeoff decision rather than leaving it purely to engineering judgment.
+
+**923. Data minimization in LLM pipeline design.** Collect/retain/pass through only the data actually necessary for the feature to function, avoid sending more context to external model providers than needed, and set retention periods reflecting genuine business need rather than indefinite default retention.
+
+**924. Environmental-impact reporting for large training runs.** Track and report compute/energy consumption (often via cloud provider carbon reporting tools or estimated FLOPs-to-energy conversion) for significant training runs, and factor efficiency considerations (right-sizing models, reusing pretrained checkpoints) into training decisions where environmental impact is a stated organizational priority.
+
+**925. Automation bias / designing against over-trust.** Present AI recommendations with appropriate uncertainty framing (not false confidence), require active human judgment rather than one-click approval for consequential decisions, and periodically audit whether human reviewers are meaningfully engaging with or just rubber-stamping AI recommendations.
+
+**926. Responsibly retiring a biased/harmful model.** Communicate the sunset plan and rationale to affected stakeholders, provide a validated replacement or fallback before full decommission, and document the retirement (what was found, what was learned) to inform future model development and governance processes.
+
+**927. Synthetic data for privacy-preserving development.** Generates statistically similar data without directly exposing real individuals' records, useful for testing/development environments where real sensitive data shouldn't be used; limitations include potential loss of subtle real-world patterns, risk of the generative model itself having memorized/leaking real records, and no privacy guarantee unless combined with formal techniques like differential privacy.
+
+**928. Handling a regulator's audit request.** Have documentation (model cards, eval results, data lineage, decision logs) already maintained and readily retrievable rather than assembled reactively, designate a clear point of contact/process for regulatory interactions, and involve legal counsel early in structuring the response.
+
+**929. "Fair" vs "unbiased" distinction.** "Unbiased" often implies statistical neutrality relative to ground truth (the model's errors aren't systematically skewed); "fair" is a normative, values-based judgment about acceptable outcomes across groups, which can require deliberately correcting for real-world data imbalances rather than simply reflecting them — the two can point in different directions depending on how historical data itself embeds societal bias.
+
+**930. Informed-consent flows for consequential AI decisions.** Clearly disclose that AI is involved in the decision, explain in plain language what data/factors inform it, provide an accessible path to request human review or explanation, and obtain explicit consent where legally required rather than relying on buried terms-of-service language.
+
+**931. Model risk management (SR 11-7) beyond banking.** Establishes a structured framework of independent model validation, ongoing performance monitoring, and documented governance separate from the model-development team — the underlying discipline (independent validation, monitoring, documentation) is valuable for any high-stakes AI system even outside regulated financial services, as a maturity benchmark to borrow from.
+
+**932. Ongoing bias monitoring structure.** Establish a recurring (not just pre-launch) cadence of fairness metric evaluation on production data/outcomes, with automated alerting on metric drift beyond acceptable thresholds, feeding into a defined remediation/escalation process.
+
+**933. Personalization-privacy tension resolution.** Architecturally minimize the personal data actually required for personalization value delivered, offer transparency/control to users over what's used, and consider whether aggregate/cohort-level personalization can achieve most of the value with less individual data exposure.
+
+**934. Data-deletion pipeline removing model influence.** Beyond deleting raw stored data, this requires tracking which trained models/derived artifacts incorporated the deleted individual's data and either retraining without it or using approximate "unlearning" techniques where full retraining isn't feasible — a genuinely hard, still-evolving technical problem worth flagging as a known limitation, not overpromising a clean solution.
+
+**935. Copyright/IP risk in generative output.** Mitigate via filtering/detection of outputs closely resembling known copyrighted training content, clear terms of use allocating responsibility, avoiding training on data with unclear licensing where feasible, and monitoring emerging case law given this area is still legally unsettled.
+
+**936. Open-weight model license/attribution handling.** Review the specific license terms of any open-weight model used (some restrict commercial use, require attribution, or prohibit certain downstream uses), maintain a compliance inventory of which models are used where under which license, and involve legal review before adopting a new model with unclear or restrictive licensing.
+
+**937. Third-party AI audit's role/timing.** Provides independent validation of fairness, safety, and compliance claims, valuable for high-stakes/high-visibility systems where internal validation alone may lack credibility with regulators, customers, or the public — commission before major launches of consequential systems or periodically for systems already in production at scale.
+
+**938. Escalation paths for potential real-world harm.** Define clear severity tiers and corresponding escalation speed/authority (e.g., immediate kill-switch authority for the on-call engineer for severe cases, structured review process for moderate cases), and ensure the path is known and rehearsed before an actual incident, not improvised during one.
+
+**939. Stakeholder mapping for responsible AI governance.** Typically includes legal/compliance, engineering/product leadership, a dedicated ethics/responsible-AI function if one exists, affected user representatives or advocates where feasible, and executive sponsorship — mapped explicitly so review processes have genuine authority and aren't just a checkbox exercise.
+
+**940. Building a culture of proactive ethical flagging.** Model the behavior visibly from leadership (openly discussing and acting on concerns raised), ensure raising a concern has no negative career consequence and is explicitly rewarded/recognized, and create low-friction channels (not just formal review boards) for engineers to surface concerns early and informally.
+
+## Section 24 — Time Series & Forecasting
+
+**941. Time series components.** Trend is the long-term directional movement; seasonality is a regular, fixed-period pattern (daily/weekly/yearly); cyclicality is a longer, non-fixed-period fluctuation (e.g., economic cycles); noise is the remaining unexplained random variation — decomposing a series into these helps choose appropriate modeling and forecasting techniques.
+
+**942. Stationarity / ADF test.** A stationary series has constant statistical properties (mean, variance, autocorrelation) over time; the Augmented Dickey-Fuller test statistically checks for the presence of a unit root (non-stationarity), with many classical forecasting models (ARIMA) requiring stationarity (often achieved via differencing) to produce valid, stable forecasts.
+
+**943. ARIMA components.** AR (autoregressive) models the value as a function of its own past values; I (integrated) applies differencing to achieve stationarity; MA (moving average) models the value as a function of past forecast errors — combined, ARIMA(p,d,q) captures a wide range of linear time-series dynamics.
+
+**944. Exponential smoothing vs ARIMA.** Exponential smoothing methods (simple, Holt's, Holt-Winters) weight recent observations more heavily via smoothing parameters and explicitly model trend/seasonality components directly; ARIMA models the series via autoregressive/moving-average relationships after differencing — exponential smoothing is often simpler and more robust for series with clear trend/seasonal structure, ARIMA more flexible for complex autocorrelation patterns.
+
+**945. Prophet's approach.** Decomposes the series into trend (with automatic changepoint detection), seasonality (via Fourier series), and holiday effects as an additive (or multiplicative) model, designed to be robust to missing data and outliers with intuitive tuning — preferable for business time series with strong seasonality/holiday effects and when quick, reasonably good forecasts with minimal tuning are needed over squeezing out maximum statistical accuracy.
+
+**946. Rolling/expanding window validation.** Standard k-fold CV shuffles data randomly, which would leak future information into training for time-dependent data; rolling/expanding window validation trains on a chronological window and validates on the subsequent period, sliding forward through the timeline, preserving the temporal ordering that respects real-world forecasting conditions.
+
+**947. Multivariate vs univariate forecasting.** Univariate forecasts a single series from its own history; multivariate incorporates multiple related series/external variables (e.g., forecasting sales using both historical sales and weather/promotions), capturing cross-series dependencies univariate models miss, at the cost of more complexity and data requirements.
+
+**948. Lag feature selection.** Choose lags based on domain knowledge (known cyclical patterns like weekly seasonality suggesting a 7-day lag), autocorrelation/partial autocorrelation function analysis identifying statistically significant lag relationships, and empirical validation of which lags actually improve holdout forecast accuracy.
+
+**949. Transformer-based forecasting (Temporal Fusion Transformer).** Applies attention mechanisms to capture long-range dependencies and dynamically weight the relevance of different past time steps and covariates, often outperforming classical methods on complex, large-scale multivariate forecasting problems with rich covariate data, at higher computational and data cost.
+
+**950. Concept drift / regime change in time series.** Occurs when the underlying data-generating process shifts (e.g., a pandemic changing shopping behavior); detect via monitoring forecast error trends and statistical change-point detection methods, and respond by retraining on more recent data or explicitly modeling the regime shift rather than assuming historical patterns still hold.
+
+**951. Handling missing/irregular timestamps.** Impute via interpolation (linear, seasonal-aware) for short gaps, explicitly model irregular sampling with methods designed for it (e.g., certain state-space models) for structurally irregular data, and flag/exclude periods with data quality issues too severe to reliably impute.
+
+**952. Backtesting avoiding lookahead bias.** Simulate the forecasting process as it would have actually run historically — only using data available up to each simulated forecast date, never allowing any future information (even indirectly, via feature engineering) to leak into that simulated forecast.
+
+**953. Hierarchical forecasting reconciliation.** Forecasts generated at multiple levels (SKU, category, region) don't automatically sum consistently; reconciliation methods (top-down, bottom-up, or optimal reconciliation) adjust forecasts across levels to ensure they're mutually consistent while ideally improving overall accuracy by leveraging information from all levels.
+
+**954. Time-series anomaly detection.** Statistical approaches (control charts, seasonal decomposition residual thresholds) are simple and interpretable but can struggle with complex patterns; ML-based approaches (isolation forests, autoencoders, or forecast-residual-based) can capture more complex normal-behavior patterns but require more data/tuning and are less immediately interpretable.
+
+**955. Forecast horizon choice / model implications.** Short horizons generally achieve higher accuracy and can rely more heavily on recent momentum; long horizons face compounding uncertainty and often need models incorporating more structural/seasonal information rather than just recent trend extrapolation — choose the model complexity and uncertainty communication approach based on how far out you're forecasting.
+
+**956. Prediction interval vs point forecast.** A point forecast gives a single best-estimate value; a prediction interval gives a range reflecting forecast uncertainty — stakeholders making decisions with real cost asymmetry (e.g., inventory over/under-stocking) typically need the interval to make risk-aware decisions, not just the point estimate.
+
+**957. Incorporating exogenous variables.** Add known future or predictable external variables (weather forecasts, planned promotions, holiday calendars) as regressors/covariates in the model, distinguishing between variables known in advance (safe to use as future inputs) versus variables only known historically (which can't be used as future-known inputs without their own forecast).
+
+**958. Cold-start forecasting for new products/SKUs.** Use analogous/similar product history as a proxy, incorporate product attributes/category-level patterns via a model that generalizes across products, and blend toward more mature, individual-item forecasting as actual sales history accumulates.
+
+**959. Forecast accuracy metrics and pitfalls.** MAPE (mean absolute percentage error) is intuitive but undefined/unstable near zero actual values; RMSE penalizes large errors more heavily (sensitive to outliers); WAPE (weighted absolute percentage error) is more robust for aggregate/mixed-volume series — choose based on your data's characteristics (presence of zeros, outlier sensitivity, need for volume-weighted accuracy).
+
+**960. Ensemble forecasting.** Combines predictions from multiple different models (simple averaging, weighted by historical accuracy, or a learned meta-model), typically improving robustness and accuracy over any single model by diversifying away individual models' specific weaknesses/biases.
+
+## Section 25 — Recommender Systems
+
+**961. Collaborative filtering cold-start weakness.** Both user-based and item-based CF rely entirely on historical interaction data, so new users (no interaction history) or new items (no one has interacted with yet) can't be meaningfully recommended/recommended for until sufficient data accumulates — a fundamental limitation requiring hybrid approaches to address.
+
+**962. Matrix factorization at scale (ALS/SVD).** Decomposes the large, sparse user-item interaction matrix into lower-dimensional user and item latent factor matrices; ALS (Alternating Least Squares) scales well to large sparse matrices via distributed computation (alternating between fixing user/item factors), making it a common choice for industrial-scale collaborative filtering.
+
+**963. Content-based filtering complementing CF.** Uses item/user attribute features (genre, category, description) rather than purely interaction patterns, directly addressing CF's cold-start weakness for new items/users since content-based recommendations don't require prior interaction history — hybrid systems combine both to get CF's personalization strength with content-based robustness to sparsity.
+
+**964. Two-tower model architecture.** Separately encodes user features into a "user tower" and item features into an "item tower," producing embeddings that are compared via dot product/cosine similarity for scoring — enables efficient large-scale retrieval since item embeddings can be precomputed and indexed for fast approximate nearest-neighbor search against a query-time user embedding.
+
+**965. Two-stage candidate generation + ranking architecture.** Candidate generation (often via two-tower embeddings or CF) efficiently narrows millions of items down to a few hundred plausible candidates; ranking then applies a more expensive, feature-rich model to precisely order that smaller candidate set — balances the need for both scale (generation) and precision (ranking).
+
+**966. Training on implicit feedback (clicks only).** Since there are no explicit negative labels (a non-click doesn't necessarily mean dislike), common approaches treat non-interacted items as weak/uncertain negatives (via negative sampling) or use specialized loss functions (e.g., Bayesian Personalized Ranking) designed specifically for implicit, one-class feedback data.
+
+**967. Diversity and serendipity.** Diversity measures how varied recommended items are from each other; serendipity measures how surprising-yet-relevant they are — both are optimized alongside pure relevance via explicit re-ranking objectives or diversity-promoting sampling, since optimizing purely for predicted relevance tends to produce narrow, repetitive, filter-bubble-prone recommendations.
+
+**968. Exposure bias feedback loops.** Items shown more get more interactions, which reinforces the model's confidence in recommending them further, progressively narrowing what gets surfaced regardless of true broader relevance/quality — corrected via exploration mechanisms (bandits), popularity-debiasing/re-weighting techniques, and explicit diversity injection.
+
+**969. Offline vs online recommender evaluation.** Offline (NDCG, precision@k on held-out historical interactions) is fast and cheap but can't capture how recommendations causally affect actual user behavior or account for the exposure-bias feedback loop; online (A/B testing on live traffic measuring actual engagement/business metrics) is the ground truth but slower and riskier — use offline for fast iteration, online for final validation before full rollout.
+
+**970. Session-based vs long-term profile recommendation.** Session-based focuses on the user's current session behavior/intent (valuable for anonymous users or rapidly shifting intent, e.g., browsing for a gift vs. usual preferences); long-term profile-based leverages accumulated historical preferences (more stable, personalized, but slower to adapt to in-the-moment intent shifts) — many production systems blend both.
+
+**971. Graph neural networks for recommendation.** Model the user-item interaction data as a bipartite graph and learn embeddings by propagating/aggregating information across graph neighborhoods (a user's embedding informed by items they've interacted with, and vice versa), capturing higher-order relationships (e.g., "users who liked what similar users liked") beyond direct pairwise interactions.
+
+**972. Multi-objective recommendation weighting.** Combine multiple prediction signals (engagement likelihood, revenue, diversity, fairness) into a single ranking score via a weighted combination or a learned model directly optimizing a business-defined composite objective, with weights tuned/validated against actual holistic business outcomes (not just any single metric) via experimentation.
+
+**973. Cold-start for a brand-new user.** Use onboarding flows to elicit initial explicit preferences, fall back to popularity-based or demographic-cohort-based recommendations until sufficient individual interaction data accumulates, and rapidly personalize as soon as even a few interactions are observed.
+
+**974. Real-time personalization infrastructure requirements.** Requires a low-latency online feature/embedding store, a fast-serving ranking model (often a lighter model than what's used offline for candidate generation), and streaming ingestion of recent user behavior so the "current session" signal is available at inference time — substantially more infrastructure investment than batch-computed daily recommendations.
+
+**975. LLM-based re-ranking on top of traditional recommendation pipeline.** Use the traditional pipeline for efficient large-scale candidate generation and initial ranking, then apply an LLM to re-rank a small shortlist incorporating richer contextual/semantic reasoning (e.g., natural-language stated preferences, nuanced fit reasoning) that traditional CF/ranking models can't easily capture, within acceptable latency/cost budgets.
+
+**976. Correcting popularity bias without tanking engagement.** Apply popularity-debiasing techniques (e.g., inverse-propensity weighting during training, or controlled diversity injection at ranking time) calibrated carefully via A/B testing, since over-correcting can reduce short-term engagement even while potentially improving long-term satisfaction/retention — validate against the actual business metric that matters, not just diversity for its own sake.
+
+**977. "Recommended because..." explanation feature.** Generate explanations based on the actual signals that drove the recommendation (similar users, similar items you've liked, matching stated preferences), ensuring the explanation is genuinely faithful to the underlying model's reasoning rather than a plausible-sounding but disconnected post-hoc rationalization.
+
+**978. Negative sampling necessity for implicit feedback.** Since implicit feedback datasets contain only positive (observed interaction) signals, training requires sampling unobserved items as proxy negatives to give the model a contrastive learning signal distinguishing preferred from non-preferred items — without negative sampling, the model has no basis to learn discriminative preferences.
+
+**979. Respecting user-stated preferences/exclusions.** Maintain an explicit user preference/exclusion store consulted as a hard filter before or during ranking (not just a soft signal blended probabilistically), ensuring stated exclusions (e.g., "don't recommend this category") are reliably honored rather than merely down-weighted.
+
+**980. Auditing for filter bubbles / feedback loop risk.** Track diversity and novelty metrics over time per user cohort (not just aggregate relevance metrics), monitor whether recommendation diversity is narrowing over a user's lifetime, and periodically inject controlled exploration to both improve long-term recommendation quality and generate the data needed to detect bubble formation.
+
+## Section 26 — Coding & Algorithms for ML
+
+**981. K-means from scratch.** Initialize k centroids (random or k-means++), iteratively assign each point to its nearest centroid, recompute centroids as the mean of assigned points, and repeat until convergence; failure modes include empty clusters (handle by reinitializing or reassigning the farthest point) and poor initialization leading to bad local optima (mitigated by k-means++ or multiple random restarts).
+
+**982. Logistic regression gradient descent from scratch.** Compute predictions via sigmoid(Xw + b), compute the gradient of log-loss with respect to weights (X^T(predictions - y)/n) and bias, update weights as w -= learning_rate * gradient, and repeat for a fixed number of iterations or until convergence.
+
+**983. Confusion matrix / precision-recall-F1 code.** Count true positives, false positives, true negatives, false negatives by comparing predictions to labels; precision = TP/(TP+FP), recall = TP/(TP+FN), F1 = 2*precision*recall/(precision+recall) — straightforward to implement directly from the four counts.
+
+**984. Decision tree split from scratch.** For each candidate feature and threshold, split the data into two groups, compute the weighted impurity (Gini or entropy) of the resulting groups, and select the split minimizing weighted impurity (maximizing information gain) across all candidate splits.
+
+**985. Efficient cosine similarity at scale.** Normalize vectors to unit length upfront, then cosine similarity reduces to a simple dot product; for large-scale comparison, use matrix multiplication (batched dot products) or an ANN index (FAISS/HNSW) rather than naive pairwise loops.
+
+**986. KNN from scratch.** For a query point, compute distance (typically Euclidean) to all training points, select the k nearest, and return the majority class (classification) or average value (regression) among those k neighbors.
+
+**987. Weighted sampling for class imbalance.** Compute inverse class frequency as sample weights, then either pass these weights directly to the loss function (weighted cross-entropy) or use them to construct a weighted random sampler that oversamples minority-class examples during batch construction.
+
+**988. Attention mechanism from scratch.** Compute Q, K, V via linear projections of the input; compute attention scores as Q @ K.transpose / sqrt(d_k); apply softmax across the key dimension; multiply the resulting weights by V to get the weighted output — straightforward to implement in a few lines of NumPy/PyTorch matrix operations.
+
+**989. Simple BPE tokenizer.** Start with a character-level vocabulary, repeatedly find and merge the most frequent adjacent pair of tokens across the training corpus into a new single token, and continue merging until reaching the target vocabulary size, building a merge-rule list applied at tokenization time.
+
+**990. Top-k and top-p sampling.** Top-k: sort probabilities descending, keep only the top k, renormalize, and sample from that restricted set. Top-p: sort probabilities descending, cumulatively sum until exceeding threshold p, keep only that prefix set, renormalize, and sample.
+
+**991. Rolling 7-day retention SQL.** Join a users table to an events table, compute each user's first-seen date, then check for the presence of any qualifying event within the subsequent 7-day window relative to a given cohort date, aggregating the count/percentage of users retained per cohort.
+
+**992. Duplicate near-match detection SQL.** Use string similarity functions (e.g., Levenshtein/trigram similarity if supported by the database) or normalized/fuzzy join keys (lowercased, whitespace-stripped) combined with a self-join on the customer table, filtering pairs above a similarity threshold and excluding exact self-matches.
+
+**993. LRU cache implementation.** Use a hash map for O(1) key lookup combined with a doubly linked list maintaining access order; on access, move the accessed node to the front; on insertion when at capacity, evict the node at the tail (least recently used) before inserting the new entry.
+
+**994. Chunking a document into overlapping windows.** Iterate through the tokenized/split document with a fixed window size and a smaller step size (window size minus desired overlap), extracting each window as a chunk until reaching the end of the document.
+
+**995. Priority-queue-based top-N ranking.** Maintain a min-heap of size N; for each candidate, if the heap has fewer than N elements, push it; otherwise, compare against the heap's minimum and replace if the candidate scores higher — achieves O(M log N) for M candidates rather than a full O(M log M) sort.
+
+**996. Batched API requests with retry/backoff.** Group requests into batches respecting the provider's rate limit, and on a rate-limit or transient error response, retry with exponential backoff (increasing delay between attempts, often with jitter) up to a maximum retry count before failing the request.
+
+**997. A/B test significance calculator (two-proportion z-test).** Compute the pooled proportion across both groups, compute the standard error using that pooled proportion and each group's sample size, compute the z-statistic as the difference in observed proportions divided by the standard error, and derive the p-value from the standard normal distribution.
+
+**998. Deduplicating embeddings above a similarity threshold.** Use an ANN index to efficiently find each embedding's nearest neighbors above a similarity threshold rather than a full O(n²) pairwise comparison, then apply a union-find or greedy clustering approach to group and collapse near-duplicate clusters into single representatives.
+
+**999. Gradient checking for custom backprop.** Compute the analytical gradient via your backprop implementation, then compute a numerical approximation via finite differences (perturbing each parameter slightly and measuring the resulting change in loss), and verify the two are close within a small tolerance to validate correctness.
+
+**1000. Parse/validate LLM JSON output with error recovery.** Attempt direct JSON parsing first; on failure, apply common repair heuristics (closing unclosed brackets/quotes, stripping markdown code fences); validate the parsed result against the expected schema; and if validation still fails, retry the LLM call with the specific error fed back as corrective context.
+
+**1001. Circular buffer for sliding window of events.** Use a fixed-size array with a head/tail pointer (or modular index) that wraps around when reaching the array's end, overwriting the oldest entry once the buffer is full — provides O(1) insertion while maintaining only the most recent N events.
+
+**1002. Exponential moving average for streaming metrics.** Maintain a single running value updated as EMA_new = alpha * new_value + (1 - alpha) * EMA_old for each incoming data point, where alpha controls the weight given to recent versus historical values — useful for drift detection since it smooths noise while remaining responsive to sustained shifts.
+
+**1003. Beam search decoder from scratch.** Maintain a fixed-size set (beam) of the top-k partial sequences by cumulative log-probability at each generation step; expand each beam candidate with all possible next tokens, re-rank the resulting expanded set, and keep only the top-k for the next step until reaching an end token or max length.
+
+**1004. Cohort-based churn rate SQL.** Group users by their signup month, join to a subsequent activity/status table, and compute the percentage of each cohort still active (or the inverse, churned) at defined time intervals after signup, typically presented as a cohort retention/churn table.
+
+**1005. Reservoir sampling.** For a stream of unknown/large length, keep the first k items in the reservoir; for each subsequent item at index i (i > k), generate a random number and replace a random existing reservoir item with probability k/i — guarantees each item has an equal probability of ending up in the final sample without needing to know the total stream length in advance.
+
+## Section 27 — Open-Ended Architecture Design Prompts
+
+**1006. Diagnosing a slow, expensive agent.** Trace the pipeline to identify which step dominates latency/cost (often excessive tool calls, redundant LLM calls, or an oversized model for the task), check for retry/loop pathologies, and apply targeted fixes: model routing/downsizing for simple sub-steps, caching, reducing unnecessary reasoning steps, and setting hard budgets to bound worst-case behavior.
+
+**1007. 0-to-1 GenAI architecture, 6 people, 6 months.** Start with one high-value, well-scoped use case rather than a platform; use hosted APIs (not self-hosted models) to move fast; build minimal but real eval infrastructure alongside the feature from day one; keep architecture simple (single model provider, straightforward RAG if needed) and defer platform-generalization work until you have a second use case proving the pattern is worth generalizing.
+
+**1008. 40% hallucination rate RAG remediation — 30/60/90.** 30 days: build/expand the eval suite to precisely characterize failure patterns (retrieval failures vs. generation failures), fix obvious prompt/grounding issues. 60 days: improve retrieval quality (chunking, re-ranking, hybrid search) and add citation/groundedness enforcement. 90 days: implement continuous monitoring and human-feedback loops to sustain the improvement and catch regressions.
+
+**1009. Serving consumer app + internal analyst tool with different latency needs.** Route both through a shared gateway but with separate serving tiers/configs — a fast, cached/simplified path for the latency-sensitive consumer app, and a more thorough (possibly agentic, multi-step) path for the analyst tool where deeper analysis matters more than sub-second response.
+
+**1010. Model deprecation response.** Immediately assess impact scope and timeline, activate the pre-built fallback (secondary provider/model behind the abstraction layer if one exists), run the fallback through the eval suite before switching production traffic, and communicate timeline/impact to stakeholders — this scenario is exactly why the earlier investment in a provider-agnostic gateway pays off.
+
+**1011. 70% cost reduction in 3 months without quality drop.** Order of levers: (1) route simple queries to cheaper models, (2) implement caching for repeated/similar queries, (3) compress prompts and reduce unnecessary context, (4) quantize/optimize any self-hosted serving, (5) only as a last resort, consider a genuinely smaller/fine-tuned model for the core task — validate quality via the eval suite at each step, not just at the end.
+
+**1012. HIPAA-regulated AI feature.** Ensure business associate agreements are in place with any third-party model provider handling PHI, minimize/de-identify data sent to external services wherever possible, add strict access logging/audit trails, and involve compliance/legal in the design from the start rather than retrofitting compliance onto an already-built feature.
+
+**1013. Fast experimental team + stability-critical team sharing infrastructure.** Provide separate environments/quotas (a sandbox for experimentation with relaxed guardrails and a hardened production environment with strict change control), sharing only the underlying platform primitives (gateway, eval framework, observability) so experimentation velocity doesn't threaten production stability.
+
+**1014. Eval says "better," customer says worse.** Treat this as a signal the eval set doesn't represent this customer's actual usage pattern; pull real transcripts from that customer, identify the specific gap the eval missed, and expand the eval set to cover it — this is a recurring failure mode worth building a standing process around, not just a one-off investigation.
+
+**1015. Platform for 200 teams to build AI features without reinventing plumbing.** Build a shared platform layer (gateway, prompt/eval framework, guardrails, cost tracking) as the mandatory foundation, with clear self-service documentation/templates, while leaving product-specific logic to individual teams — success is measured by adoption, not by how comprehensive the platform is in isolation.
+
+**1016. $2M/year managed platform vs 4-engineer in-house build decision.** Model the true in-house cost including ongoing maintenance (not just initial build), compare against the managed platform's cost plus its limitations/lock-in risk, and weight heavily toward buy unless you have a genuinely differentiating requirement the managed platform can't meet — most orgs underestimate in-house total cost of ownership.
+
+**1017. Rollback/incident plan for AI giving inappropriate financial advice.** Immediate kill-switch to disable the feature, root-cause analysis (was it a prompt gap, a jailbreak, a scope-creep issue), review of all recent outputs of that type for similar issues, mandatory compliance/legal review before re-enabling, and a permanent guardrail addition (explicit scope restriction, output filtering) preventing recurrence.
+
+**1018. Detecting a bad prompt change within minutes.** Requires synthetic monitoring (scheduled test queries against known-good expected patterns) running continuously post-deployment, combined with real-time quality-proxy metrics (retry rate, thumbs-down rate) with tight alerting windows — canary/shadow deployment before full rollout is the actual best prevention, but fast detection is the necessary backstop.
+
+**1019. Architecture resilient at every layer.** Model/provider layer: fallback chain across providers. Retrieval layer: redundant index/replica with graceful degradation to cached/simpler answers. Infra layer: multi-AZ/region deployment with automated failover. Data layer: backup/replication with tested recovery — resilience isn't one big decision, it's consistent redundancy/fallback design applied layer by layer.
+
+**1020. Agent cost growing faster than revenue.** Diagnose whether cost growth is proportional to genuine usage growth or driven by inefficiency (unnecessary tool calls, oversized models, retry loops); apply the cost-reduction playbook (routing, caching, right-sizing); and if fundamentally the unit economics don't work even after optimization, revisit the product's pricing model or scope before scaling further.
+
+**1021. Three business units, three LLM providers.** Standardize on the shared gateway/abstraction layer as the mandatory integration point (not on a single provider), let each business unit choose their preferred provider behind that abstraction, and centralize only what must be centralized (cost tracking, safety guardrails, observability) rather than forcing full provider convergence.
+
+**1022. Demonstrating AI ROI to the board in 90 days.** Pick the single highest-visibility, most measurable use case, instrument it thoroughly from day one (cost, adoption, business-outcome metrics), and present a clear before/after story with real numbers rather than a portfolio of half-finished initiatives — one credible, well-measured win beats ten vague ones for board-level credibility.
+
+**1023. Consistent AI quality across 15 languages with uneven training data.** Build per-language eval sets and accept/communicate that quality will genuinely vary by language given real differences in underlying model training data; prioritize investment (fine-tuning, human review, few-shot tuning) toward the highest-volume/highest-stakes languages first rather than promising uniform quality everywhere immediately.
+
+**1024. Model risk committee review structure/artifacts.** Bring: intended use case and scope, eval results including subgroup/fairness analysis, known failure modes and mitigations, monitoring and rollback plan, and a clear statement of residual risk being accepted — structured so a non-technical committee member can understand what they're actually approving.
+
+**1025. Fallback architecture for simultaneous provider outages.** Maintain a self-hosted smaller model as a last-resort fallback (not dependent on any external provider), or a deterministic rules-based/cached-response mode, ensuring the product degrades to "still functional, clearly limited" rather than fully failing even in the worst-case scenario of total external dependency loss.
+
+**1026. Settling fine-tune vs RAG debate with evidence.** Run both approaches against the same eval suite on the same real task, measuring quality, cost, and maintenance burden empirically rather than arguing from first principles — often the answer is genuinely "both, for different parts of the problem," which the data will reveal if the eval is well-designed.
+
+**1027. Bounding damage from a single bad actor with full access.** Apply defense in depth: least-privilege scoping even for "trusted" access, mandatory approval/confirmation for consequential actions regardless of who's requesting, hard spending/action-rate limits, comprehensive audit logging, and rapid kill-switch capability — no single control should be the only thing standing between an actor and unlimited damage.
+
+**1028. Fast-moving research model, rock-solid surrounding product.** Isolate the model behind a stable interface/contract (the abstraction layer again), invest disproportionately in the eval/regression-testing infrastructure surrounding model swaps, and treat model updates as a controlled, tested deployment event rather than letting research velocity directly propagate into production instability.
+
+**1029. Shipping a new model to production within 24 hours of provider release, safely.** Requires pre-built infrastructure: automated eval suite runnable on demand, shadow/canary deployment capability already in place, and a pre-defined go/no-go quality threshold — the speed comes from infrastructure investment made in advance, not from skipping validation steps under time pressure.
+
+**1030. Remediating low-quality scraped training data.** Assess the scope/impact on model behavior via targeted eval probing, retrain or fine-tune with a cleaned/filtered dataset going forward, and consider whether existing deployed models need to be re-validated or retired given the discovered data quality issue, documenting the remediation for any compliance/audit needs.
+
+**1031. Governance for AI decisions with legal consequences.** Mandatory human-in-the-loop for final decisions (not just AI recommendation), full audit trail of the AI's input/reasoning/output for every decision, documented model validation and ongoing monitoring meeting relevant regulatory standards, and legal review built into the launch and change-management process, not bolted on after.
+
+**1032. 3-year roadmap given 6-month capability shifts.** Plan the platform/infrastructure layer (abstraction, eval framework, guardrails) for 3-year durability since those investments compound in value, while treating specific model/technique choices as intentionally short-lived and swappable — architect for change at the capability layer, stability at the platform layer.
+
+**1033. Self-serve simple AI features for PMs, safely.** Provide constrained templates (not open-ended prompt/tool building) with pre-approved guardrails and mandatory eval validation before anything goes live, keeping the "safe surface area" PMs can touch narrow enough that mistakes have bounded blast radius.
+
+**1034. Passed all offline evals, failed publicly on launch day.** Root-cause whether the eval set failed to represent real launch-day traffic patterns (most common cause), whether a last-minute change bypassed the eval gate, or whether the failure was in an integration/infra layer the eval suite doesn't cover — the fix is almost always expanding eval coverage and tightening the "everything must pass eval before launch" process discipline.
+
+**1035. 3-year architecture: 10x cheaper inference, 2x governance requirements.** Plan for cost to stop being the primary constraint (opening room for more ambitious, higher-compute use cases) while governance/compliance tooling (audit trails, explainability, access control) becomes the actual bottleneck to scaling AI adoption — invest disproportionately in governance infrastructure now since it's the slower-moving, harder-to-retrofit capability relative to raw inference economics improving largely on its own via the industry.
+
+## Section 28 — Rapid-Fire Depth Probes
+
+**1036. KL divergence in RLHF/DPO.** It constrains the fine-tuned policy from drifting too far from the reference (SFT) model's output distribution, preventing reward-hacking degeneration and preserving the model's general capabilities while still optimizing for the reward/preference signal.
+
+**1037. Greedy vs beam search vs nucleus sampling.** Greedy is fastest but deterministic and can produce bland/repetitive text; beam search explores multiple candidate sequences for better global quality but is slower and can still be repetitive; nucleus (top-p) sampling introduces controlled randomness from a dynamically-sized probable-token set, generally producing more natural, diverse open-ended text.
+
+**1038. Distributed training failure modes.** Stragglers (one slow node holding up synchronized updates), gradient explosion (numerical instability from bad initialization/learning rate), and checkpoint corruption (incomplete writes during failure) — all require robust monitoring, gradient clipping, and validated checkpointing/resume logic to handle reliably at scale.
+
+**1039. Diffusion vs autoregressive for multimodal generation.** Diffusion models generate all at once via iterative denoising (highly parallelizable per step, strong for continuous data like images), while autoregressive models generate token-by-token sequentially (natural fit for discrete, ordered data like text) — the choice often follows the data modality's natural structure.
+
+**1040. What breaks pushing context far beyond training distribution.** Positional encoding schemes not seen during training degrade attention quality at those extended positions, and the model's effective "attention span" learned during training doesn't reliably generalize, causing coherence/accuracy to degrade even if the raw context technically fits.
+
+**1041. When prompt engineering alone fails.** When the task requires consistent, specialized behavior/format at scale that's hard to reliably elicit purely through instructions (especially for nuanced domain-specific style or knowledge), or when cost pressure makes it worth moving capability into weights to use a smaller model — that's when fine-tuning becomes worth the investment.
+
+**1042. Batch size and learning rate interaction.** Larger batch sizes produce more stable, lower-variance gradient estimates, generally allowing (and often requiring, for efficient training) a proportionally larger learning rate to maintain similar training dynamics — a common heuristic (not universal) is scaling learning rate linearly with batch size.
+
+**1043. Full fine-tuning vs last-layers-only.** Full fine-tuning updates all weights, offering the highest capacity to adapt but requiring more data/compute and risking more catastrophic forgetting; fine-tuning only the last few layers is cheaper and lower-risk for forgetting but has less capacity to adapt deep representations, suited to tasks closely related to the original pretraining objective.
+
+**1044. Larger models and hallucination confidence.** Larger models often have more accurate world knowledge, reducing certain hallucinations, but their fluency and calibrated-sounding confidence can also make remaining hallucinations more convincing and harder for users to detect than a smaller model's more obviously uncertain output.
+
+**1045. Temperature=0 and reproducibility.** Temperature=0 makes sampling deterministic (always picking the highest-probability token) in principle, but in practice numerical non-determinism from floating-point operations, hardware/batching variations, and MoE routing can still produce slightly different outputs across runs.
+
+**1046. Why RAG can worsen hallucination.** Poor-quality or irrelevant retrieved content can mislead the model into generating a confident answer grounded in wrong context, or the model may blend retrieved information with its own parametric (possibly incorrect) knowledge in a way that looks grounded but isn't — RAG helps only when retrieval quality is genuinely high.
+
+**1047. Diminishing/negative returns of more retrieved chunks.** Beyond a certain point, additional chunks add noise that dilutes the model's attention on the truly relevant passage (worsened by the "lost in the middle" effect) and increases cost/latency without proportional quality gain, sometimes actively hurting accuracy.
+
+**1048. Embedding models underperforming out-of-domain.** Embedding models learn semantic similarity patterns from their training data's specific vocabulary/style/domain conventions, which may not transfer well to a very different domain's terminology and relevance judgments — domain-specific fine-tuning closes this gap.
+
+**1049. Instructions ignored when buried mid-prompt.** Models exhibit a "lost in the middle" attention pattern where information/instructions at the very beginning or end of a long context receive more effective attention than content buried in the middle, causing mid-prompt instructions to be followed less reliably.
+
+**1050. Model size scaling and reasoning vs language tasks.** Language fluency tasks tend to scale relatively smoothly and predictably with size, while multi-step reasoning tasks can show more erratic, sometimes threshold-like improvement patterns, since reasoning may depend on the model crossing certain capability thresholds rather than improving continuously.
+
+**1051. "Aligned" vs "safe."** Alignment refers to the model's behavior matching intended human values/instructions generally; safety specifically refers to avoiding harmful outputs/actions — a model can be well-aligned to unsafe instructions if not properly constrained, and conversely, safety guardrails can exist somewhat independently of deeper value alignment.
+
+**1052. Same benchmark score, different real-world behavior.** Benchmarks test a narrow, specific distribution of tasks/phrasing that may not reflect your actual use case's distribution, and models can score similarly on aggregate while having very different strengths/weaknesses on specific sub-skills relevant to your particular application.
+
+**1053. Cost estimates wrong in production vs testing.** Testing often uses shorter, simpler, or less diverse prompts than real production traffic, misses retry/error-driven duplicate calls, and doesn't capture the long tail of unusually long conversations/documents that disproportionately drive real-world token consumption.
+
+**1054. More agents reducing success rate.** Added agents introduce more coordination failure points, communication overhead/information loss between hand-offs, and compounding error propagation (each agent's mistake can cascade to the next) — more agents only help when the task genuinely decomposes cleanly into independent sub-problems.
+
+**1055. Over-relying on LLM-as-judge failure mode.** The judge's own biases (verbosity, position, self-preference) and blind spots become invisible failure modes since there's no independent check — without periodic calibration against human judgment, you can optimize confidently toward a metric that's silently diverging from real quality.
+
+**1056. Smaller tuned models beating larger general ones.** A model specifically fine-tuned/optimized for a narrow task can outperform a much larger generalist model on that specific task, since the generalist's broad capability doesn't necessarily translate to peak performance on any single narrow use case without targeted adaptation.
+
+**1057. Latency variance spikes under load.** Often caused by queuing effects at the batching/scheduling layer, memory pressure from KV cache growth under high concurrency, or resource contention with other workloads sharing the same infrastructure — average latency looking fine can mask a growing tail-latency problem building toward saturation.
+
+**1058. Streaming vs non-streaming error handling.** Streaming requires handling partial, potentially incomplete output if an error occurs mid-stream (deciding whether to discard, retry, or gracefully truncate what's shown), and needs client-side logic to handle connection drops mid-response — fundamentally different from non-streaming's simple all-or-nothing success/failure handling.
+
+**1059. Aggressive caching risk for personalized products.** Caching by query text alone can inadvertently serve one user's cached (possibly personalized-context-dependent) response to another user, or serve stale personalized content that doesn't reflect the user's updated context/preferences — cache keys must properly account for the personalization context, not just the surface query.
+
+**1060. Passing unit-test evals but failing real conversations.** Unit-test-style evals typically test isolated, well-defined scenarios, while real conversations involve ambiguity, multi-turn context accumulation, and unexpected user phrasing/behavior that narrow test cases don't capture — a gap between component-level and true end-to-end conversational testing.
+
+**1061. Token-count estimate divergence across providers.** Different providers use different tokenizers (vocabulary, subword splitting rules), so the same text produces different token counts across providers, and some providers count differently for things like function-calling schemas or system prompts, causing naive cross-provider cost estimates to be inaccurate.
+
+**1062. Fine-tuning reducing general capability.** Narrow fine-tuning data can cause the model to overfit to that specific distribution/style, subtly overwriting more general representations learned during pretraining (catastrophic forgetting) even on seemingly unrelated tasks, especially with aggressive learning rates or too many training epochs.
+
+**1063. Guardrail too aggressive vs too permissive.** Too aggressive blocks legitimate use cases, causing user frustration and workaround-seeking behavior (potentially worse for safety than a more permissive system, since frustrated users may try to circumvent it); too permissive lets genuinely harmful content/actions through — both failure modes require monitoring false-positive and false-negative rates as co-equal metrics.
+
+**1064. RAG degrading silently after document-format change.** An upstream change to document structure/formatting (a new export template, a CMS migration) can silently break chunking or metadata extraction logic tuned to the old format, degrading retrieval quality without any explicit error — requiring ongoing retrieval-quality monitoring, not just pipeline uptime monitoring.
+
+**1065. Vector search recall dropping as index grows.** Approximate algorithms trade recall for speed, and that tradeoff typically worsens somewhat as the index scales (more candidates to approximate over) unless index parameters (e.g., HNSW's ef_search) are actively re-tuned as the index grows — recall isn't a fixed property, it degrades under fixed settings at larger scale.
+
+**1066. Why p99 over average latency for SLAs.** Average latency can look perfectly fine while a meaningful fraction of real users experience much worse performance; p99 (or p95) reflects the tail experience directly, which matters more for user trust/churn than an average that a small number of fast responses can mask problems within.
+
+**1067. Tool schema too generic vs too specific.** Too generic schemas (vague parameter descriptions, broad functionality) increase ambiguity in what arguments to pass, causing more incorrect/malformed calls; too specific (many narrow, overlapping tools) increases the chance of selecting the wrong tool among similar options — aim for clearly distinct, appropriately-scoped tools with precise parameter documentation.
+
+**1068. Silent provider backend updates.** Providers sometimes update model weights/serving infrastructure behind a stable API/model-name without a version bump, subtly changing output behavior — mitigate via continuous synthetic monitoring against a fixed eval baseline (not just trusting the version string) to catch unannounced changes.
+
+**1069. Offline eval failing to predict real satisfaction.** Offline evals often measure narrow correctness/quality dimensions on a fixed test set that may not capture what actually drives real user satisfaction (tone, speed, handling of ambiguity, conversational flow) — offline eval and true user satisfaction are correlated but not identical, requiring online validation as the real check.
+
+**1070. Context compression losing critical detail.** Aggressive summarization/compression optimizes for general gist retention, which can systematically discard specific details (exact numbers, names, dates) that seemed unimportant in isolation but turn out to be exactly what the final query needed — a fundamental tension between compression ratio and precision retention.
+
+**1071. Mega-prompt vs decomposed calls tradeoff.** A single mega-prompt reduces latency/cost (one call) but risks the model losing focus across too many simultaneous instructions/tasks; decomposed calls improve reliability and debuggability per step but multiply latency and cost — choose based on task complexity and how much each sub-step benefits from focused attention.
+
+**1072. Too many few-shot examples hurting performance.** Beyond a certain point, additional examples consume context budget better spent elsewhere, can introduce misleading patterns if examples aren't perfectly representative, and can cause the model to overfit to superficial patterns in the examples rather than the actual underlying task intent.
+
+**1073. Agent retry loops silently blowing up cost.** A failing tool call or unclear task can trigger the agent into repeated retry attempts without an explicit cap, each consuming tokens/cost, silently accumulating a large bill before anyone notices — requiring hard step/cost limits as a mandatory architectural safeguard, not an optional nice-to-have.
+
+**1074. "The model said so" insufficient for incident review.** A genuine root-cause analysis must identify the underlying cause (bad prompt, bad retrieved context, a provider model change, an adversarial input) that led to the model's output, since "the model was wrong" alone provides no actionable prevention step for the next incident.
+
+**1075. Conflating capability gains with product quality gains.** A more capable underlying model doesn't automatically translate to better product outcomes if the surrounding product logic (prompts, retrieval, guardrails, UX) wasn't designed to leverage the new capability, or if the product's actual bottleneck was never model capability in the first place.
+
+**1076. Data drift mattering more for feature pipelines than models.** A model can be perfectly correct given its inputs, but if the feature pipeline silently starts producing subtly wrong/stale/differently-distributed inputs, the model's predictions degrade even though the model itself never changed — making feature pipeline monitoring at least as important as model monitoring.
+
+**1077. Non-comparable eval scores across harness implementations.** Differences in exact prompt formatting, scoring logic (exact match vs. fuzzy match), and dataset preprocessing between different eval harnesses can produce meaningfully different scores even when nominally measuring "the same" benchmark, making raw score comparisons across different tooling unreliable without careful methodology alignment.
+
+**1078. Lower hallucination rate not improving trust metrics.** Trust is shaped by a broader set of factors (consistency, tone, transparency about uncertainty, past experience) beyond raw factual accuracy alone — a technically more accurate system that still feels unpredictable or overconfident in its remaining errors may not measurably improve user trust.
+
+**1079. Over-indexing on one benchmark for model selection.** A single benchmark reflects a specific, often narrow task distribution that may not represent your actual use case, and models can be specifically tuned/optimized for popular public benchmarks in ways that don't generalize — always validate against your own domain-specific eval set before committing to a model choice.
+
+**1080. Quantization disproportionately hurting non-English languages.** Lower-resource languages already have less robust representations in the base model, and quantization's precision loss can disproportionately degrade already-fragile representations, widening the quality gap between high- and low-resource languages further than quantization affects English performance.
+
+**1081. Inconsistent output at identical repeated requests, low temperature.** Even near temperature=0, floating-point non-determinism from parallelized GPU computation, dynamic batching interactions with other concurrent requests, and (for MoE models) routing non-determinism can produce slightly different outputs across nominally identical calls.
+
+**1082. "Add more guardrails" as the wrong first response.** Guardrails address symptoms without necessarily fixing root causes, can be stacked reactively into an unmanageable, overly restrictive system that blocks legitimate use, and without root-cause analysis first, you risk solving the wrong problem while leaving the actual vulnerability unaddressed for a slightly different attack framing.
+
+**1083. Critical business logic embedded solely in a prompt.** Prompts are harder to test rigorously than code, can be inadvertently altered by future changes without the same review rigor as code, and are subject to the model's non-deterministic interpretation — critical logic (compliance rules, financial calculations) should live in verifiable code with the LLM used for the parts that genuinely benefit from language flexibility.
+
+**1084. Agent plan looking correct step-by-step but failing overall.** Each individual step can be locally valid/reasonable while the overall plan misses the actual goal due to a subtly wrong initial problem interpretation, missing a critical constraint, or accumulating small misalignments that compound — highlighting the need for outcome-level (not just step-level) evaluation.
+
+**1085. RAG citing wrong source despite correct retrieval.** The generation step may not actually be grounding its citation logic in the true source of each specific claim, sometimes defaulting to citing the first or most prominent retrieved chunk regardless of which one actually supports a given statement — requiring explicit per-claim citation validation, not just checking that relevant documents were retrieved.
+
+**1086. Smaller context window sometimes more reliable.** A smaller, more tightly curated context forces higher-signal information density and avoids the "lost in the middle" dilution effect of a larger context stuffed with excess (possibly irrelevant) information — more context isn't always better if the additional content isn't genuinely relevant.
+
+**1087. Chain-of-thought's diminishing benefit at high complexity.** For very complex, multi-step problems, even chain-of-thought reasoning can accumulate compounding errors across many steps, and there's a practical limit to how much a single linear reasoning trace can reliably track before losing coherence — motivating techniques like tree-of-thought or explicit verification steps for the hardest problems.
+
+**1088. Prompts not portable across models.** Different models are trained with different instruction-following conventions, different sensitivity to phrasing/formatting, and different amounts of RLHF-driven behavior shaping — a prompt finely tuned to elicit ideal behavior from one model's specific training quirks often needs meaningful rework to perform equally well on a different model.
+
+**1089. Underestimating ongoing LLM feature maintenance cost.** Teams often budget for initial build but underestimate continuous costs: eval maintenance as usage evolves, prompt/model updates as providers change, monitoring/incident response, and the accumulating cost of edge cases discovered in production — LLM features have meaningfully higher ongoing maintenance burden than typical deterministic software features.
+
+**1090. "Works in the demo" as an unreliable readiness signal.** Demos are typically run on cherry-picked, well-behaved inputs by people who know how to phrase requests the system handles well, missing the long tail of real-world messiness (ambiguous phrasing, edge-case data, adversarial input, scale/concurrency effects) that only surfaces under genuine production conditions.
