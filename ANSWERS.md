@@ -1,4 +1,4 @@
-# Principal AI Lead / AI Architect — Question Bank WITH ANSWERS
+# AI Prep Buddy — Question Bank WITH ANSWERS
 
 Answers are concise "strong answer" frameworks (what a Principal-level candidate should hit), not exhaustive essays. Being built section by section.
 

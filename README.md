@@ -1,4 +1,4 @@
-# Principal AI Lead / AI Architect — Master Interview Question Bank (1000+)
+# AI Prep Buddy — Master Interview Question Bank (1000+)
 
 Compiled and synthesized from GitHub interview-prep repositories (alirezadir/AIMLInterviews, aishwaryanr/awesome-generative-ai-guide, neurarch-ai/awesome-llm-system-design, neurarch-ai/awesome-ml-system-design, shafaypro/CrackingMachineLearningInterview, andrewekhalel/MLQuestions, amitshekhariitbhu/machine-learning-interview-questions) plus standard architecture/leadership interview material. Organized end-to-end: strategy → fundamentals → LLM/GenAI depth → system design → production → governance → leadership.
 
