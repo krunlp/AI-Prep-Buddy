@@ -1189,3 +1189,56 @@ Compiled and synthesized from GitHub interview-prep repositories (alirezadir/AIM
 - **Sections 14–20** → production/architecture rounds (serving, MLOps, data eng, cloud, infra)
 - **Sections 21–23** → safety/governance rounds common at Principal level
 - **Section 28** → whiteboard follow-up/depth-probing questions an interviewer might fire rapidly
+
+## Section 29 — Enterprise AI Governance, Frameworks, Platforms & Executive Communication (1091–1140)
+
+1091. Explain the NIST AI Risk Management Framework's four core functions (Govern, Map, Measure, Manage) and how you'd operationalize each at an enterprise.
+1092. What is ISO/IEC 42001, and how does an AI Management System (AIMS) certification differ from a one-off compliance checklist?
+1093. Design a 5-level AI maturity model for an enterprise (from ad hoc experimentation to fully governed, optimized AI operations) and define what distinguishes each level.
+1094. Build a total cost of ownership (TCO) framework for an enterprise AI system — what cost categories are commonly underestimated?
+1095. Design a build-vs-buy scoring methodology (weighted scorecard) for evaluating a new AI capability.
+1096. Design a vendor evaluation scorecard for selecting an enterprise LLM/AI platform provider — what dimensions matter beyond price and benchmark scores?
+1097. Compare Databricks, Snowflake Cortex, Palantir AIP, and Microsoft Fabric as enterprise AI/data platforms — when would you choose each?
+1098. How would you integrate an LLM-powered feature into an existing SAP ERP environment without disrupting core transactional systems?
+1099. Design a pattern for embedding AI capabilities into Salesforce (e.g., Einstein-style) without creating a shadow-IT parallel system.
+1100. How would you integrate a GenAI assistant into ServiceNow for IT service management use cases?
+1101. Design a RACI matrix for an enterprise AI Center of Excellence spanning legal, security, data engineering, ML platform, and product teams.
+1102. What is a federated AI operating model, and how does it differ from a centralized AI CoE at enterprise scale?
+1103. Design an executive/board-level one-pager template for communicating an AI initiative's status, risk, and ROI.
+1104. How would you structure a change-management program for AI adoption across a 5,000-person enterprise resistant to workflow changes?
+1105. Design a migration plan moving a legacy rules-based enterprise system to an AI-augmented architecture without a "big bang" cutover.
+1106. How would you architect multi-modal enterprise data integration combining structured ERP data, unstructured documents, and image/scan data into one AI-accessible layer?
+1107. What contract/procurement terms should legal specifically negotiate with an enterprise AI vendor (SLAs, data processing agreements, indemnification, model-deprecation notice periods)?
+1108. Design an AI initiative portfolio management framework for a CIO/CTO managing 30+ concurrent AI projects across business units.
+1109. What are the core responsibilities of a Chief AI Officer role, and how does it differ from a VP of Engineering or Chief Data Officer?
+1110. Design an enterprise-wide prompt and knowledge-asset governance system — how do you prevent 50 teams from creating 50 inconsistent, redundant prompt libraries?
+1111. Explain the FDA's regulatory framework for AI/ML-based Software as a Medical Device (SaMD), and how a "locked" vs "adaptive" algorithm changes compliance requirements.
+1112. What is the NAIC's model governance guidance for AI in insurance underwriting, and how does it compare to SR 11-7 in banking?
+1113. Design an enterprise data classification scheme (public/internal/confidential/restricted) and show how it should gate what data can flow to which AI systems.
+1114. How would you architect a "walled garden" AI environment for a highly regulated enterprise (defense, pharma) where no data can leave a controlled boundary, including for model updates?
+1115. Design an enterprise-wide AI incident severity classification (SEV1-SEV4 equivalent) and the corresponding response SLA for each tier.
+1116. How would you structure quarterly AI governance reporting to a board risk committee?
+1117. What is shadow AI (unsanctioned tool usage by employees), and how would you design a policy and technical control response to it?
+1118. Design an enterprise single sign-on and entitlement model for AI tools ensuring an employee's AI access mirrors their existing data access rights exactly.
+1119. How would you build a business case comparing the TCO of a single enterprise-wide AI platform versus allowing each business unit to independently license tools?
+1120. What KPIs would you present to a CFO to justify continued AI platform investment after the first year, beyond raw usage numbers?
+1121. Design an AI procurement due-diligence checklist covering model provenance, training-data licensing, and downstream liability exposure.
+1122. How would you structure an AI ethics review board's charter, including escalation authority and how it differs from a technical architecture review board?
+1123. What is the EU AI Act's "high-risk" system obligations (conformity assessment, technical documentation, human oversight) and how would you build a compliance-readiness checklist against them?
+1124. Design an enterprise AI skills/capability matrix used for both hiring and internal upskilling planning across an engineering organization.
+1125. How would you present a "walk before you run" AI adoption sequence to a board that wants to move directly to autonomous agents?
+1126. What is vendor lock-in risk specific to enterprise AI platforms, and how would you structure contracts/architecture to preserve exit optionality?
+1127. Design a cross-business-unit AI use-case intake and prioritization committee process for a large enterprise.
+1128. How would you calculate and present the "cost of inaction" — the competitive risk of not investing in an AI capability — to a skeptical executive team?
+1129. What due diligence would you perform before allowing an AI vendor's model to process data subject to attorney-client privilege?
+1130. Design an enterprise data residency and sovereign-cloud architecture for a company operating in the EU, US, China, and India simultaneously.
+1131. How would you architect AI system access for third-party contractors/consultants without granting them the same data visibility as full-time employees?
+1132. What is a model transparency/nutrition-label approach to enterprise AI procurement, and what should it disclose?
+1133. Design a business continuity plan specifically for AI-dependent enterprise workflows if the AI platform team is unavailable (turnover, reorg) for an extended period.
+1134. How would you structure an internal AI "marketplace" where business units can discover and request access to vetted, pre-approved AI capabilities?
+1135. What enterprise architecture principles (from a TOGAF-style framework) apply most directly to governing AI system sprawl?
+1136. How would you design an AI capability's decommissioning/sunset process at enterprise scale, including data retention and dependent-system notification?
+1137. Design a cross-functional incident command structure specifically for a major AI-driven outage affecting multiple business units simultaneously.
+1138. What's the enterprise-grade difference between a proof-of-concept, a pilot, and a production-grade AI deployment, and what gate criteria separate each stage?
+1139. How would you structure an annual AI risk assessment cycle that satisfies both internal audit and external regulatory expectations?
+1140. Design a framework for measuring and reporting AI-driven productivity gains at the enterprise level without over-claiming causality.

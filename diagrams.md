@@ -1,11 +1,11 @@
 ---
 layout: default
-title: Architecture Diagrams
+title: System-Design Diagrams
 ---
 
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 
-[← Back to Home](index.html) · [Question Bank →](questions.html) · [Answer Frameworks →](answers.html) · [Design Patterns Catalog →](patterns.html)
+[← Back to Home](index.html) · [Question Bank →](questions.html) · [Answer Frameworks →](answers.html) · [System-Design Diagrams →](diagrams.html) · [Design Patterns Catalog →](patterns.html)
 
 # AI Prep Buddy — Architecture Diagrams, Flows & Worked Examples
 

@@ -5,7 +5,7 @@ title: Design Patterns Catalog
 
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 
-[← Back to Home](index.html) · [Question Bank →](questions.html) · [Answer Frameworks →](answers.html) · [System-Design Diagrams →](diagrams.html)
+[← Back to Home](index.html) · [Question Bank →](questions.html) · [Answer Frameworks →](answers.html) · [System-Design Diagrams →](diagrams.html) · [Design Patterns Catalog →](patterns.html)
 
 # AI Prep Buddy — Design Patterns Catalog
 
@@ -430,6 +430,114 @@ flowchart TD
 ---
 
 *This catalog covers the recurring conceptual patterns underlying Sections 1–12 and 15–28. Combined with `ARCHITECTURE_DIAGRAMS.md` (system-design patterns for Sections 13, 14, 27), between the two files nearly every diagrammable concept in the bank now has a visual reference.*
+
+---
+
+## G. Enterprise Governance & Operating-Model Patterns
+
+### G1. AI Maturity Model (Q1093)
+
+```mermaid
+flowchart LR
+    L1[Level 1: Ad Hoc<br/>scattered experiments] --> L2[Level 2: Repeatable<br/>team-level patterns]
+    L2 --> L3[Level 3: Defined<br/>shared platform + governance]
+    L3 --> L4[Level 4: Managed<br/>quantitative metrics drive decisions]
+    L4 --> L5[Level 5: Optimizing<br/>continuous improvement, proactive risk]
+```
+
+**When to draw this:** Any "how do you assess where an org stands" or roadmap-planning question. Most enterprises today sit at Level 2–3; a Principal-level answer should be able to place a hypothetical org on this scale and articulate the specific gap to the next level, not just describe the levels abstractly.
+
+---
+
+### G2. TCO Framework for an Enterprise AI System (Q1094)
+
+```mermaid
+flowchart TD
+    BUILD[Initial Build Cost] --> TCO[Total Cost of Ownership]
+    RUN[Annual Run Cost × Expected Lifespan] --> TCO
+    subgraph RunCosts["Commonly Underestimated Run Costs"]
+    EVAL[Ongoing Eval Maintenance]
+    ONCALL[Incident Response / On-Call]
+    DATA[Data Pipeline Upkeep]
+    ITER[Prompt/Model Iteration Over Time]
+    end
+    RunCosts --> RUN
+    RISK[Risk-Adjusted Incident Cost] --> TCO
+```
+
+**When to draw this:** Any cost-justification or build-vs-buy question. The point that separates a strong answer: most people only budget the "Build" box — the run-cost sub-boxes are where enterprise AI TCO is chronically underestimated.
+
+---
+
+### G3. Build-vs-Buy-vs-Partner Weighted Scorecard (Q1095)
+
+```mermaid
+flowchart TD
+    OPTION[Candidate Option: Build / Buy / Partner] --> D1[Differentiation Value - weight: high]
+    OPTION --> D2[Time to Value - weight: medium]
+    OPTION --> D3[TCO - weight: high]
+    OPTION --> D4[Data/IP Control - weight: medium]
+    OPTION --> D5[Lock-in Risk - weight: medium]
+    OPTION --> D6[Internal Maintain Capability - weight: medium]
+    D1 --> SCORE[Weighted Composite Score]
+    D2 --> SCORE
+    D3 --> SCORE
+    D4 --> SCORE
+    D5 --> SCORE
+    D6 --> SCORE
+    SCORE --> DECISION[Decision: filled out BEFORE the team has a preference]
+```
+
+**When to draw this:** Any build-vs-buy question. The critical caveat to always state out loud: the scorecard only has integrity if it's filled out before the team's emotional preference forms — otherwise it's theater justifying a decision already made.
+
+---
+
+### G4. Enterprise System Integration Pattern (SAP/Salesforce/ServiceNow) (Q1098–1100)
+
+```mermaid
+flowchart TD
+    AI[AI Feature] --> NATIVE{Integration Approach}
+    NATIVE -->|Preferred| EXTENSION[Native Extension Framework: SAP BTP / Salesforce Apex / ServiceNow Virtual Agent]
+    NATIVE -->|Avoid| PARALLEL[Parallel External Tool: shadow-IT risk]
+    EXTENSION --> INHERIT[Inherits Existing Permission Model + Audit Trail]
+    EXTENSION --> READONLY{Write Action?}
+    READONLY -->|Yes| APPROVAL[Routes Through Existing Business-Process Approval]
+    READONLY -->|No| DIRECT[Direct Read Access]
+    PARALLEL -.x.-> RISK[Separate access-control system to maintain, audit gaps]
+```
+
+**When to draw this:** Any enterprise-integration question (SAP, Salesforce, ServiceNow, or similar). The core principle generalizes beyond any single vendor: build inside the system of record's native extension framework so permissions/audit are inherited, never build a parallel tool that requires a second access-control system to keep in sync.
+
+---
+
+### G5. AI Center of Excellence RACI (Q1101)
+
+```mermaid
+flowchart TD
+    subgraph CoE["AI Center of Excellence"]
+    PLATFORM[ML Platform Team: Responsible - shared infra, gateway, eval, guardrails]
+    end
+    subgraph Governance
+    LEGAL[Legal/Compliance: Accountable - regulatory interpretation]
+    SECURITY[Security: Accountable - data/access controls]
+    end
+    subgraph Delivery
+    PRODUCT[Product Teams: Responsible + Accountable - their own feature outcomes]
+    DATAENG[Data Engineering: Responsible - pipeline/data quality]
+    end
+    EXEC[Executive Sponsor: Accountable - overall strategy, Informed on projects]
+
+    PLATFORM -.provides platform to.-> PRODUCT
+    LEGAL -.consulted on.-> PRODUCT
+    SECURITY -.consulted on.-> PRODUCT
+    EXEC -.sponsors.-> CoE
+```
+
+**When to draw this:** Any AI CoE or organizational-design question. The detail that distinguishes a strong answer: Product teams remain accountable for *their own* outcomes — the CoE's job is to provide platform and guardrails, not to own every team's product decisions, which is the most common design mistake in real enterprise AI CoE rollouts.
+
+---
+
+*These five patterns extend the catalog into enterprise governance/operating-model territory, complementing the technical patterns in sections A–F above. Combined with Section 29 in the question bank, this closes the gap between "can build the system" and "can operate AI at true enterprise scale."*
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
