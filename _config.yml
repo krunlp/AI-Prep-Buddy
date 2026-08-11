@@ -1,0 +1,16 @@
+title: AI Prep Buddy
+description: 1000+ interview questions, answer frameworks, and architecture diagrams for AI/ML system design interviews
+theme: jekyll-theme-cayman
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+plugins:
+  - jekyll-relative-links
+relative_links:
+  enabled: true
+  collections: false
+include:
+  - README.md
+  - ANSWERS.md
+  - ARCHITECTURE_DIAGRAMS.md
