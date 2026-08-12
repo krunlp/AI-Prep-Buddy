@@ -3,7 +3,7 @@ layout: default
 title: Real-World Sources
 ---
 
-[← Back to Home](index.html) · [Question Bank →](questions.html) · [Answer Frameworks →](answers.html) · [System-Design Diagrams →](diagrams.html) · [Design Patterns Catalog →](patterns.html) · [Real-World Sources →](sources.html)
+[← Back to Home](index.html) · [Question Bank →](questions.html) · [Answers →](answers.html) · [Diagrams →](diagrams.html) · [Patterns →](patterns.html) · [Sources →](sources.html) · [Simulator →](simulator.html) · [Cheat Sheet →](cheatsheet.html) · [Glossary →](glossary.html) · [Company Prep →](company-prep.html)
 
 # AI Prep Buddy — Real-World Industry Sources & 2026 Refresh Notes
 
@@ -82,6 +82,8 @@ Being direct about this rather than silently leaving it: given this bank was ori
 5. **Sections 22–23, 27 (Safety/Governance/Architecture prompts)** — originally illustrated with hypothetical scenarios only. Now supplemented with real, citable incidents (Air Canada, DPD, McDonald's/Paradox.ai, the Cyera agent-harm research) that are considerably stronger to cite in an actual interview than a hypothetical, since they demonstrate awareness of the field's actual current failure record.
 
 6. **What held up well without needing correction**: the core system-design patterns (RAG pipeline architecture, feature stores, MLOps eval-gating, multi-provider fallback, agent orchestration patterns), the ML/DL/stats fundamentals (Sections 3–7), and the enterprise governance frameworks added in Section 29 (NIST AI RMF, ISO 42001, EU AI Act structure) all check out against current sources without material correction needed — these are more stable, slower-moving areas of the field than the LLM-specific technical layer.
+
+7. **EU AI Act high-risk deadline — genuinely live as of this writing (August 2026)**: Q1123/Q1139 reference the EU AI Act's high-risk obligations without a specific date, which turns out to be the right call — **the exact enforcement date is currently in flux**. The Annex III high-risk obligations were legislated to take effect August 2, 2026. The European Commission proposed a "Digital Omnibus" delay (published Nov 19, 2025) that would push Annex III obligations to December 2, 2027 and Annex I (product-embedded high-risk systems) to August 2, 2028. As of the most recent sources found, **some report this delay as agreed/enacted, others report it as still pending trilogue negotiation with the original August 2026 date remaining legally binding in the meantime.** Practical guidance for an interview answer: state the obligation categories (conformity assessment, technical documentation, human oversight, post-market monitoring) confidently since those are stable regardless of exact date, and flag the date itself as "actively shifting — worth checking current status" rather than committing to either August 2026 or December 2027 as settled fact. This is also a good real illustration of Q1139 (annual AI risk assessment cycles) — regulatory deadlines can move, so a compliance program built rigidly around one fixed date is itself a design risk.
 
 ---
 

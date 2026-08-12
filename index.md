@@ -36,6 +36,30 @@ A complete interview-prep bank for AI/ML system design and architecture roles �
 
 </div>
 
+<div style="display:flex; gap:1.2rem; flex-wrap:wrap; margin: 1.2rem 0 2rem 0;">
+
+<a href="simulator.html" style="flex:1; min-width:200px; padding:1.2rem; border:1px solid #d1d5da; border-radius:8px; text-decoration:none; color:inherit; display:block;">
+<h3>🎤 Mock Interview Simulator</h3>
+<p>Interactive — random question draw, timer, self-grading, and weak-spot tracking across all 1132 questions.</p>
+</a>
+
+<a href="cheatsheet.html" style="flex:1; min-width:200px; padding:1.2rem; border:1px solid #d1d5da; border-radius:8px; text-decoration:none; color:inherit; display:block;">
+<h3>⚡ Cheat Sheet</h3>
+<p>The condensed, day-of-interview version — read this in 20 minutes, not the full bank.</p>
+</a>
+
+<a href="glossary.html" style="flex:1; min-width:200px; padding:1.2rem; border:1px solid #d1d5da; border-radius:8px; text-decoration:none; color:inherit; display:block;">
+<h3>🔤 Glossary</h3>
+<p>Quick lookup for the 60+ acronyms used throughout the bank (RAG, MoE, GQA, LoRA, GRPO, and more).</p>
+</a>
+
+<a href="company-prep.html" style="flex:1; min-width:200px; padding:1.2rem; border:1px solid #d1d5da; border-radius:8px; text-decoration:none; color:inherit; display:block;">
+<h3>🏢 Company-Specific Prep</h3>
+<p>Reported interview-process patterns for Anthropic, OpenAI, Google DeepMind, and enterprise AI leadership tracks.</p>
+</a>
+
+</div>
+
 ---
 
 ## How to use this
