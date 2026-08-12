@@ -12,8 +12,15 @@ relative_links:
   collections: false
 include:
   - README.md
+  - index.md
+  - questions.md
   - answers.md
   - diagrams.md
   - patterns.md
   - code-solutions.md
   - study-paths.md
+  - company-prep.md
+  - cheatsheet.md
+  - glossary.md
+  - sources.md
+  - simulator.html
