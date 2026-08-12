@@ -1,6 +1,6 @@
 # AI Prep Buddy — Day-of-Interview Cheat Sheet
 
-The condensed version. Read this in the 20 minutes before your interview, not the full 1140-question bank. Organized around the questions you're most likely to actually get.
+The condensed version. Read this in the 20 minutes before your interview, not the full 1206-question bank. Organized around the questions you're most likely to actually get.
 
 ---
 
@@ -52,7 +52,21 @@ vLLM = production default (PagedAttention, broad compatibility). **SGLang** = re
 
 STAR, but the **Action** should show *judgment under ambiguity* and the **Result** should include *what you'd do differently* — interviewers weight self-awareness about failure more than a clean success story.
 
+## Enterprise Agent Interoperability, Cold (MCP / A2A / Cloud) — Currently the Fastest-Moving Part of the Field
+
+**MCP (Model Context Protocol, Anthropic, Nov 2024)** = agent-to-*tool* access — "USB-C for AI." Now adopted by OpenAI, Google, Microsoft. 2026-07-28 spec's biggest change: moved to a **stateless core** for standard HTTP/cloud scaling. Know: MCP Server, MCP Registry (like Docker Hub for pre-audited integrations), MCP Server Card (discovery without a live connection), Elicitation (human-approval pause point).
+
+**A2A (Agent2Agent, Google, April 2025, now Linux Foundation)** = agent-to-*agent* delegation and coordination, especially cross-vendor. Discovery via **Agent Card** at `/.well-known/agent-card.json`. Explicit task lifecycle: submitted → working → input-required → completed/failed/canceled. **MCP is vertical (agent→tool), A2A is horizontal (agent→agent)** — say this distinction out loud if asked how they relate.
+
+**Agent Registry vs. Agent Broker**: Registry = catalog (what exists, what can it do). Broker = runtime enforcement (does the receiving agent actually have permission for this data, right now). A registry without a broker is documentation, not a security boundary — always make this distinction.
+
+**Cloud agent runtimes** (all reached enterprise GA within the same 6-month window, Oct 2025–Q1 2026): **AWS Bedrock AgentCore** (Action Groups = Lambda tools, vault-backed tokens, best for zero-trust/regulated/FedRAMP). **Azure AI Foundry Agent Service** (Entra ID identity, deep M365 integration, only place to get GPT-5/OpenAI models natively). **Vertex AI Agent Engine** (native IAM, Apigee turns existing APIs into MCP servers, Google Search grounding). Decision framework: pick based on "which platform can own your control plane without fighting your existing operation," not a feature checklist.
+
+**The stat to know cold**: per a 2026 OutSystems survey, **96% of enterprises have agents in production, only 12% can actually govern them.** This is your answer to almost any "why does agent governance matter" question.
+
 ## Questions to Ask Them (don't skip this)
+
+
 
 One specific, current question about their architecture/research direction — not about perks or generic "what's the culture like." Shows you did homework, not just interview prep.
 

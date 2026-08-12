@@ -476,6 +476,15 @@ Compiled and synthesized from GitHub interview-prep repositories (alirezadir/AIM
 438. Explain how you'd handle multi-tenancy and namespace isolation in a shared vector DB.
 439. What is the cost model for a vector DB at scale (storage, compute, query throughput)?
 440. Explain how embeddings for text, image, and code differ, and whether they can share a vector space.
+441. What is a vector index's "recall floor," and how would you set a minimum acceptable recall threshold before shipping a retrieval feature to production?
+442. Explain how you'd migrate a production vector index from one embedding model to another with zero retrieval downtime.
+443. What is the tradeoff between storing full-precision vectors versus binary/scalar-quantized vectors for a cost-sensitive, large-scale deployment?
+444. Explain how vector database choice interacts with your broader data platform — when does it make sense to add vector search directly to an existing operational database (e.g., Postgres/pgvector) versus standing up a dedicated vector database?
+445. What is the role of a vector database's write consistency model, and why does eventual consistency matter for a RAG system with frequently updated documents?
+446. Explain how you'd benchmark vector search cost (not just latency/recall) across candidate providers at your actual production scale.
+447. What is a "hot" versus "cold" partition strategy for a vector index serving both frequently-queried recent documents and a long tail of rarely-queried historical ones?
+448. Explain how filtered vector search (metadata pre-filtering) performance degrades when filters are highly selective, and how index design should account for it.
+449. What operational monitoring would you put on a production vector database beyond query latency — index size growth, memory pressure, and recall drift over time?
 450. Explain cross-lingual embeddings and their use in multilingual retrieval.
 
 ## Section 12 — Agentic AI & Multi-Agent Systems (451–495)
@@ -648,8 +657,7 @@ Compiled and synthesized from GitHub interview-prep repositories (alirezadir/AIM
 607. Explain canary deployment and shadow deployment for model releases.
 608. What is blue-green deployment, and how does it apply to model serving?
 609. Explain how you'd design a rollback strategy for a bad model deployment.
-610. What is batching at inference time, and how does it trade off latency for throughput?
-610. Explain continuous batching specifically for LLM serving (vLLM/TGI-style).
+610. What is batching at inference time and how does it trade off latency for throughput, and how does continuous batching (vLLM/SGLang-style) refine this specifically for LLM serving?
 611. What is speculative decoding, and what hardware/latency profile benefits most from it?
 612. Explain tensor parallelism vs. pipeline parallelism vs. data parallelism for serving very large models.
 613. What is model sharding across GPUs, and when is it necessary vs. optional?

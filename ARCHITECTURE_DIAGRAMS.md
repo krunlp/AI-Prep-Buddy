@@ -431,7 +431,7 @@ flowchart TD
 
 ---
 
-*These 13 diagrams cover the core recurring architecture patterns across Sections 13, 14, and 27. The same patterns (gateway/routing, caching layers, fallback chains, eval-gated CI/CD, two-stage retrieval-then-rank, and human-in-the-loop escalation) recombine to answer most of the remaining open-ended system-design questions in the bank.*
+*(Coverage continues below — diagrams 14 onward extend into additional system-design questions.)*
 
 ---
 
@@ -809,7 +809,7 @@ flowchart TD
 
 ---
 
-*Coverage note: 28 diagrams now cover the large majority of distinct architectural patterns across Sections 13, 14, and 27 (~135 system-design questions total). Remaining uncovered questions are largely close variants of patterns already diagrammed above (e.g., Q567 autocomplete is a lighter version of Q574's real-time-bidding latency-budget pattern; Q572 video recommendation reuses the two-stage recsys pattern in diagram 7 with a diversity re-ranking layer). Ask for any specific remaining question's diagram individually if a variant isn't obviously covered by an existing pattern.*
+*(Coverage continues below — diagrams 29 onward extend into additional system-design questions.)*
 
 ---
 

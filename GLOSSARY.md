@@ -8,6 +8,8 @@ A quick-lookup reference for the 60+ acronyms used across this bank. Alphabetica
 | ABAC | Attribute-Based Access Control | Access control model using attributes (role, department, sensitivity) rather than fixed permission lists |
 | ACP | Agent Communication Protocol | IBM Research's multi-agent protocol with formal negotiation semantics (propose/accept/reject/counter) |
 | ADF | Augmented Dickey-Fuller (test) | Statistical test for stationarity in a time series |
+| AgentCore | (AWS Bedrock AgentCore) | AWS's managed agent runtime — identity, tools (Action Groups/Lambda), memory (DynamoDB), tracing (CloudWatch) |
+| BAA | Business Associate Agreement | HIPAA-required contract governing a vendor's handling of protected health information |
 | AI/ML acronyms continued below alphabetically | | |
 | ANP | Agent Network Protocol | Community-driven protocol aimed at decentralized agent marketplaces |
 | ANN | Approximate Nearest Neighbor | Fast, approximate similarity search algorithm class (e.g., HNSW, IVF) |
@@ -38,6 +40,8 @@ A quick-lookup reference for the 60+ acronyms used across this bank. Alphabetica
 | GQA | Grouped-Query Attention | Attention variant sharing K/V across grouped heads — the modern default |
 | GRPO | Group Relative Policy Optimization | RL post-training method comparing grouped samples, no critic network — dominant for reasoning models as of 2025–2026 |
 | HNSW | Hierarchical Navigable Small World | Graph-based ANN indexing algorithm |
+| IAM | Identity and Access Management | Cloud framework for controlling who/what can access which resources |
+| IdP | Identity Provider | System (e.g., Entra ID, Okta) that authenticates users/services and issues identity assertions |
 | HyDE | Hypothetical Document Embeddings | RAG technique embedding a generated hypothetical answer for retrieval |
 | IoU | Intersection over Union | Overlap metric for bounding boxes/segmentation |
 | IVF | Inverted File Index | Cluster-based ANN indexing algorithm |
@@ -75,6 +79,7 @@ A quick-lookup reference for the 60+ acronyms used across this bank. Alphabetica
 | RACI | Responsible, Accountable, Consulted, Informed | Organizational role-clarity framework |
 | RAG | Retrieval-Augmented Generation | Grounding LLM generation in retrieved external documents |
 | RAGAS | RAG Assessment (framework) | Open-source library for automated RAG evaluation metrics |
+| RBAC | Role-Based Access Control | Access control model granting permissions based on assigned roles |
 | ReAct | Reasoning + Acting | Agent prompting pattern interleaving thought, action, and observation |
 | RLAIF | Reinforcement Learning from AI Feedback | Using AI-generated (not human) preference labels for alignment |
 | RLHF | Reinforcement Learning from Human Feedback | Classic alignment method using a human-preference-trained reward model |
@@ -90,6 +95,7 @@ A quick-lookup reference for the 60+ acronyms used across this bank. Alphabetica
 | SOC2 | Service Organization Control 2 | Security/compliance audit standard |
 | SR 11-7 | Supervisory Guidance on Model Risk Management | US Federal Reserve/OCC banking model-governance standard |
 | SVM | Support Vector Machine | Max-margin classification/regression algorithm |
+| SSO | Single Sign-On | One authentication login granting access across multiple integrated systems |
 | TCO | Total Cost of Ownership | Full lifecycle cost, not just initial build cost |
 | TF-IDF | Term Frequency-Inverse Document Frequency | Classic sparse text-relevance weighting scheme |
 | TGI | Text Generation Inference | Hugging Face's LLM serving framework (deprecated as of Dec 2025) |
@@ -98,6 +104,8 @@ A quick-lookup reference for the 60+ acronyms used across this bank. Alphabetica
 | VAE | Variational Autoencoder | Generative autoencoder with a probabilistic latent space |
 | VIF | Variance Inflation Factor | Multicollinearity-detection metric |
 | ViT | Vision Transformer | Transformer architecture applied to image patches |
+| VPC | Virtual Private Cloud | Isolated private network within a cloud provider, used for secure agent/service traffic routing |
+| FedRAMP | Federal Risk and Authorization Management Program | US government cloud-security authorization standard |
 | WAPE | Weighted Absolute Percentage Error | Volume-weighted forecast-accuracy metric |
 | YaRN | Yet another RoPE extensioN method | Technique extending RoPE-based models to longer context lengths |
 
