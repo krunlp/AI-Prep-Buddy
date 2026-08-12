@@ -1,37 +1,76 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mock Interview Simulator — AI Prep Buddy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background: #f6f8fa; color: #24292e; }
-  header { text-align: center; margin-bottom: 20px; }
-  header h1 { background: linear-gradient(120deg,#155799,#159957); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  nav { text-align: center; margin-bottom: 24px; }
-  nav a { margin: 0 8px; color: #159957; text-decoration: none; font-size: 0.95em; }
-  .controls { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; justify-content: center; }
-  select, button { padding: 8px 14px; border-radius: 6px; border: 1px solid #d1d5da; font-size: 0.95em; cursor: pointer; background: white; }
-  button.primary { background: #159957; color: white; border: none; font-weight: 600; }
-  button.primary:hover { background: #117a45; }
-  .card { background: white; border: 1px solid #d1d5da; border-radius: 10px; padding: 24px; margin-bottom: 16px; }
-  .section-label { font-size: 0.8em; color: #6a737d; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-  .question { font-size: 1.2em; font-weight: 600; margin-bottom: 16px; line-height: 1.4; }
-  .timer { text-align: center; font-size: 1.8em; font-family: monospace; margin: 12px 0; color: #155799; }
-  .answer { background: #f0f9f4; border-left: 4px solid #159957; padding: 16px; border-radius: 6px; line-height: 1.6; display: none; margin-top: 16px; }
-  .answer.show { display: block; }
-  .grade-buttons { display: flex; gap: 10px; justify-content: center; margin-top: 16px; }
-  .grade-buttons button { flex: 1; max-width: 150px; }
-  .btn-got { border-color: #159957; color: #159957; }
-  .btn-partial { border-color: #d9a441; color: #d9a441; }
-  .btn-missed { border-color: #d73a49; color: #d73a49; }
-  .stats { display: flex; justify-content: space-around; background: white; border-radius: 10px; padding: 16px; margin-bottom: 20px; border: 1px solid #d1d5da; }
-  .stat { text-align: center; }
-  .stat-num { font-size: 1.6em; font-weight: 700; }
-  .stat-label { font-size: 0.8em; color: #6a737d; }
-  footer { text-align: center; margin-top: 30px; font-size: 0.85em; color: #6a737d; }
-  .reset-link { text-align: center; margin-top: 10px; }
-  .reset-link a { color: #d73a49; font-size: 0.85em; cursor: pointer; }
+  :root {
+    --bg-primary: #0f172a;
+    --bg-card: #1e293b;
+    --bg-card-hover: #334155;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --accent-primary: #6366f1;
+    --accent-green: #10b981;
+    --accent-amber: #f59e0b;
+    --accent-rose: #ef4444;
+    --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+    --border-color: #334155;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+  }
+  [data-theme="light"] {
+    --bg-primary: #f8fafc;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f1f5f9;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --border-color: #e2e8f0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-primary); padding: 20px; max-width: 900px; margin: 0 auto; min-height: 100vh; }
+  header { text-align: center; margin: 20px 0; }
+  header h1 { font-family: 'Outfit', sans-serif; font-size: 2.2rem; background: var(--accent-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: 800; margin-bottom: 8px; }
+  header p { color: var(--text-secondary); font-size: 1rem; }
+  nav { text-align: center; margin-bottom: 24px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+  nav a { color: var(--text-secondary); text-decoration: none; font-size: 0.9em; padding: 6px 12px; border-radius: 6px; background: var(--bg-card); border: 1px solid var(--border-color); transition: all 0.2s ease; }
+  nav a:hover { color: var(--text-primary); border-color: var(--accent-primary); }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  .stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 16px; text-align: center; }
+  .stat-num { font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 700; }
+  .stat-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+  #statGot { color: var(--accent-green); }
+  #statPartial { color: var(--accent-amber); }
+  #statMissed { color: var(--accent-rose); }
+  #statTotal { color: var(--accent-primary); }
+  .controls { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; justify-content: center; }
+  select, button { padding: 10px 18px; border-radius: var(--radius-md); border: 1px solid var(--border-color); font-size: 0.95em; cursor: pointer; background: var(--bg-card); color: var(--text-primary); font-weight: 500; font-family: inherit; transition: all 0.2s ease; }
+  select { min-width: 250px; }
+  button.primary { background: var(--accent-gradient); color: white; border: none; font-weight: 600; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
+  button.primary:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4); }
+  .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 28px; margin-bottom: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2); }
+  .section-label { font-size: 0.8rem; color: var(--accent-primary); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; display: inline-block; background: rgba(99, 102, 241, 0.1); padding: 4px 10px; border-radius: 6px; }
+  .question { font-family: 'Outfit', sans-serif; font-size: 1.35rem; font-weight: 600; margin-bottom: 20px; line-height: 1.45; color: var(--text-primary); }
+  .timer { text-align: center; font-size: 2.2rem; font-family: 'Fira Code', monospace; margin: 16px 0; color: var(--accent-primary); font-weight: 600; }
+  .answer { background: rgba(16, 185, 129, 0.08); border-left: 4px solid var(--accent-green); padding: 20px; border-radius: var(--radius-md); line-height: 1.65; display: none; margin-top: 20px; color: var(--text-primary); font-size: 1rem; }
+  .answer.show { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .grade-buttons { display: flex; gap: 12px; justify-content: center; margin-top: 20px; }
+  .grade-buttons button { flex: 1; padding: 12px; font-weight: 600; border-radius: var(--radius-md); }
+  .btn-got { background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.4); color: var(--accent-green); }
+  .btn-got:hover { background: var(--accent-green); color: white; }
+  .btn-partial { background: rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 0.4); color: var(--accent-amber); }
+  .btn-partial:hover { background: var(--accent-amber); color: white; }
+  .btn-missed { background: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.4); color: var(--accent-rose); }
+  .btn-missed:hover { background: var(--accent-rose); color: white; }
+  footer { text-align: center; margin-top: 40px; font-size: 0.85em; color: var(--text-secondary); }
+  .reset-link { text-align: center; margin-top: 14px; }
+  .reset-link a { color: var(--accent-rose); font-size: 0.85em; cursor: pointer; text-decoration: underline; }
 </style>
 </head>
 <body>

@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% if page.title %}{{ page.title }} — AI Prep Buddy{% else %}AI Prep Buddy — Master AI/ML Interview Question Bank{% endif %}</title>
+  <meta name="description" content="{{ page.description | default: site.description }}">
+  
+  <!-- OpenGraph / Social Media Meta -->
+  <meta property="og:title" content="{{ page.title | default: site.title }}">
+  <meta property="og:description" content="{{ page.description | default: site.description }}">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ page.url | absolute_url }}">
+  <meta property="og:image" content="https://repository-images.githubusercontent.com/AI-Prep-Buddy/social-preview.png">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-card: #1e293b;
+      --bg-card-hover: #334155;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent-primary: #6366f1;
+      --accent-secondary: #10b981;
+      --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+      --border-color: #334155;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+    }
+
+    [data-theme="light"] {
+      --bg-primary: #f8fafc;
+      --bg-secondary: #ffffff;
+      --bg-card: #ffffff;
+      --bg-card-hover: #f1f5f9;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --accent-primary: #4f46e5;
+      --accent-secondary: #059669;
+      --border-color: #e2e8f0;
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Header & Navigation */
+    header.site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      transition: background 0.3s ease;
+    }
+
+    [data-theme="light"] header.site-header {
+      background: rgba(248, 250, 252, 0.85);
+    }
+
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0.85rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+
+    .logo-badge {
+      background: var(--accent-gradient);
+      color: white;
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      font-weight: 700;
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+    }
+
+    .logo-text {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 800;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    nav.site-nav {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    nav.site-nav a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      padding: 0.4rem 0.75rem;
+      border-radius: var(--radius-sm);
+      transition: all 0.2s ease;
+    }
+
+    nav.site-nav a:hover, nav.site-nav a.active {
+      color: var(--text-primary);
+      background: var(--bg-card-hover);
+    }
+
+    .theme-toggle-btn {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .theme-toggle-btn:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent-primary);
+    }
+
+    /* Main Container */
+    main.main-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+      flex: 1;
+      width: 100%;
+    }
+
+    /* Typography & Headers */
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Outfit', sans-serif;
+      color: var(--text-primary);
+      font-weight: 700;
+      line-height: 1.25;
+      margin-top: 1.75rem;
+      margin-bottom: 0.85rem;
+    }
+
+    h1 { font-size: 2.25rem; letter-spacing: -0.5px; }
+    h2 { font-size: 1.65rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-top: 2.5rem; }
+    h3 { font-size: 1.3rem; }
+
+    p { margin-bottom: 1rem; color: var(--text-secondary); font-size: 1rem; }
+
+    a { color: var(--accent-primary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* Code & Pre Blocks */
+    pre, code {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.9rem;
+    }
+
+    code {
+      background: rgba(99, 102, 241, 0.1);
+      color: #a855f7;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+    }
+
+    [data-theme="light"] code {
+      background: rgba(99, 102, 241, 0.08);
+      color: #4f46e5;
+    }
+
+    pre {
+      background: #090d16 !important;
+      color: #e2e8f0;
+      padding: 1.25rem;
+      border-radius: var(--radius-md);
+      overflow-x: auto;
+      border: 1px solid var(--border-color);
+      margin: 1.25rem 0;
+      position: relative;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    /* Table Styling */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      background: var(--bg-card);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    th, td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    th {
+      background: var(--bg-card-hover);
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    /* Difficulty Badges */
+    .badge-diff {
+      display: inline-block;
+      padding: 0.2rem 0.55rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 20px;
+      margin-left: 0.5rem;
+    }
+
+    .badge-standard { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-hard { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .badge-principal { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+
+    /* Live Search Input */
+    .search-box-container {
+      margin: 1.5rem 0 2rem;
+      position: relative;
+    }
+
+    .search-box-input {
+      width: 100%;
+      padding: 0.85rem 1.25rem 0.85rem 2.75rem;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.25s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .search-box-input:focus {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+    }
+
+    /* Footer */
+    footer.site-footer {
+      border-top: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+      padding: 2.5rem 1.5rem;
+      margin-top: auto;
+    }
+
+    .footer-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    .footer-links a {
+      color: var(--text-secondary);
+      margin-left: 1rem;
+      text-decoration: none;
+    }
+
+    .footer-links a:hover { color: var(--accent-primary); }
+
+    @media (max-width: 768px) {
+      .header-container { flex-direction: column; align-items: flex-start; }
+      nav.site-nav { width: 100%; overflow-x: auto; padding-bottom: 0.5rem; }
+      h1 { font-size: 1.75rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-container">
+    <a href="{{ site.baseurl }}/" class="logo-container">
+      <div class="logo-badge"><i class="fa-solid fa-brain"></i></div>
+      <span class="logo-text">AI Prep Buddy</span>
+    </a>
+    
+    <nav class="site-nav">
+      <a href="{{ site.baseurl }}/index.html">Home</a>
+      <a href="{{ site.baseurl }}/questions.html">Questions (1613)</a>
+      <a href="{{ site.baseurl }}/answers.html">Answers</a>
+      <a href="{{ site.baseurl }}/simulator.html">🎤 Simulator</a>
+      <a href="{{ site.baseurl }}/company-prep.html">🏢 Companies</a>
+      <a href="{{ site.baseurl }}/diagrams.html">Diagrams</a>
+      <a href="{{ site.baseurl }}/patterns.html">Patterns</a>
+      <a href="{{ site.baseurl }}/cheatsheet.html">Cheat Sheet</a>
+      <a href="{{ site.baseurl }}/glossary.html">Glossary</a>
+    </nav>
+
+    <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Light/Dark Theme">
+      <i class="fa-solid fa-moon" id="themeIcon"></i>
+    </button>
+  </div>
+</header>
+
+<main class="main-content">
+  {{ content }}
+</main>
+
+<footer class="site-footer">
+  <div class="footer-container">
+    <div>
+      <strong>AI Prep Buddy</strong> — Open-source principal-level AI/ML interview prep bank (1,613 questions across 49 sections).
+    </div>
+    <div class="footer-links">
+      <a href="https://github.com/krunlp/AI-Prep-Buddy" target="_blank"><i class="fa-brands fa-github"></i> GitHub</a>
+      <a href="{{ site.baseurl }}/data/questions.json" target="_blank"><i class="fa-solid fa-code"></i> JSON API</a>
+      <a href="{{ site.baseurl }}/LICENSE">MIT License</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Theme Toggle Script
+  const themeToggleBtn = document.getElementById('themeToggleBtn');
+  const themeIcon = document.getElementById('themeIcon');
+  const currentTheme = localStorage.getItem('theme') || 'dark';
+
+  document.documentElement.setAttribute('data-theme', currentTheme);
+  updateThemeIcon(currentTheme);
+
+  themeToggleBtn.addEventListener('click', () => {
+    let theme = document.documentElement.getAttribute('data-theme');
+    let newTheme = theme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcon(newTheme);
+  });
+
+  function updateThemeIcon(theme) {
+    if (theme === 'dark') {
+      themeIcon.className = 'fa-solid fa-sun';
+    } else {
+      themeIcon.className = 'fa-solid fa-moon';
+    }
+  }
+
+  // Highlight Difficulty Tags Dynamically
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('body p, body li').forEach(el => {
+      if (el.innerHTML.includes('⭐⭐⭐')) {
+        el.innerHTML = el.innerHTML.replace('⭐⭐⭐', '<span class="badge-diff badge-principal"><i class="fa-solid fa-crown"></i> Principal</span>');
+      } else if (el.innerHTML.includes('⭐⭐')) {
+        el.innerHTML = el.innerHTML.replace('⭐⭐', '<span class="badge-diff badge-hard"><i class="fa-solid fa-fire"></i> Hard</span>');
+      } else if (el.innerHTML.includes('⭐')) {
+        el.innerHTML = el.innerHTML.replace('⭐', '<span class="badge-diff badge-standard"><i class="fa-solid fa-check"></i> Standard</span>');
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
