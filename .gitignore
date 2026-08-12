@@ -1,0 +1,15 @@
+# Jekyll & GitHub Pages build artifacts
+_site/
+.jekyll-cache/
+.jekyll-metadata
+
+# OS & Editor temp files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Local agent & temporary scratch files
+.tmp/
+*.tmp
+node_modules/

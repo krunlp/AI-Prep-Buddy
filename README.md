@@ -1,11 +1,13 @@
 # AI Prep Buddy — Master Interview Question Bank (1613 Questions)
 
+[![CI Verification](https://github.com/krunlp/AI-Prep-Buddy/actions/workflows/ci.yml/badge.svg)](https://github.com/krunlp/AI-Prep-Buddy/actions/workflows/ci.yml)
 [![Questions](https://img.shields.io/badge/Questions-1613-blue?style=flat-square)](questions.md)
 [![Sections](https://img.shields.io/badge/Sections-49-green?style=flat-square)](questions.md)
 [![Diagrams](https://img.shields.io/badge/Diagrams-39-orange?style=flat-square)](diagrams.md)
 [![Patterns](https://img.shields.io/badge/Patterns-19-purple?style=flat-square)](patterns.md)
+[![JSON API Dataset](https://img.shields.io/badge/API_Dataset-JSON-orange?style=flat-square)](data/questions.json)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
-[![GitHub Pages](https://img.shields.io/badge/Live_Site-GitHub_Pages-brightgreen?style=flat-square)](https://krunlp.github.io/AI-Prep-Buddy/)
+[![Live Site](https://img.shields.io/badge/Live_Site-GitHub_Pages-brightgreen?style=flat-square)](https://krunlp.github.io/AI-Prep-Buddy/)
 
 Compiled and synthesized from GitHub interview-prep repositories (alirezadir/AIMLInterviews, aishwaryanr/awesome-generative-ai-guide, neurarch-ai/awesome-llm-system-design, neurarch-ai/awesome-ml-system-design, shafaypro/CrackingMachineLearningInterview, andrewekhalel/MLQuestions, amitshekhariitbhu/machine-learning-interview-questions) plus standard architecture/leadership interview material. Organized end-to-end: strategy → fundamentals → LLM/GenAI depth → system design → production → governance → leadership.
 
