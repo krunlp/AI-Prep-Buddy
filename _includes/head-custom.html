@@ -1,0 +1,115 @@
+<!-- Custom Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- FontAwesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- Custom Theme Overrides -->
+<style>
+  :root {
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-card: #1e293b;
+    --bg-card-hover: #334155;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --accent-primary: #6366f1;
+    --accent-secondary: #10b981;
+    --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+    --border-color: #334155;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+    line-height: 1.6;
+  }
+
+  .page-header {
+    background-color: #0f172a !important;
+    background-image: var(--accent-gradient) !important;
+    padding: 3rem 1.5rem !important;
+    border-bottom: 1px solid var(--border-color) !important;
+  }
+
+  .project-name {
+    font-family: 'Outfit', sans-serif !important;
+    font-size: 3rem !important;
+    font-weight: 800 !important;
+  }
+
+  .project-tagline {
+    font-size: 1.2rem !important;
+    opacity: 0.9;
+  }
+
+  .main-content {
+    max-width: 1100px !important;
+    padding: 2rem 1.5rem !important;
+    margin: 0 auto;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', sans-serif !important;
+    color: var(--text-primary) !important;
+  }
+
+  h2 {
+    border-bottom: 2px solid var(--border-color) !important;
+    padding-bottom: 0.5rem !important;
+    margin-top: 2rem !important;
+  }
+
+  p, li {
+    color: var(--text-secondary) !important;
+    font-size: 1.05rem !important;
+  }
+
+  a {
+    color: #818cf8 !important;
+    text-decoration: none !important;
+  }
+
+  a:hover {
+    text-decoration: underline !important;
+  }
+
+  pre {
+    background: #090d16 !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius-md) !important;
+    padding: 1.2rem !important;
+  }
+
+  code {
+    font-family: 'Fira Code', monospace !important;
+    background: rgba(99, 102, 241, 0.15) !important;
+    color: #c084fc !important;
+    border-radius: 4px;
+    padding: 0.15rem 0.4rem !important;
+  }
+
+  table {
+    width: 100% !important;
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius-md) !important;
+    margin: 1.5rem 0 !important;
+  }
+
+  th {
+    background: var(--bg-card-hover) !important;
+    color: var(--text-primary) !important;
+  }
+
+  td {
+    border-bottom: 1px solid var(--border-color) !important;
+    color: var(--text-secondary) !important;
+  }
+</style>
