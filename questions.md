@@ -3,7 +3,7 @@ layout: default
 title: Question Bank
 ---
 
-[← Back to Home](index.html) · [Question Bank →](questions.html) · [Answer Frameworks →](answers.html) · [System-Design Diagrams →](diagrams.html) · [Design Patterns Catalog →](patterns.html)
+[← Back to Home](index.html) · [Question Bank →](questions.html) · [Answer Frameworks →](answers.html) · [System-Design Diagrams →](diagrams.html) · [Design Patterns Catalog →](patterns.html) · [Real-World Sources →](sources.html)
 
 # AI Prep Buddy — Master Interview Question Bank (1000+)
 

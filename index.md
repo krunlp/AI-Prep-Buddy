@@ -29,6 +29,11 @@ A complete interview-prep bank for AI/ML system design and architecture roles �
 <p>19 conceptual pattern diagrams spanning transformer internals, training/alignment, prompting/reasoning, agent architecture, MLOps, and safety — the patterns behind Sections 1–12 and 15–28.</p>
 </a>
 
+<a href="sources.html" style="flex:1; min-width:220px; padding:1.2rem; border:1px solid #d1d5da; border-radius:8px; text-decoration:none; color:inherit; display:block;">
+<h3>📚 Real-World Sources</h3>
+<p>Curated citations from actual current sources (Anthropic engineering blog, real 2025-2026 incident case studies, live LLMOps tooling landscape) plus explicit notes on what's been refreshed since the bank's initial draft.</p>
+</a>
+
 </div>
 
 ---
