@@ -1,22 +1,24 @@
 ---
 layout: default
 title: Home
+description: "1500+ AI/ML interview questions with answer frameworks, architecture diagrams, code solutions, and study paths. Principal-level prep for 2026."
+image: https://repository-images.githubusercontent.com/AI-Prep-Buddy/social-preview.png
 ---
 
 # AI Prep Buddy
 
-A complete interview-prep bank for AI/ML system design and architecture roles — **1206 questions**, **answer frameworks for every one**, and **69 architecture & pattern diagrams** with worked examples.
+A complete interview-prep bank for AI/ML system design and architecture roles — **1563 questions**, **answer frameworks for every one**, and **69 architecture & pattern diagrams** with worked examples.
 
 <div style="display:flex; gap:1.2rem; flex-wrap:wrap; margin: 2rem 0;">
 
 <a href="questions.html" style="flex:1; min-width:220px; padding:1.2rem; border:1px solid #d1d5da; border-radius:8px; text-decoration:none; color:inherit; display:block;">
 <h3>📋 Question Bank</h3>
-<p>All 1206 questions across 31 sections — strategy, ML/DL fundamentals, LLM &amp; transformers, RAG, agents, system design, MLOps, safety, governance, coding, and rapid-fire depth probes.</p>
+<p>All 1563 questions across 47 sections — strategy, ML/DL fundamentals, LLMs, RAG, agents, system design, MLOps, safety, governance, coding, multimodal, fine-tuning, speech, edge AI, distributed training, causal inference, hardware kernels, AI security, long context, and domain-specific AI.</p>
 </a>
 
 <a href="answers.html" style="flex:1; min-width:220px; padding:1.2rem; border:1px solid #d1d5da; border-radius:8px; text-decoration:none; color:inherit; display:block;">
 <h3>✅ Answer Frameworks</h3>
-<p>A strong-answer framework for every one of the 1206 questions — what a Principal-level candidate should hit, not generic filler.</p>
+<p>A strong-answer framework for every one of the 1563 questions — what a Principal-level candidate should hit, not generic filler.</p>
 </a>
 
 <a href="diagrams.html" style="flex:1; min-width:220px; padding:1.2rem; border:1px solid #d1d5da; border-radius:8px; text-decoration:none; color:inherit; display:block;">
@@ -40,7 +42,7 @@ A complete interview-prep bank for AI/ML system design and architecture roles �
 
 <a href="simulator.html" style="flex:1; min-width:200px; padding:1.2rem; border:1px solid #d1d5da; border-radius:8px; text-decoration:none; color:inherit; display:block;">
 <h3>🎤 Mock Interview Simulator</h3>
-<p>Interactive — random question draw, timer, self-grading, and weak-spot tracking across all 1206 questions.</p>
+<p>Interactive — random question draw, timer, self-grading, and weak-spot tracking across all 1563 questions.</p>
 </a>
 
 <a href="cheatsheet.html" style="flex:1; min-width:200px; padding:1.2rem; border:1px solid #d1d5da; border-radius:8px; text-decoration:none; color:inherit; display:block;">
@@ -60,14 +62,30 @@ A complete interview-prep bank for AI/ML system design and architecture roles �
 
 </div>
 
+<div style="display:flex; gap:1.2rem; flex-wrap:wrap; margin: 1.2rem 0 2rem 0;">
+
+<a href="code-solutions.html" style="flex:1; min-width:220px; padding:1.2rem; border:1px solid #d1d5da; border-radius:8px; text-decoration:none; color:inherit; display:block;">
+<h3>💻 Code Solutions</h3>
+<p>Complete Python implementations for all 25 coding questions (Q981–1005) — k-means, attention, BPE tokenizer, beam search, reservoir sampling, and more.</p>
+</a>
+
+<a href="study-paths.html" style="flex:1; min-width:220px; padding:1.2rem; border:1px solid #d1d5da; border-radius:8px; text-decoration:none; color:inherit; display:block;">
+<h3>🗺️ Study Paths</h3>
+<p>Curated 2-week study plans for 3 target roles — Staff MLE, Principal AI Lead, and AI Platform Engineer — with day-by-day schedules and specific question numbers.</p>
+</a>
+
+</div>
+
 ---
 
 ## How to use this
 
-1. **Skim the question bank** to see the full scope and identify weak areas.
-2. **Read the answer frameworks** for sections matching your target role's emphasis (e.g., heavy on Sections 9–13 for GenAI/LLM roles, Sections 1–2 + 23 for leadership-heavy loops).
-3. **Study the architecture diagrams** — these patterns (gateway/routing, two-stage retrieval, eval-gated CI/CD, fallback chains) recombine to answer most open-ended system-design prompts.
-4. Practice explaining answers out loud, not just reading them — interview performance is about articulation under pressure, not recognition.
+1. **Pick your study path** — use the [Study Paths](study-paths.html) page to find the 2-week plan matching your target role.
+2. **Skim the question bank** to see the full scope and identify weak areas. Questions are tagged by difficulty (⭐/⭐⭐/⭐⭐⭐).
+3. **Read the answer frameworks** for sections matching your target role's emphasis (e.g., heavy on Sections 9–13 for GenAI/LLM roles, Sections 1–2 + 23 for leadership-heavy loops).
+4. **Study the architecture diagrams** — these patterns (gateway/routing, two-stage retrieval, eval-gated CI/CD, fallback chains) recombine to answer most open-ended system-design prompts.
+5. **Practice the coding questions** with [Code Solutions](code-solutions.html) — implement from scratch, then check against the reference solutions.
+6. Practice explaining answers out loud, not just reading them — interview performance is about articulation under pressure, not recognition.
 
 ---
 

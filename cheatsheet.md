@@ -67,6 +67,27 @@ One specific, current question about their architecture/research direction — n
 
 Say the pattern name out loud even if you haven't fully worked out the details — "this looks like a two-stage retrieve-then-rank problem, let me think through the ranking stage" buys you thinking time and shows structured reasoning, which is what's actually being graded.
 
+## Frontier Topic Quick-Reference (Sections 32–47)
+
+- **Multimodal**: early fusion (one model, all modalities) vs late fusion (separate encoders → projection). CLIP aligns image-text via contrastive loss. For multimodal RAG, you need layout-aware parsing + table extraction, not just text chunking.
+- **Fine-tuning decision**: prompt engineering first → RAG if you need knowledge → LoRA/QLoRA if you need behavior/style → full fine-tune only if you have massive domain-specific data and compute budget.
+- **Quantization quick hierarchy**: FP16 → INT8 (PTQ, easy, ~1% quality loss) → INT4 (AWQ/GPTQ, noticeable on non-English) → speculative: FP4/FP8 (QAT required). GGUF for CPU/edge.
+- **Fairness impossibility**: you cannot simultaneously satisfy demographic parity, equalized odds, and calibration — pick the one that matches your application's harm model.
+- **Diffusion models**: noise → denoise over T steps. Classifier-free guidance trades diversity for prompt adherence. DiT (Diffusion Transformer) is replacing U-Net as the backbone.
+- **Voice agent latency budget**: ASR (~200ms) + LLM (~300ms) + TTS (~200ms) = ~700ms minimum. Streaming ASR + speculative TTS start before LLM completes to hit conversational feel.
+- **Edge AI**: quantize → prune → distill → use hardware delegates (CoreML/NPU). Federated learning = model goes to data, not data to model.
+- **Distributed training**: ZeRO-1 shards optimizer, ZeRO-2 adds gradients, ZeRO-3 adds parameters. Tensor parallelism splits layers, pipeline parallelism splits stages. Memory ≈ 18× params (FP32 Adam).
+- **Data-centric AI**: "more data" is rarely the right answer — "better data" almost always is. Synthetic data works when verified by a stronger model or deterministic check.
+- **Search/Ranking**: two-stage always — cheap recall (BM25 + embedding) → expensive precision (cross-encoder re-ranker). ColBERT = late interaction compromise between bi-encoder speed and cross-encoder quality.
+- **Causal inference**: correlation ≠ causation. Use DAGs to identify confounders. Propensity score matching when you can't randomize. Uplift modeling when you want to target the persuadable, not the already-converted.
+- **Agentic Systems**: ReAct for short-horizon tool execution → Tree-of-Thought / MCTS for complex search space planning. Always sandbox execution in MicroVMs (gVisor/Firecracker) with strict eBPF syscall limits.
+- **Hardware Acceleration**: Memory wall is the primary LLM decode bottleneck (HBM bandwidth bound). Use Triton for custom fused kernels. FlashAttention-3 avoids HBM writes via online softmax & SRAM tiling.
+- **AI Security & Red Teaming**: Dual-LLM architecture separates untrusted data parsing from privileged reasoning. Defense-in-depth requires output guardrails (Llama Guard/NeMo) + Confidential Computing (GPU TEEs).
+- **Long-Context Mechanics**: SSMs (Mamba) offer $O(N)$ linear inference state tracking vs Transformer $O(N^2)$ quadratic KV-cache growth. PagedAttention eliminates memory fragmentation; SGLang RadixAttention enables dynamic tree prefix reuse.
+- **Domain-Specific AI**: Robotics uses Vision-Language-Action (VLA) models mapping visual inputs directly to continuous motor actions. Healthcare AI demands MedMedQA evals & HIPAA PHI de-identification. Financial AI relies on microsecond-level limit order book (LOB) models. Software agents combine AST Code Property Graphs with test-driven execution loops.
+
 ---
 
-*Full depth on every topic here: `README.md` (questions) → `ANSWERS.md` (frameworks) → `ARCHITECTURE_DIAGRAMS.md` + `DESIGN_PATTERNS_CATALOG.md` (diagrams) → `REAL_WORLD_SOURCES.md` (citations).*
+*Full depth on every topic here: `README.md` (questions) → `answers.md` (frameworks) → `diagrams.md` + `patterns.md` (diagrams) → `sources.md` (citations).*
+
+

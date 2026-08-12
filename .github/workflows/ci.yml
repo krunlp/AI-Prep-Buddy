@@ -1,0 +1,42 @@
+name: CI Verification
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Verify Question Count Consistency
+        run: |
+          python3 -c "
+          import re, sys
+
+          with open('questions.md') as f:
+              q_text = f.read()
+          q_count = len(re.findall(r'^\d+\.', q_text, re.MULTILINE))
+          sec_count = len(re.findall(r'^## Section', q_text, re.MULTILINE))
+
+          print(f'Detected {q_count} questions across {sec_count} sections in questions.md')
+
+          assert q_count >= 1500, f'Expected at least 1500 questions, found {q_count}'
+          assert sec_count == 47, f'Expected 47 sections, found {sec_count}'
+
+          print('✅ Question count & section count verification passed!')
+          "
+
+      - name: Build Jekyll Site
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./
+          destination: ./_site

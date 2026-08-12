@@ -1,5 +1,5 @@
 title: AI Prep Buddy
-description: 1000+ interview questions, answer frameworks, and architecture diagrams for AI/ML system design interviews
+description: 1500+ interview questions, answer frameworks, architecture diagrams, and code solutions for AI/ML system design interviews
 theme: jekyll-theme-cayman
 markdown: kramdown
 kramdown:
@@ -12,5 +12,8 @@ relative_links:
   collections: false
 include:
   - README.md
-  - ANSWERS.md
-  - ARCHITECTURE_DIAGRAMS.md
+  - answers.md
+  - diagrams.md
+  - patterns.md
+  - code-solutions.md
+  - study-paths.md

@@ -1,4 +1,11 @@
-# AI Prep Buddy — Master Interview Question Bank (1000+)
+# AI Prep Buddy — Master Interview Question Bank (1563 Questions)
+
+[![Questions](https://img.shields.io/badge/Questions-1563-blue?style=flat-square)](questions.md)
+[![Sections](https://img.shields.io/badge/Sections-47-green?style=flat-square)](questions.md)
+[![Diagrams](https://img.shields.io/badge/Diagrams-39-orange?style=flat-square)](diagrams.md)
+[![Patterns](https://img.shields.io/badge/Patterns-19-purple?style=flat-square)](patterns.md)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
+[![GitHub Pages](https://img.shields.io/badge/Live_Site-GitHub_Pages-brightgreen?style=flat-square)](https://krunlp.github.io/AI-Prep-Buddy/)
 
 Compiled and synthesized from GitHub interview-prep repositories (alirezadir/AIMLInterviews, aishwaryanr/awesome-generative-ai-guide, neurarch-ai/awesome-llm-system-design, neurarch-ai/awesome-ml-system-design, shafaypro/CrackingMachineLearningInterview, andrewekhalel/MLQuestions, amitshekhariitbhu/machine-learning-interview-questions) plus standard architecture/leadership interview material. Organized end-to-end: strategy → fundamentals → LLM/GenAI depth → system design → production → governance → leadership.
 

@@ -107,7 +107,49 @@ A quick-lookup reference for the 60+ acronyms used across this bank. Alphabetica
 | ViT | Vision Transformer | Transformer architecture applied to image patches |
 | WAPE | Weighted Absolute Percentage Error | Volume-weighted forecast-accuracy metric |
 | YaRN | Yet another RoPE extensioN method | Technique extending RoPE-based models to longer context lengths |
+| ASR | Automatic Speech Recognition | Converting spoken audio to text (e.g., Whisper, Conformer) |
+| ATE | Average Treatment Effect | Expected difference in outcomes between treatment and control groups |
+| AWQ | Activation-aware Weight Quantization | Quantization method preserving salient weights identified by activation patterns |
+| C2PA | Coalition for Content Provenance and Authenticity | Standard for cryptographic content provenance/watermarking |
+| CFG | Classifier-Free Guidance | Diffusion-model technique steering generation toward the text prompt without a separate classifier |
+| ColBERT | Contextualized Late Interaction over BERT | Late-interaction re-ranking model computing token-level similarity efficiently |
+| CTC | Connectionist Temporal Classification | Loss function for sequence-to-sequence without explicit alignment (used in ASR) |
+| DDPM | Denoising Diffusion Probabilistic Model | Core architecture behind modern image/video generation models |
+| DiD | Difference-in-Differences | Causal inference method comparing pre/post changes across treatment and control groups |
+| DiT | Diffusion Transformer | Transformer-based architecture for diffusion models (replaces U-Net) |
+| DoRA | Weight-Decomposed Low-Rank Adaptation | LoRA variant decomposing weights into magnitude and direction components |
+| DVC | Data Version Control | Git-like versioning for ML datasets and pipelines |
+| FID | Fréchet Inception Distance | Image generation quality metric comparing feature distributions |
+| FSDP | Fully Sharded Data Parallel | PyTorch's distributed training strategy sharding parameters, gradients, and optimizer states |
+| GAT | Graph Attention Network | GNN variant using attention-weighted neighbor aggregation |
+| GCN | Graph Convolutional Network | Foundational GNN architecture using spectral/spatial convolutions on graphs |
+| GGUF | GPT-Generated Unified Format | Quantized model file format for efficient CPU/edge inference (llama.cpp ecosystem) |
+| GPTQ | GPT Quantization | Post-training quantization method using approximate second-order information |
+| HTE | Heterogeneous Treatment Effect | Treatment effect that varies across subpopulations |
+| IPW | Inverse Probability Weighting | Causal inference technique reweighting samples by propensity score |
+| MOS | Mean Opinion Score | Subjective quality metric for speech synthesis (1-5 human rating scale) |
+| NAS | Neural Architecture Search | Automated search for optimal model architectures |
+| NPU | Neural Processing Unit | Dedicated on-device hardware accelerator for ML inference (Apple Neural Engine, Snapdragon NPU) |
+| RRF | Reciprocal Rank Fusion | Simple score-based method for combining multiple ranked lists |
+| SUTVA | Stable Unit Treatment Value Assumption | A/B testing assumption that one unit's treatment doesn't affect another's outcome |
+| TEE | Trusted Execution Environment | Secure hardware enclave for privacy-preserving computation (H100, SEV-SNP) |
+| TTS | Text-to-Speech | Converting text to spoken audio (neural TTS: VALL-E, XTTS) |
+| VLA | Vision-Language-Action (model) | Multimodal model mapping visual and language inputs to robotic actions (RT-2, OpenVLA) |
+| WER | Word Error Rate | Primary ASR accuracy metric (insertions + deletions + substitutions / total words) |
+| AST | Abstract Syntax Tree | Tree representation of source code structure used by coding agents |
+| DP-SGD | Differentially Private SGD | Stochastic gradient descent with clip-and-noise privacy guarantees |
+| GCG | Greedy Coordinate Gradient | Adversarial prompt optimization attack technique |
+| HBM | High Bandwidth Memory | Stacked 3D DRAM memory used on modern GPUs (H100/H200 HBM3e) |
+| MCTS | Monte Carlo Tree Search | Heuristic search algorithm used for decision processes and long-horizon agent planning |
+| NVLink | NVIDIA Interconnect | High-speed point-to-point interconnect between GPUs (up to 900 GB/s on NVLink-4) |
+| PaI | Prompt Injection | Security vulnerability where untrusted input overrides system instructions |
+| ReAct | Reasoning + Acting | Interleaved paradigm for LLM agent reasoning and execution |
+| SIMT | Single Instruction, Multiple Threads | CUDA execution architecture where threads execute instructions in warps |
+| SSM | State Space Model | Sub-quadratic sequence modeling architecture (Mamba, S4, RWKV) |
+| ToT | Tree-of-Thought | Agent planning framework maintaining multiple reasoning branches |
 
 ---
 
-*Cross-reference: most of these terms are explained in fuller context in `ANSWERS.md` (search the term) or diagrammed directly in `DESIGN_PATTERNS_CATALOG.md` Section A (Transformer & LLM Internals Patterns).*
+*Cross-reference: most of these terms are explained in fuller context in `answers.md` (search the term) or diagrammed directly in `patterns.md` Section A (Transformer & LLM Internals Patterns).*
+
+
