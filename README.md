@@ -1,7 +1,7 @@
-# AI Prep Buddy — Master Interview Question Bank (1588 Questions)
+# AI Prep Buddy — Master Interview Question Bank (1613 Questions)
 
-[![Questions](https://img.shields.io/badge/Questions-1588-blue?style=flat-square)](questions.md)
-[![Sections](https://img.shields.io/badge/Sections-48-green?style=flat-square)](questions.md)
+[![Questions](https://img.shields.io/badge/Questions-1613-blue?style=flat-square)](questions.md)
+[![Sections](https://img.shields.io/badge/Sections-49-green?style=flat-square)](questions.md)
 [![Diagrams](https://img.shields.io/badge/Diagrams-39-orange?style=flat-square)](diagrams.md)
 [![Patterns](https://img.shields.io/badge/Patterns-19-purple?style=flat-square)](patterns.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)

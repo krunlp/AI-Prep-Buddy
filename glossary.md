@@ -147,9 +147,18 @@ A quick-lookup reference for the 60+ acronyms used across this bank. Alphabetica
 | SIMT | Single Instruction, Multiple Threads | CUDA execution architecture where threads execute instructions in warps |
 | SSM | State Space Model | Sub-quadratic sequence modeling architecture (Mamba, S4, RWKV) |
 | ToT | Tree-of-Thought | Agent planning framework maintaining multiple reasoning branches |
+| ACA | Azure Container Apps | Serverless container platform supporting GPU workloads |
+| CMI | Custom Model Import | AWS Bedrock feature for importing fine-tuned custom weights |
+| CUD | Committed Use Discount | GCP pricing model providing volume discounts for reserved compute |
+| DLC | Deep Learning Container | Pre-configured Docker images optimized by AWS/GCP for ML serving |
+| GKE | Google Kubernetes Engine | Google Cloud managed Kubernetes platform with TPU/GPU auto-provisioning |
+| KEDA | Kubernetes Event-driven Autoscaling | Autoscaler scaling pod count based on external metrics (queue depth, token latency) |
+| PSC | Private Service Connect | GCP private data plane networking for securely reaching Google AI APIs |
+| PTU | Provisioned Throughput Unit | Reserved latency and throughput capacity model in Azure OpenAI Service |
 
 ---
 
 *Cross-reference: most of these terms are explained in fuller context in `answers.md` (search the term) or diagrammed directly in `patterns.md` Section A (Transformer & LLM Internals Patterns).*
+
 
 

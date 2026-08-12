@@ -85,9 +85,10 @@ Say the pattern name out loud even if you haven't fully worked out the details �
 - **AI Security & Red Teaming**: Dual-LLM architecture separates untrusted data parsing from privileged reasoning. Defense-in-depth requires output guardrails (Llama Guard/NeMo) + Confidential Computing (GPU TEEs).
 - **Long-Context Mechanics**: SSMs (Mamba) offer $O(N)$ linear inference state tracking vs Transformer $O(N^2)$ quadratic KV-cache growth. PagedAttention eliminates memory fragmentation; SGLang RadixAttention enables dynamic tree prefix reuse.
 - **Domain-Specific AI**: Robotics uses Vision-Language-Action (VLA) models mapping visual inputs directly to continuous motor actions. Healthcare AI demands MedMedQA evals & HIPAA PHI de-identification. Financial AI relies on microsecond-level limit order book (LOB) models. Software agents combine AST Code Property Graphs with test-driven execution loops.
-- **Deep-Dive Frameworks & Gateways**: LangGraph uses StateGraph + TypedDict schemas + Checkpointers (`MemorySaver`/`PostgresSaver`); CrewAI uses Manager Agents + 3-tier memory; AutoGen uses `ConversableAgent` + `GroupChatManager` + Docker sandbox; AI Gateway uses Qdrant/Redis semantic vector caching ($0.92-0.98$ cosine threshold) + weighted round-robin multi-cloud failover; LLMLingua prunes low-perplexity tokens; Merkle trees ensure immutable append-only agent audit ledgers.
+- **Cloud AI Deployments**: AWS uses Bedrock Provisioned Throughput + SageMaker Async + EKS Karpenter GPU autoscaling + Inferentia2; Azure uses Azure OpenAI PTU + Azure ML vLLM Online Endpoints + AKS KEDA (queue/latency scaling) + APIM Gateway; GCP uses Vertex AI Endpoints + Cloud Run GPU (serverless L4) + GKE TPU/GPU Ray clusters + AlloyDB pgvector; FinOps uses Prometheus DCGM GPU utilization exporters + Spot/Preemptible reserved capacity strategies.
 
 ---
+
 
 
 *Full depth on every topic here: `README.md` (questions) → `answers.md` (frameworks) → `diagrams.md` + `patterns.md` (diagrams) → `sources.md` (citations).*

@@ -30,7 +30,7 @@ jobs:
           print(f'Detected {q_count} questions across {sec_count} sections in questions.md')
 
           assert q_count >= 1500, f'Expected at least 1500 questions, found {q_count}'
-          assert sec_count == 48, f'Expected 48 sections, found {sec_count}'
+          assert sec_count == 49, f'Expected 49 sections, found {sec_count}'
 
           print('✅ Question count & section count verification passed!')
           "

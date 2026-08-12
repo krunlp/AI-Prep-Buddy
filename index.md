@@ -1,24 +1,24 @@
 ---
 layout: default
 title: Home
-description: "1500+ AI/ML interview questions with answer frameworks, architecture diagrams, code solutions, and study paths. Principal-level prep for 2026."
+description: "1600+ AI/ML interview questions with answer frameworks, architecture diagrams, code solutions, and study paths. Principal-level prep for 2026."
 image: https://repository-images.githubusercontent.com/AI-Prep-Buddy/social-preview.png
 ---
 
 # AI Prep Buddy
 
-A complete interview-prep bank for AI/ML system design and architecture roles — **1588 questions**, **answer frameworks for every one**, and **69 architecture & pattern diagrams** with worked examples.
+A complete interview-prep bank for AI/ML system design and architecture roles — **1613 questions**, **answer frameworks for every one**, and **69 architecture & pattern diagrams** with worked examples.
 
 <div style="display:flex; gap:1.2rem; flex-wrap:wrap; margin: 2rem 0;">
 
 <a href="questions.html" style="flex:1; min-width:220px; padding:1.2rem; border:1px solid #d1d5da; border-radius:8px; text-decoration:none; color:inherit; display:block;">
 <h3>📋 Question Bank</h3>
-<p>All 1588 questions across 48 sections — strategy, ML/DL fundamentals, LLMs, RAG, agents, system design, MLOps, safety, governance, coding, multimodal, fine-tuning, speech, edge AI, distributed training, causal inference, hardware kernels, AI security, long context, domain-specific AI, deep-dive agentic frameworks, AI gateways, and token budget engineering.</p>
+<p>All 1613 questions across 49 sections — strategy, ML/DL fundamentals, LLMs, RAG, agents, system design, MLOps, safety, governance, coding, multimodal, fine-tuning, speech, edge AI, distributed training, causal inference, hardware kernels, AI security, long context, domain-specific AI, deep-dive agentic frameworks, AI gateways, token budget engineering, and cloud deployment architectures (AWS, Azure & GCP).</p>
 </a>
 
 <a href="answers.html" style="flex:1; min-width:220px; padding:1.2rem; border:1px solid #d1d5da; border-radius:8px; text-decoration:none; color:inherit; display:block;">
 <h3>✅ Answer Frameworks</h3>
-<p>A strong-answer framework for every one of the 1588 questions — what a Principal-level candidate should hit, not generic filler.</p>
+<p>A strong-answer framework for every one of the 1613 questions — what a Principal-level candidate should hit, not generic filler.</p>
 </a>
 
 <a href="diagrams.html" style="flex:1; min-width:220px; padding:1.2rem; border:1px solid #d1d5da; border-radius:8px; text-decoration:none; color:inherit; display:block;">
@@ -42,7 +42,7 @@ A complete interview-prep bank for AI/ML system design and architecture roles �
 
 <a href="simulator.html" style="flex:1; min-width:200px; padding:1.2rem; border:1px solid #d1d5da; border-radius:8px; text-decoration:none; color:inherit; display:block;">
 <h3>🎤 Mock Interview Simulator</h3>
-<p>Interactive — random question draw, timer, self-grading, and weak-spot tracking across all 1588 questions.</p>
+<p>Interactive — random question draw, timer, self-grading, and weak-spot tracking across all 1613 questions.</p>
 </a>
 
 <a href="cheatsheet.html" style="flex:1; min-width:200px; padding:1.2rem; border:1px solid #d1d5da; border-radius:8px; text-decoration:none; color:inherit; display:block;">
