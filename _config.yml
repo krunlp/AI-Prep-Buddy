@@ -13,6 +13,7 @@ relative_links:
 include:
   - README.md
   - index.md
+  - index.html
   - questions.md
   - answers.md
   - diagrams.md

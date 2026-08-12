@@ -9,7 +9,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
 [![Live Site](https://img.shields.io/badge/Live_Site-GitHub_Pages-brightgreen?style=flat-square)](https://krunlp.github.io/AI-Prep-Buddy/)
 
-Compiled and synthesized from GitHub interview-prep repositories (alirezadir/AIMLInterviews, aishwaryanr/awesome-generative-ai-guide, neurarch-ai/awesome-llm-system-design, neurarch-ai/awesome-ml-system-design, shafaypro/CrackingMachineLearningInterview, andrewekhalel/MLQuestions, amitshekhariitbhu/machine-learning-interview-questions) plus standard architecture/leadership interview material. Organized end-to-end: strategy → fundamentals → LLM/GenAI depth → system design → production → governance → leadership.
+The comprehensive open-source interview-prep platform for AI/ML System Design, LLMs, Agents, Hardware Acceleration, and Cloud AI Architecture loops. Organized into 49 structured technical sections covering strategy, fundamentals, frontier models, infrastructure, governance, and leadership.
 
 ---
 

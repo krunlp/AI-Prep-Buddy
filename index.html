@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Prep Buddy — Ultimate Student & Candidate AI/ML Interview Hub</title>
+  <meta name="description" content="1,613 principal-level AI/ML interview questions, answer frameworks, system design diagrams, interactive mock simulator, and study paths for students & engineers.">
+  
+  <!-- Google Fonts & FontAwesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-primary: #0b0f19;
+      --bg-secondary: #151d30;
+      --bg-card: #151d30;
+      --bg-card-hover: #1e2942;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent-primary: #6366f1;
+      --accent-secondary: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #ec4899;
+      --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+      --border-color: #26334d;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 20px;
+    }
+
+    [data-theme="light"] {
+      --bg-primary: #f8fafc;
+      --bg-secondary: #ffffff;
+      --bg-card: #ffffff;
+      --bg-card-hover: #f1f5f9;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --border-color: #e2e8f0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Sticky Navigation */
+    header.site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(11, 15, 25, 0.9);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .header-container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0.9rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .logo-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      text-decoration: none;
+    }
+
+    .logo-badge {
+      background: var(--accent-gradient);
+      color: white;
+      width: 42px;
+      height: 42px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+    }
+
+    .logo-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.45rem;
+      font-weight: 800;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    nav.nav-links {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    nav.nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 500;
+      padding: 0.45rem 0.85rem;
+      border-radius: var(--radius-sm);
+      transition: all 0.2s ease;
+    }
+
+    nav.nav-links a:hover, nav.nav-links a.active {
+      color: var(--text-primary);
+      background: var(--bg-card-hover);
+    }
+
+    /* Hero Section */
+    .hero-container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 3.5rem 1.5rem 2.5rem;
+      text-align: center;
+    }
+
+    .hero-badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 1rem;
+      border-radius: 30px;
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: #818cf8;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-heading {
+      font-family: 'Outfit', sans-serif;
+      font-size: 3.4rem;
+      font-weight: 800;
+      line-height: 1.15;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 1.25rem;
+      letter-spacing: -1px;
+    }
+
+    .hero-subtext {
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      max-width: 820px;
+      margin: 0 auto 2.5rem;
+    }
+
+    /* Live Search Box */
+    .search-wrapper {
+      max-width: 680px;
+      margin: 0 auto 3rem;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 1.1rem 1.5rem 1.1rem 3.25rem;
+      border-radius: 40px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-size: 1.05rem;
+      outline: none;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4);
+      transition: all 0.25s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.25);
+    }
+
+    .search-icon-left {
+      position: absolute;
+      left: 1.25rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+
+    /* Metric Stat Grid */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.25rem;
+      max-width: 1240px;
+      margin: 0 auto 3.5rem;
+      padding: 0 1.5rem;
+    }
+
+    .stat-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.4rem;
+      text-align: center;
+      transition: all 0.25s ease;
+    }
+
+    .stat-box:hover {
+      transform: translateY(-3px);
+      border-color: var(--accent-primary);
+    }
+
+    .stat-number {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.3rem;
+      font-weight: 800;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 0.25rem;
+    }
+
+    /* Main Hub Section */
+    .hub-container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 1.5rem 4rem;
+    }
+
+    .section-title-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.75rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.75rem;
+    }
+
+    .section-title-wrapper h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.75rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .grid-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3.5rem;
+    }
+
+    .hub-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.8rem;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .hub-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--accent-primary);
+      box-shadow: 0 16px 35px -10px rgba(99, 102, 241, 0.3);
+    }
+
+    .card-header-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .hub-card h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+    }
+
+    .hub-card p {
+      color: var(--text-secondary);
+      font-size: 0.98rem;
+      line-height: 1.55;
+      margin-bottom: 1.25rem;
+      flex: 1;
+    }
+
+    .card-btn-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--accent-primary);
+    }
+
+    /* 5 Student Tracks Section */
+    .tracks-wrapper {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 4rem;
+    }
+
+    .track-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      border-left: 4px solid var(--accent-primary);
+    }
+
+    .track-card h4 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.15rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .track-card p {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.85rem;
+    }
+
+    .track-card a {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--accent-primary);
+      text-decoration: none;
+    }
+
+    /* Footer */
+    footer.site-footer {
+      border-top: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+      padding: 2.5rem 1.5rem;
+      margin-top: auto;
+    }
+
+    .footer-flex {
+      max-width: 1240px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .footer-links a {
+      color: var(--text-secondary);
+      margin-left: 1.25rem;
+      text-decoration: none;
+    }
+
+    .footer-links a:hover { color: var(--accent-primary); }
+
+    @media (max-width: 768px) {
+      .hero-heading { font-size: 2.2rem; }
+      .header-container { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-container">
+    <a href="index.html" class="logo-brand">
+      <div class="logo-badge"><i class="fa-solid fa-graduation-cap"></i></div>
+      <span class="logo-title">AI Prep Buddy</span>
+    </a>
+    
+    <nav class="nav-links">
+      <a href="index.html" class="active">Home</a>
+      <a href="questions.html">Questions (1613)</a>
+      <a href="answers.html">Answers</a>
+      <a href="simulator.html">🎤 Simulator</a>
+      <a href="company-prep.html">🏢 Companies</a>
+      <a href="diagrams.html">Diagrams</a>
+      <a href="patterns.html">Patterns</a>
+      <a href="cheatsheet.html">Cheat Sheet</a>
+      <a href="glossary.html">Glossary</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero-container">
+  <div class="hero-badge-pill">
+    <i class="fa-solid fa-star"></i> Student & Candidate Interview Hub — 2026 Edition
+  </div>
+  <h1 class="hero-heading">Master AI/ML & System Design Interviews</h1>
+  <p class="hero-subtitle">
+    The ultimate student-friendly platform with <strong>1,613 principal-grade questions</strong>, step-by-step answer frameworks, system architecture diagrams, interactive mock simulator, and role-tailored study paths.
+  </p>
+
+  <div class="search-wrapper">
+    <i class="fa-solid fa-magnifying-glass search-icon-left"></i>
+    <input type="text" class="search-input" id="quickSearchInput" placeholder="Search 1,613 questions by topic (e.g. Transformer, vLLM, RAG, CUDA, AWS, LoRA)..." onkeyup="handleQuickSearch()">
+  </div>
+</div>
+
+<div class="stats-row">
+  <div class="stat-box">
+    <div class="stat-number" style="color: #6366f1;">1,613</div>
+    <div class="stat-label">Interview Questions</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-number" style="color: #10b981;">49</div>
+    <div class="stat-label">Technical Sections</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-number" style="color: #f59e0b;">39</div>
+    <div class="stat-label">System Diagrams</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-number" style="color: #ec4899;">10</div>
+    <div class="stat-label">FAANG & AI Guides</div>
+  </div>
+</div>
+
+<div class="hub-container">
+
+  <div class="section-title-wrapper">
+    <h2><i class="fa-solid fa-rocket" style="color: var(--accent-primary);"></i> Candidate Quick Launch Pad</h2>
+  </div>
+
+  <div class="grid-cards">
+
+    <a href="questions.html" class="hub-card">
+      <div class="card-header-icon" style="background: rgba(99, 102, 241, 0.12); color: #6366f1;">
+        <i class="fa-solid fa-book-open"></i>
+      </div>
+      <h3>📋 Question Bank</h3>
+      <p>Browse all 1,613 questions across 49 sections categorized cleanly with difficulty levels (⭐ Standard, ⭐⭐ Hard, ⭐⭐⭐ Principal).</p>
+      <span class="card-btn-link">Explore Question Bank <i class="fa-solid fa-arrow-right"></i></span>
+    </a>
+
+    <a href="answers.html" class="hub-card">
+      <div class="card-header-icon" style="background: rgba(16, 185, 129, 0.12); color: #10b981;">
+        <i class="fa-solid fa-lightbulb"></i>
+      </div>
+      <h3>💡 Answer Frameworks</h3>
+      <p>Master concise, bulleted answer frameworks for every question — learn what senior and principal engineers look for in top candidates.</p>
+      <span class="card-btn-link" style="color: #10b981;">View Answer Frameworks <i class="fa-solid fa-arrow-right"></i></span>
+    </a>
+
+    <a href="simulator.html" class="hub-card">
+      <div class="card-header-icon" style="background: rgba(236, 72, 153, 0.12); color: #ec4899;">
+        <i class="fa-solid fa-microphone"></i>
+      </div>
+      <h3>🎤 Mock Simulator Studio</h3>
+      <p>Practice timed interview questions with self-grading, answer reveals, and browser-saved weak spot analytics.</p>
+      <span class="card-btn-link" style="color: #ec4899;">Launch Mock Simulator <i class="fa-solid fa-arrow-right"></i></span>
+    </a>
+
+    <a href="company-prep.html" class="hub-card">
+      <div class="card-header-icon" style="background: rgba(245, 158, 11, 0.12); color: #f59e0b;">
+        <i class="fa-solid fa-building"></i>
+      </div>
+      <h3>🏢 Company Interview Guides</h3>
+      <p>Detailed candidate-reported process breakdowns for Meta, NVIDIA, Microsoft, Apple, Tesla, Mistral AI, OpenAI, and DeepMind.</p>
+      <span class="card-btn-link" style="color: #f59e0b;">Read Company Guides <i class="fa-solid fa-arrow-right"></i></span>
+    </a>
+
+    <a href="diagrams.html" class="hub-card">
+      <div class="card-header-icon" style="background: rgba(168, 85, 247, 0.12); color: #a855f7;">
+        <i class="fa-solid fa-diagram-project"></i>
+      </div>
+      <h3>🏗️ Architecture Diagrams</h3>
+      <p>39 rendered architecture diagrams (RAG, agent loops, vLLM serving, vector stores, MLOps) with worked system design examples.</p>
+      <span class="card-btn-link" style="color: #a855f7;">View Diagrams <i class="fa-solid fa-arrow-right"></i></span>
+    </a>
+
+    <a href="study-paths.html" class="hub-card">
+      <div class="card-header-icon" style="background: rgba(59, 130, 246, 0.12); color: #3b82f6;">
+        <i class="fa-solid fa-map-location-dot"></i>
+      </div>
+      <h3>🗺️ 2-Week Study Paths</h3>
+      <p>Structured 14-day study schedules tailored for Staff MLEs, Principal AI Architects, and Frontier ML Researchers.</p>
+      <span class="card-btn-link" style="color: #3b82f6;">View Study Paths <i class="fa-solid fa-arrow-right"></i></span>
+    </a>
+
+  </div>
+
+  <!-- Student Study Tracks -->
+  <div class="section-title-wrapper">
+    <h2><i class="fa-solid fa-layer-group" style="color: var(--accent-secondary);"></i> Student Learning Tracks (49 Sections)</h2>
+  </div>
+
+  <div class="tracks-wrapper">
+
+    <div class="track-card" style="border-left-color: #6366f1;">
+      <h4>Track 1: ML/DL & Math Fundamentals</h4>
+      <p>Sections 1–7: Strategy, leadership, statistics, probability, computer vision, and pre-LLM NLP basics.</p>
+      <a href="questions.html#section-1-strategy-vision--technical-leadership-125">Browse Track 1 Questions →</a>
+    </div>
+
+    <div class="track-card" style="border-left-color: #10b981;">
+      <h4>Track 2: LLMs, GenAI & Fine-Tuning</h4>
+      <p>Sections 8–12, 32–33, 46: Transformers, prompting, RAG, vector DBs, agents, PEFT, long context, and SSMs.</p>
+      <a href="questions.html#section-8-llm--transformer-fundamentals-286345">Browse Track 2 Questions →</a>
+    </div>
+
+    <div class="track-card" style="border-left-color: #f59e0b;">
+      <h4>Track 3: System Design & MLOps</h4>
+      <p>Sections 13–21, 38, 48–49: LLM system design, serving, feature stores, data engineering, AWS/Azure/GCP cloud deployments.</p>
+      <a href="questions.html#section-13-llm-system-design--genai-architecture-496555">Browse Track 3 Questions →</a>
+    </div>
+
+    <div class="track-card" style="border-left-color: #ec4899;">
+      <h4>Track 4: Safety, Security & Hardware</h4>
+      <p>Sections 22–23, 34, 44–45: Guardrails, prompt injection, CUDA kernels, FlashAttention, TEEs, and AI ethics.</p>
+      <a href="questions.html#section-22-safety-guardrails--llm-security-866905">Browse Track 4 Questions →</a>
+    </div>
+
+  </div>
+
+</div>
+
+<footer class="site-footer">
+  <div class="footer-flex">
+    <div>
+      <strong>AI Prep Buddy</strong> — Open-source principal-level AI/ML interview prep platform (1,613 questions across 49 sections).
+    </div>
+    <div class="footer-links">
+      <a href="https://github.com/krunlp/AI-Prep-Buddy" target="_blank"><i class="fa-brands fa-github"></i> GitHub</a>
+      <a href="data/questions.json" target="_blank"><i class="fa-solid fa-file-code"></i> JSON API</a>
+      <a href="LICENSE">MIT License</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+function handleQuickSearch() {
+  const query = document.getElementById('quickSearchInput').value.trim().toLowerCase();
+  if (query.length > 2) {
+    // Redirect or highlight query
+    window.location.href = `questions.html?search=${encodeURIComponent(query)}`;
+  }
+}
+</script>
+
+</body>
+</html>
