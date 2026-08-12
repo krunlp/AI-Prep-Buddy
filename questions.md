@@ -1249,3 +1249,75 @@ Compiled and synthesized from GitHub interview-prep repositories (alirezadir/AIM
 1138. What's the enterprise-grade difference between a proof-of-concept, a pilot, and a production-grade AI deployment, and what gate criteria separate each stage?
 1139. How would you structure an annual AI risk assessment cycle that satisfies both internal audit and external regulatory expectations?
 1140. Design a framework for measuring and reporting AI-driven productivity gains at the enterprise level without over-claiming causality.
+
+## Section 30 — Enterprise Agent Interoperability (MCP, A2A) & Advanced RAG (1141–1180)
+
+1141. Explain the Model Context Protocol (MCP): what problem does it solve, and how does it differ from a custom tool-calling integration?
+1142. What is an MCP server vs. an MCP client, and how does the client-server architecture map onto an enterprise's existing systems?
+1143. Explain the MCP Registry concept — how is it analogous to a package registry like Docker Hub or npm, and what enterprise problem does it solve?
+1144. What is an "MCP Server Card," and how does it enable discovery without a live connection?
+1145. How would you design governance for an internal MCP server registry — namespace trust, pre-audit requirements, and versioning?
+1146. Explain MCP's shift toward a stateless architecture — why does statefulness cause problems at enterprise scale, and what does stateless enable?
+1147. What is the MCP "Tasks" extension, and why does it matter for long-running agent operations?
+1148. How would you design authentication/authorization for MCP servers at enterprise scale, given the protocol's move toward OAuth/OpenID Connect alignment?
+1149. What is "Elicitation" in MCP, and how does it enable human-in-the-loop approval for high-risk agent actions?
+1150. Design an enterprise MCP gateway that sits between internal agents and a mix of internal and third-party MCP servers — what does it need to enforce?
+1151. Explain the Agent2Agent (A2A) protocol: what problem does it solve that MCP does not?
+1152. What is an "Agent Card" in A2A, and how does it enable one agent to discover another agent's capabilities across organizational boundaries?
+1153. Explain A2A's task lifecycle states (submitted, working, input-required, completed, failed, canceled, rejected) and why an explicit lifecycle matters for enterprise workflows.
+1154. How do MCP and A2A compose together in a single enterprise architecture — which layer handles what?
+1155. Compare A2A, MCP, ACP (IBM's Agent Communication Protocol), and ANP (Agent Network Protocol) — what distinct problem does each address?
+1156. Design an enterprise Agent Registry — what should it catalog beyond just an agent's name (capabilities, owner, risk tier, data access scope)?
+1157. What is an "Agent Broker," and how does it differ architecturally from an Agent Registry?
+1158. How would you design secure data hand-off between two agents built by different teams (e.g., a Sales agent passing context to a Pricing agent) without redundant re-querying or data leakage?
+1159. Design a governance review process specifically for onboarding a new agent into an enterprise Agent Registry before it's discoverable by other agents.
+1160. What security risks are introduced specifically by cross-vendor agent interoperability (A2A-style) that don't exist in a single-vendor, single-agent system?
+1161. How would you audit and trace a multi-agent workflow that spans agents from three different vendors communicating via A2A, when something goes wrong?
+1162. What is the "governance gap" in current agent interoperability protocols — what can MCP, A2A, and ACP not yet express natively that enterprises need?
+1163. Design a permission model for an agent that uses MCP to access ten different internal tools with very different sensitivity levels.
+1164. How would you version and deprecate an internal MCP server without breaking every agent currently depending on it?
+1165. What observability specifically changes when your agent architecture spans MCP (tool access) and A2A (agent-to-agent) simultaneously?
+1166. Design a "walled garden" MCP deployment for a regulated enterprise that cannot allow agents to reach external MCP servers at all.
+1167. How would you decide whether a new integration should be built as an MCP server, an A2A-exposed agent, or a traditional internal API?
+1168. What is permission-aware retrieval in enterprise RAG, and why do most consumer-grade RAG tools fail to provide it?
+1169. Design a RAG system that automatically inherits a document's existing access-control permissions rather than requiring separate, manually-maintained AI permissions.
+1170. Explain hybrid RAG, GraphRAG, and Agentic RAG as a maturity progression — when does each level of complexity actually earn its cost in an enterprise context?
+1171. What is late chunking, and how does it solve a specific failure mode of the traditional chunk-then-embed pipeline?
+1172. Design an audit-trail/lineage system for enterprise RAG that can trace any generated answer back to its exact source document and permission context, for regulatory defensibility.
+1173. What is the "facts vs. behavior" heuristic for choosing between RAG and fine-tuning, and where does it break down?
+1174. How would you design a RAG evaluation framework with measurable, auditable thresholds suitable for a regulated enterprise (not just an internal quality bar)?
+1175. What is shadow AI risk specific to RAG systems, and how does uncoordinated departmental RAG deployment create compliance exposure?
+1176. Design an enterprise knowledge layer that unifies RAG-based retrieval across multiple AI interfaces (chatbot, IDE assistant, CRM agent) with one consistent permission and audit system.
+1177. How would you decide when single-pass RAG is insufficient and agentic/corrective RAG (re-searching on insufficient evidence) is actually warranted, given the added cost and latency?
+1178. What embedding-model and re-ranker landscape considerations matter for an enterprise choosing a RAG stack in 2026 versus building on defaults from a year or two prior?
+1179. Design a self-improving RAG system where verification workflows and expert feedback propagate corrections automatically across all connected interfaces.
+1180. How would you present a board-level risk assessment of your organization's agent interoperability posture (MCP/A2A exposure, third-party agent access, registry governance maturity)?
+
+## Section 31 — Cloud-Native Agent Deployment: AWS, Azure, GCP (1181–1206)
+
+1181. Compare AWS Bedrock AgentCore, Azure AI Foundry Agent Service, and Google Vertex AI Agent Engine as managed agent runtimes — what does "managed runtime" actually need to provide beyond model access?
+1182. Explain AWS Bedrock's Action Groups pattern — how does an agent get tool access, and what AWS service actually executes each action?
+1183. What is AgentCore's approach to identity and token management, and why is it described as well-suited for zero-trust, multi-tenant deployments?
+1184. How does Azure AI Foundry's agent identity model work, and what's the tradeoff for enterprises not already using Microsoft Entra ID?
+1185. Explain how Google Vertex AI Agent Engine handles identity and IAM permissions for deployed agents, and how Apigee fits into the architecture.
+1186. What is Bedrock AgentCore's approach to session memory, and what underlying AWS service backs it?
+1187. Compare the observability approach across all three platforms — CloudWatch tracing (AWS), Azure Monitor integration, and Vertex AI's built-in dashboards.
+1188. Design a multi-agent collaboration architecture using Bedrock AgentCore's 2026 multi-agent delegation capability — how do sub-agents get invoked?
+1189. Why would an enterprise choose Azure AI Foundry specifically for GPT-5/OpenAI-model-based agents, given model availability differences across the three clouds?
+1190. What does deep Microsoft 365 integration (Outlook, Teams, SharePoint, Sentinel) unlock for an Azure-deployed agent that AWS/GCP-deployed agents can't easily replicate?
+1191. How does Vertex AI's Google Search grounding with citation support change the RAG-vs-native-search tradeoff for a GCP-native agent?
+1192. Design a decision framework for choosing between AWS Bedrock, Azure AI Foundry, and Vertex AI for a new enterprise agent deployment, given existing cloud investment.
+1193. What compliance/certification differences exist across the three platforms (FedRAMP, HIPAA, data residency), and how would this affect a regulated-industry deployment decision?
+1194. How would you architect a multi-cloud agent deployment needing GPT, Claude, and Llama all under enterprise terms — why do practitioners suggest this typically requires two platforms, not one?
+1195. Explain how transforming existing internal APIs into MCP servers via Apigee (GCP) compares to building MCP servers from scratch — what governance advantage does this pattern offer?
+1196. Design cost controls for an agent platform processing millions of sessions monthly across a hyperscaler's consumption-based pricing model — what usage patterns most commonly cause runaway cost?
+1197. What is VPC/PrivateLink-based network isolation for agent deployments, and why does AWS's implementation get specifically called out as strong for regulated environments?
+1198. How would you design an agent's tool-execution layer to be portable across AWS Lambda (Bedrock Action Groups), Azure Functions (Foundry), and GCP Cloud Functions (Vertex) without vendor-locking the core agent logic?
+1199. What governance gap does the OutSystems 2026 finding (96% of enterprises have agents in production, only 12% can govern them) point to, and how would you close it architecturally regardless of which cloud you're on?
+1200. Design an evaluation/policy-preview integration (like Bedrock AgentCore's Policy and Evaluations previews) into a CI/CD pipeline for agent deployment.
+1201. How would you decide whether to build on a hyperscaler's native agent runtime versus an open-source framework (LangGraph, CrewAI) versus a cross-cloud platform — what does each trade away?
+1202. What does "agent estate" mean as an enterprise planning concept, and how would you inventory and govern one across multiple cloud deployments?
+1203. Design disaster recovery for a mission-critical agent deployed on a single hyperscaler's managed runtime — what's actually portable if that cloud has an extended outage?
+1204. How would you structure IAM least-privilege permissions for an agent on Vertex AI Agent Engine that needs to query BigQuery but never modify it?
+1205. What is the practical difference between "agent orchestration inside one cloud's estate" (e.g., Bedrock Agents and Flows) versus true cross-cloud agent portability, and which do most enterprises actually need?
+1206. How would you present a cloud-agent-platform selection recommendation to a CTO who wants to avoid a repeat of a prior costly cloud-migration lock-in mistake?

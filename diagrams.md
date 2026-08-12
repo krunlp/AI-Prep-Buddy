@@ -1115,9 +1115,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var text = code.textContent;
     var container = code.closest("div.highlighter-rouge") || code.closest("pre");
     var div = document.createElement("div");
-    div.className = "mermaid";
-    div.id = "mermaid-" + i;
-    div.textContent = text;
+    div.className = "mermaid"; div.id = "mermaid-" + i; div.textContent = text;
     container.parentNode.replaceChild(div, container);
   });
   mermaid.run({ querySelector: ".mermaid" });

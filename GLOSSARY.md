@@ -4,8 +4,14 @@ A quick-lookup reference for the 60+ acronyms used across this bank. Alphabetica
 
 | Acronym | Full Term | One-Line Definition |
 |---|---|---|
+| A2A | Agent2Agent Protocol | Google/Linux Foundation open standard for agent-to-agent discovery, task delegation, and coordination across vendors |
+| ABAC | Attribute-Based Access Control | Access control model using attributes (role, department, sensitivity) rather than fixed permission lists |
+| ACP | Agent Communication Protocol | IBM Research's multi-agent protocol with formal negotiation semantics (propose/accept/reject/counter) |
 | ADF | Augmented Dickey-Fuller (test) | Statistical test for stationarity in a time series |
+| AI/ML acronyms continued below alphabetically | | |
+| ANP | Agent Network Protocol | Community-driven protocol aimed at decentralized agent marketplaces |
 | ANN | Approximate Nearest Neighbor | Fast, approximate similarity search algorithm class (e.g., HNSW, IVF) |
+| RAGAS | Retrieval-Augmented Generation Assessment | Open-source framework for automated RAG evaluation metrics |
 | ANOVA | Analysis of Variance | Statistical test comparing means across 3+ groups |
 | API | Application Programming Interface | Contract for how software components communicate |
 | AUC | Area Under the Curve | Aggregate performance metric (usually ROC or PR curve) |
@@ -46,6 +52,7 @@ A quick-lookup reference for the 60+ acronyms used across this bank. Alphabetica
 | LSTM | Long Short-Term Memory | Gated RNN architecture mitigating vanishing gradients |
 | MAP | Maximum a Posteriori (also: Mean Average Precision) | Context-dependent — Bayesian point estimate, or a ranking-quality metric |
 | MCMC | Markov Chain Monte Carlo | Sampling method for complex posterior distributions |
+| MCP | Model Context Protocol | Anthropic's open standard (Nov 2024) for agent-to-tool/data access — the "USB-C port for AI" |
 | METEOR | Metric for Evaluation of Translation with Explicit ORdering | Translation-quality metric adding synonym/stem matching to BLEU |
 | MHA / MQA | Multi-Head Attention / Multi-Query Attention | Attention variants — MHA gives every head its own K/V, MQA shares one K/V across all heads |
 | MLA | Multi-Head Latent Attention | KV-cache-compressing attention variant (DeepSeek-style) |

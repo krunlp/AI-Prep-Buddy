@@ -539,6 +539,88 @@ flowchart TD
 
 *These five patterns extend the catalog into enterprise governance/operating-model territory, complementing the technical patterns in sections A–F above. Combined with Section 29 in the question bank, this closes the gap between "can build the system" and "can operate AI at true enterprise scale."*
 
+---
+
+## H. Enterprise Agent Interoperability & Cloud Deployment Patterns (2026)
+
+### H1. MCP + A2A Composed Architecture (Q1141, Q1151, Q1154)
+
+```mermaid
+flowchart TD
+    subgraph Agent1["Agent A (Sales)"]
+    A1LOGIC[Agent Logic]
+    end
+    subgraph Agent2["Agent B (Pricing) - different vendor"]
+    A2LOGIC[Agent Logic]
+    end
+
+    A1LOGIC -->|MCP: tool access| CRM[(CRM MCP Server)]
+    A1LOGIC -->|MCP: tool access| DOCS[(Docs MCP Server)]
+    A2LOGIC -->|MCP: tool access| PRICING[(Pricing DB MCP Server)]
+
+    A1LOGIC <-->|A2A: Agent Card discovery + task delegation| A2LOGIC
+
+    REGISTRY[Agent Registry] -.discovery.-> A1LOGIC
+    REGISTRY -.discovery.-> A2LOGIC
+```
+
+**When to draw this:** Any question about how MCP and A2A fit together. The core distinction to state explicitly: **MCP is vertical** (an agent reaching down into its own tools/data), **A2A is horizontal** (agents reaching across to each other, potentially across vendor boundaries) — they solve different problems and compose rather than compete.
+
+---
+
+### H2. Agent Registry + Broker Pattern (Q1156–1158)
+
+```mermaid
+flowchart TD
+    NEWAGENT[New Agent] --> ONBOARD[Onboarding Review: capability, risk tier, owner, security review]
+    ONBOARD -->|Approved| REGISTRY[(Agent Registry: catalog, discoverable)]
+    REGISTRY --> DISCOVER[Other Agents Discover via Agent Card]
+    DISCOVER --> BROKER[Agent Broker: runtime intermediary]
+    BROKER --> AUTHCHECK{Receiving Agent Authorized for This Data?}
+    AUTHCHECK -->|Yes| HANDOFF[Scoped Context Hand-off]
+    AUTHCHECK -->|No| DENY[Deny + Log]
+    HANDOFF --> LOG[Audit Log]
+```
+
+**When to draw this:** Any Agent Registry or multi-agent-governance question. The distinction to always call out: the **Registry** answers "what exists and what can it do" (catalog); the **Broker** answers "how does data actually flow safely at runtime" (active enforcement) — a registry without a broker is just documentation, not a security boundary.
+
+---
+
+### H3. Permission-Aware Enterprise RAG (Q1168–1169)
+
+```mermaid
+flowchart TD
+    USER[User Query] --> IDENTITY[Resolve User Identity]
+    IDENTITY --> ENTITLEMENTS[(Existing Enterprise Entitlement System - same source as all other data access)]
+    QUERY[Query] --> RETRIEVE[Retrieve Candidates]
+    ENTITLEMENTS --> FILTER[Filter Candidates: only docs user is ALREADY authorized to see]
+    RETRIEVE --> FILTER
+    FILTER --> RANK[Rank Filtered Set]
+    RANK --> GENERATE[Generate Answer]
+    GENERATE --> AUDIT[Audit: source doc + permission context logged]
+```
+
+**When to draw this:** Any enterprise RAG or "why do consumer RAG tools fail in enterprise" question. The critical detail: permission filtering happens **before ranking, sourced from the same entitlement system as everything else** — never a separately-maintained "AI permissions" list, which inevitably drifts out of sync with real access control.
+
+---
+
+### H4. Cloud-Native Agent Runtime Comparison (Q1181, Q1192)
+
+```mermaid
+flowchart TD
+    DECISION{Primary Deployment Driver?} 
+    DECISION -->|Need GPT-5/OpenAI models specifically| AZURE[Azure AI Foundry Agent Service<br/>+ Entra ID identity<br/>+ M365 deep integration]
+    DECISION -->|Zero-trust, multi-tenant, regulated/FedRAMP/HIPAA| AWS[AWS Bedrock AgentCore<br/>+ vault-backed tokens<br/>+ VPC/PrivateLink]
+    DECISION -->|GCP-native, BigQuery, Gemini multimodal, Search grounding| GCP[Vertex AI Agent Engine<br/>+ native IAM<br/>+ Apigee API-to-MCP]
+    DECISION -->|Need GPT + Claude + Llama together| BOTH[Two-Platform: Foundry + Bedrock<br/>accept operational overhead]
+```
+
+**When to draw this:** Any "which cloud for agent deployment" question. All three reached enterprise GA within the same six-month window (Oct 2025–Q1 2026) and now differ mainly in ecosystem fit, not raw capability — the decision framework is "which platform can own your control plane without fighting your existing operation," not a feature checklist comparison.
+
+---
+
+*Section H reflects the state of enterprise agent interoperability as of mid-2026 — this is the fastest-moving area in the entire bank (MCP alone had its largest spec revision since launch in July 2026). Re-verify against `REAL_WORLD_SOURCES.md` before relying on specific version/timing details in an interview.*
+
 <script>
 document.addEventListener("DOMContentLoaded", function () {
   mermaid.initialize({ startOnLoad: false, theme: "default" });
@@ -547,9 +629,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var text = code.textContent;
     var container = code.closest("div.highlighter-rouge") || code.closest("pre");
     var div = document.createElement("div");
-    div.className = "mermaid";
-    div.id = "mermaid-" + i;
-    div.textContent = text;
+    div.className = "mermaid"; div.id = "mermaid-" + i; div.textContent = text;
     container.parentNode.replaceChild(div, container);
   });
   mermaid.run({ querySelector: ".mermaid" });
