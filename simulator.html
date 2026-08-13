@@ -336,6 +336,24 @@ function startTimer() {
   }, 1000);
 }
 
+// Deep link: simulator.html?section=12 preselects that section's filter, so the
+// role map and study paths can send you straight into targeted practice.
+(function applySectionDeepLink() {
+  try {
+    const want = new URLSearchParams(window.location.search).get('section');
+    if (!want) return;
+    const n = String(parseInt(want, 10));
+    if (n === 'NaN') return;
+    for (let i = 0; i < sel.options.length; i++) {
+      const label = sel.options[i].value;
+      if (/^Section\s+(\d+)/.test(label) && RegExp.$1 === n) {
+        sel.value = label;
+        break;
+      }
+    }
+  } catch (e) { /* no deep link support, ignore */ }
+})();
+
 document.getElementById('newQuestionBtn').addEventListener('click', pickQuestion);
 document.getElementById('revealBtn').addEventListener('click', () => {
   clearInterval(timerInterval);

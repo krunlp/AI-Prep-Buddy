@@ -38,9 +38,13 @@ Only two files are hand-edited:
 | `questions.md` | **Source of truth** for question text and numbering |
 | `answers.md` | **Source of truth** for answer text |
 
+Role definitions live in `scripts/roles_data.py` (sections referenced by number,
+so they survive renumbering).
+
 Everything else is **generated**. Do not hand-edit these — your changes will be
 overwritten:
 
+- `roles.html`
 - `data/questions.json`
 - the `QA_DATA` block inside `simulator.html`
 - question counts in `README.md` and `index.html`

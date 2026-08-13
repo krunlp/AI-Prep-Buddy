@@ -22,6 +22,7 @@ import re
 import sys
 
 import qa_lib
+import build_roles
 
 
 def _fmt_thousands(n: int) -> str:
@@ -149,6 +150,21 @@ def sync_index_html(total, dry_run=False):
     return True
 
 
+def _roles_drift():
+    """True if roles.html would change (checked without writing)."""
+    import io, contextlib
+    path = qa_lib.REPO_ROOT / "roles.html"
+    before = path.read_text(encoding="utf-8") if path.exists() else ""
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        build_roles.main()
+    after = path.read_text(encoding="utf-8") if path.exists() else ""
+    if before != after:
+        path.write_text(before, encoding="utf-8")  # restore, --check must not mutate
+        return True
+    return False
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true", help="report drift without writing")
@@ -170,6 +186,7 @@ def main() -> int:
     print(f"source of truth: {total} questions across {sections} sections")
 
     changed = {
+        "roles.html": bool(build_roles.main()) if not args.check else _roles_drift(),
         "data/questions.json": sync_questions_json(dataset, total, sections, args.check),
         "simulator.html": sync_simulator(dataset, total, args.check),
         "README.md": sync_readme(total, args.check),
