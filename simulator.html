@@ -692,7 +692,8 @@ function localScore(userText, reference) {
   const pct = concepts.length ? Math.round((hit.length / concepts.length) * 100) : 0;
   const words = userText.trim() ? userText.trim().split(/\s+/).length : 0;
   let verdict;
-  if (!words) verdict = 'No answer captured yet.';
+  if (!concepts.length) verdict = 'No reference answer available to score against.';
+  else if (!words) verdict = 'No answer captured yet.';
   else if (pct >= 70) verdict = 'Strong coverage of the key concepts.';
   else if (pct >= 45) verdict = 'Partial — you hit the main idea but left gaps.';
   else if (pct >= 20) verdict = 'Thin — several core concepts were not mentioned.';
@@ -825,6 +826,18 @@ async function evaluateAnswer() {
 function resetEvaluation() {
   if (evalResult) { evalResult.innerHTML = ''; evalResult.classList.remove('show'); }
   if (typedAnswer) typedAnswer.value = '';
+}
+
+// Warm the IDF index in the background. Building it lazily inside the first
+// click costs a corpus pass over every answer, which is a visible freeze on a
+// phone. Doing it during idle time makes the first evaluation feel instant.
+function warmIdf() {
+  try { getIdf(); } catch (e) { /* scoring will build it on demand instead */ }
+}
+if (typeof requestIdleCallback === 'function') {
+  requestIdleCallback(warmIdf, { timeout: 4000 });
+} else {
+  setTimeout(warmIdf, 1200);
 }
 
 // --- wiring ---------------------------------------------------------------
