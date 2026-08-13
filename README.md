@@ -1,4 +1,4 @@
-# AI Prep Buddy — Master Interview Question Bank (1621 Questions)
+# AI Prep Buddy — Master Interview Question Bank (1,621 Questions)
 
 [![CI Verification](https://github.com/krunlp/AI-Prep-Buddy/actions/workflows/ci.yml/badge.svg)](https://github.com/krunlp/AI-Prep-Buddy/actions/workflows/ci.yml)
 [![Questions](https://img.shields.io/badge/Questions-1621-blue?style=flat-square)](questions.md)

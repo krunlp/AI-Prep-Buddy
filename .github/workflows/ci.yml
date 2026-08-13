@@ -17,23 +17,17 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Verify Question Count Consistency
-        run: |
-          python3 -c "
-          import re, sys
+      # Structural integrity of the question bank.
+      # Catches: duplicate numbers, numbering gaps, unanswered questions,
+      # orphan answers, section range overlaps, mismatched section headers,
+      # and derived artifacts drifting out of sync with the source of truth.
+      - name: Verify question bank integrity
+        run: python3 scripts/verify_integrity.py
 
-          with open('questions.md') as f:
-              q_text = f.read()
-          q_count = len(re.findall(r'^\d+\.', q_text, re.MULTILINE))
-          sec_count = len(re.findall(r'^## Section', q_text, re.MULTILINE))
-
-          print(f'Detected {q_count} questions across {sec_count} sections in questions.md')
-
-          assert q_count >= 1500, f'Expected at least 1500 questions, found {q_count}'
-          assert sec_count == 49, f'Expected 49 sections, found {sec_count}'
-
-          print('✅ Question count & section count verification passed!')
-          "
+      # Fails if questions.md / answers.md were edited without regenerating
+      # data/questions.json, simulator.html, README.md and index.html.
+      - name: Verify derived artifacts are in sync
+        run: python3 scripts/sync_derived.py --check
 
       - name: Build Jekyll Site
         uses: actions/jekyll-build-pages@v1

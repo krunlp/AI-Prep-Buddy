@@ -1,0 +1,22 @@
+#!/bin/sh
+# AI Prep Buddy pre-commit hook.
+# Install with:  ln -sf ../../scripts/pre-commit .git/hooks/pre-commit
+#
+# Blocks commits that corrupt the question bank or leave derived artifacts
+# out of sync with questions.md / answers.md.
+
+set -e
+
+echo "[pre-commit] verifying question bank integrity..."
+python3 scripts/verify_integrity.py
+
+echo "[pre-commit] verifying derived artifacts are in sync..."
+if ! python3 scripts/sync_derived.py --check; then
+  echo
+  echo "Derived artifacts are stale. Run:"
+  echo "    python3 scripts/sync_derived.py"
+  echo "then stage the regenerated files and commit again."
+  exit 1
+fi
+
+echo "[pre-commit] ok"
