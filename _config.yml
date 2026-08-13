@@ -12,7 +12,6 @@ relative_links:
   collections: false
 include:
   - README.md
-  - index.md
   - index.html
   - questions.md
   - answers.md

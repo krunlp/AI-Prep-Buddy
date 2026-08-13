@@ -166,6 +166,42 @@ def main() -> int:
                 f"— run scripts/sync_derived.py",
             )
 
+    # 9. No two source pages may render to the same URL.
+    #    Regression guard: index.md and index.html both rendered to /index.html,
+    #    so Jekyll silently dropped one and the surviving homepage was arbitrary.
+    from collections import defaultdict
+
+    outputs = defaultdict(list)
+    for p in qa_lib.REPO_ROOT.glob("*.md"):
+        if p.name in {"README.md", "CONTRIBUTING.md"}:
+            continue
+        outputs[p.stem + ".html"].append(p.name)
+    for p in qa_lib.REPO_ROOT.glob("*.html"):
+        outputs[p.name].append(p.name)
+    for url, sources in sorted(outputs.items()):
+        if len(sources) > 1:
+            fail(
+                "page-conflict",
+                f"/{url} is produced by multiple files: {sorted(sources)} — "
+                f"Jekyll will drop one non-deterministically",
+            )
+
+    # 10. Every published page must be reachable from the homepage.
+    #     Regression guard: code-solutions.html and sources.html existed but
+    #     nothing linked to them, so the content was effectively invisible.
+    index_path = qa_lib.REPO_ROOT / "index.html"
+    if index_path.exists():
+        index_text = index_path.read_text(encoding="utf-8")
+        linked = set(re.findall(r'href="([a-z0-9\-]+)\.html"', index_text))
+        published = {u[:-5] for u in outputs} - {"index"}
+        unlinked = sorted(published - linked)
+        if unlinked:
+            fail(
+                "orphan-page",
+                f"published but not linked from index.html: "
+                f"{', '.join(p + '.html' for p in unlinked)}",
+            )
+
     # --- report -----------------------------------------------------------
     print()
     for w in WARNINGS:
