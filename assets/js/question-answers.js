@@ -27,6 +27,7 @@
   var tip = null;
   var activeItem = null;
   var canHover = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  var debug = { items: 0, bound: 0, byText: 0, byOrder: 0, reason: null };
 
   // ---------------------------------------------------------------- styling
   function injectStyles() {
@@ -78,68 +79,112 @@
   }
 
   // ------------------------------------------------------------------- bind
-  // Walk each section heading, collect the list items that follow it, and pair
-  // them with that section's question numbers in order.
+  // Matching is done on QUESTION TEXT, not on DOM structure. The bank is not
+  // uniform: early sections are tight lists (no blank lines), later sections
+  // are loose lists, and sections 43+ have a bold title line plus a
+  // description continuation. Any structural assumption breaks on one of them.
+  // Text matching survives all three. Document order is only a fallback.
+  function normText(s) {
+    return String(s || '')
+      .replace(/\u2b50/g, ' ')            // difficulty stars
+      .replace(/[*`_]/g, ' ')             // markdown syntax kept in the JSON
+      .replace(/[\u2010-\u2015]/g, '-')  // dash variants
+      .replace(/[\u2018\u2019]/g, "'")
+      .replace(/[\u201c\u201d]/g, '"')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .toLowerCase();
+  }
+
   function bindItems(index) {
+    var exact = Object.create(null);
+    var prefix = Object.create(null);
     var bySection = {};
-    var order = [];
     index.forEach(function (q) {
-      if (!bySection[q.section]) { bySection[q.section] = []; order.push(q.section); }
-      bySection[q.section].push(q.id);
+      var n = normText(q.question);
+      if (!n) return;
+      exact[n] = q.id;
+      var pre = n.slice(0, 60);
+      if (prefix[pre] === undefined) prefix[pre] = q.id;
+      else prefix[pre] = -1;             // ambiguous, don't use
+      (bySection[q.section] = bySection[q.section] || []).push(q.id);
     });
 
-    var headings = Array.prototype.filter.call(
-      document.querySelectorAll('h2'),
-      function (h) { return /^Section\s+\d+/.test((h.textContent || '').trim()); }
-    );
+    var items = Array.prototype.slice.call(document.querySelectorAll('li'));
+    if (!items.length) {
+      debug.reason = 'no <li> elements found on the page';
+      return 0;
+    }
 
-    var bound = 0;
-    headings.forEach(function (h) {
-      var text = (h.textContent || '').trim();
-      var key = Object.keys(bySection).find(function (s) {
-        return text.indexOf(s.replace(/\s*\(\d+[–-]\d+\)\s*$/, '').trim()) === 0 ||
-               s.indexOf(text.replace(/\s*\(\d+[–-]\d+\)\s*$/, '').trim()) === 0;
-      });
-      if (!key) return;
-      var nums = bySection[key];
+    var bound = 0, matchedByText = 0;
+    var unmatched = [];
+    items.forEach(function (li) {
+      if (li.closest('nav') || li.closest('.site-nav')) return;
+      var t = normText(li.textContent);
+      if (!t) return;
+      var id = exact[t];
+      if (id === undefined) {
+        var p = prefix[t.slice(0, 60)];
+        if (p !== undefined && p !== -1) id = p;
+      }
+      if (id === undefined) { unmatched.push(li); return; }
+      attach(li, id);
+      matchedByText++;
+      bound++;
+    });
 
-      // Gather <li> elements between this heading and the next one.
-      var items = [];
-      var node = h.nextElementSibling;
-      while (node && node.tagName !== 'H2') {
-        if (node.tagName === 'OL' || node.tagName === 'UL') {
-          Array.prototype.push.apply(items, node.querySelectorAll(':scope > li'));
+    // Fallback for anything text matching missed: map the still-unbound items
+    // to the remaining question numbers of their section, in document order.
+    if (unmatched.length) {
+      var used = Object.create(null);
+      items.forEach(function (li) { if (li.dataset.qnum) used[li.dataset.qnum] = 1; });
+      var headings = Array.prototype.filter.call(document.querySelectorAll('h2'),
+        function (h) { return /^Section\s+\d+/.test((h.textContent || '').trim()); });
+      unmatched.forEach(function (li) {
+        var h = null, node = li;
+        while (node) {
+          if (node.previousElementSibling) node = node.previousElementSibling;
+          else node = node.parentElement;
+          if (!node) break;
+          if (node.tagName === 'H2' && headings.indexOf(node) !== -1) { h = node; break; }
         }
-        node = node.nextElementSibling;
-      }
-      if (!items.length) return;
-
-      // Correct the visible numbering, which kramdown restarts at 1.
-      var firstList = items[0].parentElement;
-      if (firstList && firstList.tagName === 'OL' && nums.length) {
-        firstList.setAttribute('start', String(nums[0]));
-      }
-
-      items.forEach(function (li, i) {
-        if (i >= nums.length) return;
-        var num = nums[i];
-        li.classList.add('qa-item', 'qa-ready');
-        li.dataset.qnum = String(num);
-        li.setAttribute('tabindex', '0');
-        li.setAttribute('aria-label', 'Question ' + num + '. Reveal answer.');
-        // Wrap existing content so hover underline targets only the question.
-        var span = document.createElement('span');
-        span.className = 'qa-q';
-        while (li.firstChild) span.appendChild(li.firstChild);
-        li.appendChild(span);
-        var badge = document.createElement('span');
-        badge.className = 'qa-badge';
-        badge.textContent = canHover ? '· hover for answer' : '· tap for answer';
-        li.appendChild(badge);
+        if (!h) return;
+        var htext = (h.textContent || '').replace(/\s*\(\d+[\u2013-]\d+\)\s*$/, '').trim();
+        var key = Object.keys(bySection).find(function (s) {
+          return htext.indexOf(s.trim()) === 0 || s.trim().indexOf(htext) === 0;
+        });
+        if (!key) return;
+        var free = bySection[key].filter(function (n) { return !used[n]; });
+        if (!free.length) return;
+        var id = free[0];
+        used[id] = 1;
+        attach(li, id);
         bound++;
       });
-    });
+    }
+
+    debug.items = items.length;
+    debug.bound = bound;
+    debug.byText = matchedByText;
+    debug.byOrder = bound - matchedByText;
+    if (!bound) debug.reason = 'no list item text matched any question';
     return bound;
+  }
+
+  function attach(li, num) {
+    if (li.dataset.qnum) return;
+    li.classList.add('qa-item', 'qa-ready');
+    li.dataset.qnum = String(num);
+    li.setAttribute('tabindex', '0');
+    li.setAttribute('aria-label', 'Question ' + num + '. Reveal answer.');
+    var span = document.createElement('span');
+    span.className = 'qa-q';
+    while (li.firstChild) span.appendChild(li.firstChild);
+    li.appendChild(span);
+    var badge = document.createElement('span');
+    badge.className = 'qa-badge';
+    badge.textContent = canHover ? '\u00b7 hover for answer' : '\u00b7 tap for answer';
+    li.appendChild(badge);
   }
 
   // ------------------------------------------------------------------- view
@@ -284,15 +329,31 @@
     window.addEventListener('scroll', function () { if (canHover) hideTip(); }, { passive: true });
   }
 
+  // Append ?qadebug=1 to the URL to see why binding did or did not happen.
+  function showDebug() {
+    var d = document.createElement('div');
+    d.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:99999;padding:10px 14px;' +
+      'background:#111;color:#0f0;font:12px/1.5 monospace;border-top:2px solid #0f0';
+    d.textContent = 'qa-debug · list items: ' + debug.items + ' · bound: ' + debug.bound +
+      ' (text ' + debug.byText + ', order ' + debug.byOrder + ')' +
+      (debug.reason ? ' · ' + debug.reason : '');
+    document.body.appendChild(d);
+  }
+
   function init() {
     if (!document.querySelector('h2')) return;
     fetchJson(QUESTIONS_URL).then(function (data) {
       var index = data && data.questions ? data.questions : data;
       if (!Array.isArray(index) || !index.length) return;
       injectStyles();
-      if (bindItems(index) > 0) wireEvents();
-    }).catch(function () {
-      /* offline or opened via file:// — page still works, just without reveal */
+      var n = bindItems(index);
+      if (n > 0) wireEvents();
+      window.__qaDebug = debug;
+      if (/[?&]qadebug=1/.test(window.location.search)) showDebug();
+    }).catch(function (err) {
+      debug.reason = 'could not load data/questions.json: ' + (err && err.message);
+      window.__qaDebug = debug;
+      if (/[?&]qadebug=1/.test(window.location.search)) showDebug();
     });
   }
 

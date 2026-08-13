@@ -236,7 +236,7 @@ def main() -> int:
         fail("hover-answers", "assets/js/question-answers.js is missing")
     else:
         qmd = (qa_lib.REPO_ROOT / "questions.md").read_text(encoding="utf-8")
-        if "question-answers.js" not in qmd:
+        if "question-answers.js" not in qmd:  # version query tolerated
             fail("hover-answers", "questions.md does not load question-answers.js")
     if not ans_json.exists():
         fail("hover-answers", "data/answers.json is missing — run scripts/sync_derived.py")

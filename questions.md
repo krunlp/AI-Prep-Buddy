@@ -1991,4 +1991,4 @@ Synthesize an end-to-end multi-region, multi-cloud enterprise GenAI serving plat
 
 ---
 
-<script src="assets/js/question-answers.js" defer></script>
+<script src="assets/js/question-answers.js?v=2" defer></script>
