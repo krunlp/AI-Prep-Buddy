@@ -52,6 +52,23 @@ def sync_questions_json(dataset, total, sections, dry_run=False):
     return True
 
 
+def sync_answers_json(dataset, total, dry_run=False):
+    """Answer lookup consumed by the question page's hover/tap reveal."""
+    path = qa_lib.REPO_ROOT / "data" / "answers.json"
+    blob = {
+        "total_answers": total,
+        "answers": {str(r["n"]): r["a"] for r in dataset},
+    }
+    new_text = json.dumps(blob, indent=0, ensure_ascii=False) + "\n"
+    old_text = path.read_text(encoding="utf-8") if path.exists() else ""
+    if new_text == old_text:
+        return False
+    if not dry_run:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(new_text, encoding="utf-8")
+    return True
+
+
 def sync_simulator(dataset, total, dry_run=False):
     path = qa_lib.SIMULATOR_HTML
     if not path.exists():
@@ -114,6 +131,26 @@ def sync_readme(total, dry_run=False):
     if not dry_run:
         path.write_text(text, encoding="utf-8")
     return True
+
+
+def sync_prose_counts(total, dry_run=False):
+    """Keep bank-size mentions in prose pages accurate."""
+    changed = False
+    pretty = _fmt_thousands(total)
+    for name in ("study-paths.md", "cheatsheet.md", "questions.md", "answers.md"):
+        path = qa_lib.REPO_ROOT / name
+        if not path.exists():
+            continue
+        text = path.read_text(encoding="utf-8")
+        num = r"(?:\d{1,3}(?:,\d{3})+|\d{3,5})"
+        new = re.sub(rf"over {num} questions", f"over {pretty} questions", text)
+        new = re.sub(rf"\({num} Questions\)", f"({pretty} Questions)", new)
+        new = re.sub(rf"{num}-question bank", f"{pretty}-question bank", new)
+        if new != text:
+            changed = True
+            if not dry_run:
+                path.write_text(new, encoding="utf-8")
+    return changed
 
 
 def sync_index_html(total, dry_run=False):
@@ -188,9 +225,11 @@ def main() -> int:
     changed = {
         "roles.html": bool(build_roles.main()) if not args.check else _roles_drift(),
         "data/questions.json": sync_questions_json(dataset, total, sections, args.check),
+        "data/answers.json": sync_answers_json(dataset, total, args.check),
         "simulator.html": sync_simulator(dataset, total, args.check),
         "README.md": sync_readme(total, args.check),
         "index.html": sync_index_html(total, args.check),
+        "prose counts": sync_prose_counts(total, args.check),
     }
 
     drifted = [name for name, did in changed.items() if did]

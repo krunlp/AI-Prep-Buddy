@@ -197,7 +197,11 @@ def main() -> int:
 
     # 8. Advertised counts in human-facing files must match reality.
     #    Regression guard: README badge and index.html nav sat at 1613.
-    for name in ("README.md", "index.html"):
+    #     Regression guard: questions.md kept advertising 1,613 in its H1 long
+    #     after the bank grew, because this check only looked at two files.
+    page_files = ["README.md", "index.html", "questions.md", "answers.md",
+                  "cheatsheet.md", "study-paths.md", "simulator.html"]
+    for name in page_files:
         path = qa_lib.REPO_ROOT / name
         if not path.exists():
             continue
@@ -219,6 +223,31 @@ def main() -> int:
                 f"{name} advertises {_fmt(sorted(stale))} but source has {total} "
                 f"— run scripts/sync_derived.py",
             )
+
+    # 8b. The question page's hover/tap reveal depends on a generated answer
+    #     lookup and a client script. Both must exist and match the source.
+    ans_json = qa_lib.REPO_ROOT / "data" / "answers.json"
+    hover_js = qa_lib.REPO_ROOT / "assets" / "js" / "question-answers.js"
+    if not hover_js.exists():
+        fail("hover-answers", "assets/js/question-answers.js is missing")
+    else:
+        qmd = (qa_lib.REPO_ROOT / "questions.md").read_text(encoding="utf-8")
+        if "question-answers.js" not in qmd:
+            fail("hover-answers", "questions.md does not load question-answers.js")
+    if not ans_json.exists():
+        fail("hover-answers", "data/answers.json is missing — run scripts/sync_derived.py")
+    else:
+        try:
+            blob = json.loads(ans_json.read_text(encoding="utf-8"))
+            got = len(blob.get("answers", {}))
+            if got != total:
+                fail(
+                    "hover-answers",
+                    f"data/answers.json holds {got} answers but source has {total} "
+                    f"— run scripts/sync_derived.py",
+                )
+        except json.JSONDecodeError as exc:
+            fail("hover-answers", f"data/answers.json is not valid JSON: {exc}")
 
     # 9. No two source pages may render to the same URL.
     #    Regression guard: index.md and index.html both rendered to /index.html,

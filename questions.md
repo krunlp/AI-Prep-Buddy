@@ -5,7 +5,7 @@ title: Question Bank
 
 [← Back to Home](index.html) · [Question Bank →](questions.html) · [Answers →](answers.html) · [Diagrams →](diagrams.html) · [Patterns →](patterns.html) · [Sources →](sources.html) · [Simulator →](simulator.html) · [Cheat Sheet →](cheatsheet.html) · [Glossary →](glossary.html) · [Company Prep →](company-prep.html)
 
-# AI Prep Buddy — Master Interview Question Bank (1,613 Questions)
+# AI Prep Buddy — Master Interview Question Bank (1,621 Questions)
 
 The complete open-source prep platform for AI/ML engineering, system design, and architecture loops. Organized into 49 structured technical sections with difficulty tags (`⭐ Standard`, `⭐⭐ Hard`, `⭐⭐⭐ Principal`).
 
@@ -1992,3 +1992,5 @@ Construct an enterprise GPU observability and resource reclamation architecture.
 Synthesize an end-to-end multi-region, multi-cloud enterprise GenAI serving platform blueprint spanning AWS (Bedrock/SageMaker), Azure (Azure OpenAI/AML), and GCP (Vertex AI/GKE). Detail the global traffic management layer, unified federated IAM/RBAC identity plane, central AI Gateway (rate limiting, caching, routing), secret rotation, observability telemetry, and Disaster Recovery (DR) RPO/RTO targets.
 
 ---
+
+<script src="assets/js/question-answers.js" defer></script>
