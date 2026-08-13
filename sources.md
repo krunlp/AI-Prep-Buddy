@@ -3,8 +3,6 @@ layout: default
 title: Real-World Sources
 ---
 
-[← Back to Home](index.html) · [Question Bank →](questions.html) · [Answers →](answers.html) · [Diagrams →](diagrams.html) · [Patterns →](patterns.html) · [Sources →](sources.html) · [Simulator →](simulator.html) · [Cheat Sheet →](cheatsheet.html) · [Glossary →](glossary.html) · [Company Prep →](company-prep.html)
-
 # AI Prep Buddy — Real-World Industry Sources & 2026 Refresh Notes
 
 This document grounds the question bank in actual current sources (searched August 2026) rather than training-data recall alone. It has two parts: **(1) curated real sources** mapped to relevant sections, and **(2) explicit refresh notes** flagging where the bank's original content is dated or oversimplified relative to current practice.

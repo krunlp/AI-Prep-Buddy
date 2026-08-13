@@ -199,8 +199,12 @@ def main() -> int:
     #    Regression guard: README badge and index.html nav sat at 1613.
     #     Regression guard: questions.md kept advertising 1,613 in its H1 long
     #     after the bank grew, because this check only looked at two files.
+    #     Regression guard 2: _layouts/default.html is the site-wide shell, so
+    #     one stale number there is stale on EVERY page. It was advertising
+    #     1,613 in both the nav and the footer while every check passed.
     page_files = ["README.md", "index.html", "questions.md", "answers.md",
-                  "cheatsheet.md", "study-paths.md", "simulator.html"]
+                  "cheatsheet.md", "study-paths.md", "simulator.html",
+                  "_layouts/default.html", "_config.yml", "roles.html"]
     for name in page_files:
         path = qa_lib.REPO_ROOT / name
         if not path.exists():
@@ -267,6 +271,41 @@ def main() -> int:
                 "page-conflict",
                 f"/{url} is produced by multiple files: {sorted(sources)} — "
                 f"Jekyll will drop one non-deterministically",
+            )
+
+    # 8c. Diagram-count claims must match the actual number of diagrams.
+    #     Regression guard: diagrams.md carried interim notes claiming "13
+    #     diagrams" and "28 diagrams" long after it held 39.
+    for name, pattern in (("diagrams.md", r"^## \d+\."), ("patterns.md", r"^### [A-Z]\d+\.")):
+        path = qa_lib.REPO_ROOT / name
+        if not path.exists():
+            continue
+        text = path.read_text(encoding="utf-8")
+        actual = len(re.findall(pattern, text, re.MULTILINE))
+        claims = {int(n) for n in re.findall(r"\b(\d{1,3}) diagrams\b", text)}
+        wrong = sorted(c for c in claims if c != actual)
+        if wrong:
+            fail(
+                "diagram-count",
+                f"{name} claims {wrong} diagrams but contains {actual}",
+            )
+
+    # 9b. The shared layout's nav must reach every published page. It is the
+    #     only navigation on markdown pages, so a page missing here is
+    #     effectively unreachable while browsing.
+    layout = qa_lib.REPO_ROOT / "_layouts" / "default.html"
+    if layout.exists():
+        lt = layout.read_text(encoding="utf-8")
+        nav_links = set(re.findall(r'href="\{\{ site\.baseurl \}\}/([a-z0-9\-]+)\.html"', lt))
+        published_pages = {p.stem for p in qa_lib.REPO_ROOT.glob("*.md")
+                           if p.name not in {"README.md", "CONTRIBUTING.md"}}
+        published_pages |= {p.stem for p in qa_lib.REPO_ROOT.glob("*.html")}
+        missing_nav = sorted(published_pages - nav_links - {"index"})
+        if missing_nav:
+            fail(
+                "layout-nav",
+                "pages missing from the shared layout nav: "
+                + ", ".join(p + ".html" for p in missing_nav),
             )
 
     # 10. Every published page must be reachable from the homepage.

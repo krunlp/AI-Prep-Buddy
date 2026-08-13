@@ -3,8 +3,6 @@ layout: default
 title: Answer Frameworks
 ---
 
-[← Back to Home](index.html) · [Question Bank →](questions.html) · [Answers →](answers.html) · [Diagrams →](diagrams.html) · [Patterns →](patterns.html) · [Sources →](sources.html) · [Simulator →](simulator.html) · [Cheat Sheet →](cheatsheet.html) · [Glossary →](glossary.html) · [Company Prep →](company-prep.html)
-
 # AI Prep Buddy — Question Bank WITH ANSWERS
 
 Answers are concise "strong answer" frameworks (what a Principal-level candidate should hit), not exhaustive essays. Being built section by section.

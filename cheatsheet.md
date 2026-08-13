@@ -3,8 +3,6 @@ layout: default
 title: Cheat Sheet
 ---
 
-[← Back to Home](index.html) · [Question Bank →](questions.html) · [Answers →](answers.html) · [Diagrams →](diagrams.html) · [Patterns →](patterns.html) · [Sources →](sources.html) · [Simulator →](simulator.html) · [Cheat Sheet →](cheatsheet.html) · [Glossary →](glossary.html) · [Company Prep →](company-prep.html)
-
 # AI Prep Buddy — Day-of-Interview Cheat Sheet
 
 The condensed version. Read this in the 20 minutes before your interview, not the full 1,621-question bank. Organized around the questions you're most likely to actually get.

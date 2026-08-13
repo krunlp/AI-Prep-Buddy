@@ -3,8 +3,6 @@ layout: default
 title: Question Bank
 ---
 
-[← Back to Home](index.html) · [Question Bank →](questions.html) · [Answers →](answers.html) · [Diagrams →](diagrams.html) · [Patterns →](patterns.html) · [Sources →](sources.html) · [Simulator →](simulator.html) · [Cheat Sheet →](cheatsheet.html) · [Glossary →](glossary.html) · [Company Prep →](company-prep.html)
-
 # AI Prep Buddy — Master Interview Question Bank (1,621 Questions)
 
 The complete open-source prep platform for AI/ML engineering, system design, and architecture loops. Organized into 49 structured technical sections with difficulty tags (`⭐ Standard`, `⭐⭐ Hard`, `⭐⭐⭐ Principal`).

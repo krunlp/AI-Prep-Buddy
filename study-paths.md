@@ -3,8 +3,6 @@ layout: default
 title: Study Paths
 ---
 
-[← Back to Home](index.html) · [Question Bank →](questions.html) · [Answers →](answers.html) · [Diagrams →](diagrams.html) · [Patterns →](patterns.html) · [Sources →](sources.html) · [Simulator →](simulator.html) · [Cheat Sheet →](cheatsheet.html) · [Glossary →](glossary.html) · [Company Prep →](company-prep.html)
-
 # AI Interview Study Paths
 
 Welcome to the curated study paths! With over 1,621 questions in the bank, it's impossible to review everything in a short timeframe. We have created three distinct 2-week study plans tailored to specific roles. 

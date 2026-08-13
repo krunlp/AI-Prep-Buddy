@@ -133,6 +133,22 @@ def sync_readme(total, dry_run=False):
     return True
 
 
+def sync_layout(total, dry_run=False):
+    """The shared layout is the shell for every page; its counts must track."""
+    path = qa_lib.REPO_ROOT / "_layouts" / "default.html"
+    if not path.exists():
+        return False
+    text = path.read_text(encoding="utf-8")
+    num = r"(?:\d{1,3}(?:,\d{3})+|\d{3,5})"
+    new = re.sub(rf"Questions \({num}\)", f"Questions ({total})", text)
+    new = re.sub(rf"\({num} questions across", f"({_fmt_thousands(total)} questions across", new)
+    if new == text:
+        return False
+    if not dry_run:
+        path.write_text(new, encoding="utf-8")
+    return True
+
+
 def sync_prose_counts(total, dry_run=False):
     """Keep bank-size mentions in prose pages accurate."""
     changed = False
@@ -230,6 +246,7 @@ def main() -> int:
         "README.md": sync_readme(total, args.check),
         "index.html": sync_index_html(total, args.check),
         "prose counts": sync_prose_counts(total, args.check),
+        "_layouts/default.html": sync_layout(total, args.check),
     }
 
     drifted = [name for name, did in changed.items() if did]

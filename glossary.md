@@ -3,8 +3,6 @@ layout: default
 title: Glossary
 ---
 
-[← Back to Home](index.html) · [Question Bank →](questions.html) · [Answers →](answers.html) · [Diagrams →](diagrams.html) · [Patterns →](patterns.html) · [Sources →](sources.html) · [Simulator →](simulator.html) · [Cheat Sheet →](cheatsheet.html) · [Glossary →](glossary.html) · [Company Prep →](company-prep.html)
-
 # AI Prep Buddy — Glossary of Acronyms
 
 A quick-lookup reference for the 60+ acronyms used across this bank. Alphabetical.

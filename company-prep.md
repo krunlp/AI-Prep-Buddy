@@ -3,8 +3,6 @@ layout: default
 title: Company-Specific Prep
 ---
 
-[← Back to Home](index.html) · [Question Bank →](questions.html) · [Answers →](answers.html) · [Diagrams →](diagrams.html) · [Patterns →](patterns.html) · [Sources →](sources.html) · [Simulator →](simulator.html) · [Cheat Sheet →](cheatsheet.html) · [Glossary →](glossary.html) · [Company Prep →](company-prep.html)
-
 # AI Prep Buddy — Company-Specific Interview Prep
 
 Grounded in publicly reported candidate experiences and third-party interview-coaching research as of 2026. **Caveat upfront: none of this is official company material** — top companies don't publish internal rubrics, and this reflects community-reported patterns, not confirmed internal process. Treat it as directional, not gospel.
