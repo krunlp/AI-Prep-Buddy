@@ -136,7 +136,27 @@ TEMPLATE = """<!DOCTYPE html>
   footer { text-align: center; margin-top: 34px; font-size: 0.84em; color: var(--text-secondary); }
   footer a { color: var(--accent-indigo); }
   @media (max-width: 600px) { select { min-width: 100%; } body { padding: 14px; } }
+
+  /* Light theme. This page is standalone (no Jekyll layout), so it reads the
+     theme the shared layout's toggle stored in localStorage. */
+  html[data-theme="light"] {
+    --bg: #f6f8fb;
+    --card: #ffffff;
+    --border: rgba(16,32,46,0.14);
+    --text-primary: #16202e;
+    --text-secondary: #55627a;
+  }
 </style>
+<script>
+(function () {
+  try {
+    var t = localStorage.getItem('theme');
+    if (t === 'light' || t === 'dark') {
+      document.documentElement.setAttribute('data-theme', t);
+    }
+  } catch (e) {}
+})();
+</script>
 </head>
 <body>
 

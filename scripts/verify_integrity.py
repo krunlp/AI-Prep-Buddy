@@ -308,6 +308,26 @@ def main() -> int:
                 + ", ".join(p + ".html" for p in missing_nav),
             )
 
+    # 9c. Standalone HTML pages don't use the shared layout, so each carries
+    #     its own nav. Regression guard: simulator.html shipped without links
+    #     to roles, study-paths and code-solutions.
+    standalone = ["simulator.html", "roles.html", "index.html"]
+    all_pages = {p.stem for p in qa_lib.REPO_ROOT.glob("*.md")
+                 if p.name not in {"README.md", "CONTRIBUTING.md"}}
+    all_pages |= {p.stem for p in qa_lib.REPO_ROOT.glob("*.html")}
+    for name in standalone:
+        path = qa_lib.REPO_ROOT / name
+        if not path.exists():
+            continue
+        linked = set(re.findall(r'href="([a-z0-9\-]+)\.html"',
+                                path.read_text(encoding="utf-8")))
+        gap = sorted(all_pages - linked - {path.stem})
+        if gap:
+            fail(
+                "standalone-nav",
+                f"{name} nav is missing: " + ", ".join(p + ".html" for p in gap),
+            )
+
     # 10. Every published page must be reachable from the homepage.
     #     Regression guard: code-solutions.html and sources.html existed but
     #     nothing linked to them, so the content was effectively invisible.

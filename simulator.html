@@ -114,7 +114,29 @@
   .chip.hit { background: rgba(16,185,129,0.15); color: var(--accent-emerald, #10b981); }
   .chip.miss { background: rgba(239,68,68,0.13); color: var(--accent-rose, #ef4444); }
   .eval-source { text-align: center; font-size: 0.75em; color: var(--text-secondary); margin-top: 12px; }
+
+  /* Light theme, kept in sync with the shared layout's toggle. Standalone
+     pages don't inherit the layout, so they read localStorage['theme']. */
+  html[data-theme="light"] {
+    --bg-primary: #f6f8fb;
+    --bg-card: #ffffff;
+    --bg-card-hover: #eef2f7;
+    --text-primary: #16202e;
+    --text-secondary: #55627a;
+    --border-color: #d8dee9;
+  }
 </style>
+<script>
+// Standalone page: honour the theme chosen via the shared layout's toggle.
+(function () {
+  try {
+    var t = localStorage.getItem('theme');
+    if (t === 'light' || t === 'dark') {
+      document.documentElement.setAttribute('data-theme', t);
+    }
+  } catch (e) {}
+})();
+</script>
 </head>
 <body>
 
@@ -126,6 +148,9 @@
 <nav>
 <a href="index.html">Home</a> ·
 <a href="questions.html">Question Bank</a> ·
+<a href="roles.html">🎯 By Role</a> ·
+<a href="study-paths.html">Study Paths</a> ·
+<a href="code-solutions.html">Code</a> ·
 <a href="answers.html">Answers</a> ·
 <a href="diagrams.html">Diagrams</a> ·
 <a href="patterns.html">Patterns</a> ·
