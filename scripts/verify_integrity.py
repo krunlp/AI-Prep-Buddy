@@ -153,6 +153,13 @@ def main() -> int:
             "function saveStats",
             "getElementById('sectionFilter')",
             "addEventListener('click', pickQuestion)",
+            # voice features
+            "function speakQuestion",
+            "function startRecording",
+            "function stopRecording",
+            "function resetVoiceForNewQuestion",
+            "speechSynthesis",
+            "webkitSpeechRecognition",
         ]
         for sym in required_symbols:
             if sym not in html:

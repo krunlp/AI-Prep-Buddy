@@ -71,13 +71,30 @@
   footer { text-align: center; margin-top: 40px; font-size: 0.85em; color: var(--text-secondary); }
   .reset-link { text-align: center; margin-top: 14px; }
   .reset-link a { color: var(--accent-rose); font-size: 0.85em; cursor: pointer; text-decoration: underline; }
+
+  /* --- voice --- */
+  .voice-panel { border-top: 1px solid var(--border, rgba(255,255,255,0.12)); margin-top: 16px; padding-top: 14px; }
+  .voice-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: center; }
+  .voice-toggle { font-size: 0.9em; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; cursor: pointer; }
+  .voice-btn { padding: 7px 12px; border-radius: 6px; border: 1px solid var(--border, rgba(255,255,255,0.18)); background: transparent; color: var(--text-primary, inherit); cursor: pointer; font-size: 0.9em; }
+  .voice-btn:hover:not(:disabled) { border-color: var(--accent-indigo, #6366f1); }
+  .voice-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .voice-btn.mic.recording { background: var(--accent-rose, #ef4444); color: #fff; border-color: var(--accent-rose, #ef4444); animation: micpulse 1.4s ease-in-out infinite; }
+  @keyframes micpulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
+  .voice-rate { padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border, rgba(255,255,255,0.18)); background: transparent; color: var(--text-primary, inherit); font-size: 0.85em; }
+  .voice-status { text-align: center; font-size: 0.82em; color: var(--text-secondary); margin-top: 8px; min-height: 1em; }
+  .voice-status.error { color: var(--accent-rose, #ef4444); }
+  .transcript { display: none; margin-top: 12px; padding: 12px; border: 1px dashed var(--border, rgba(255,255,255,0.18)); border-radius: 6px; font-size: 0.92em; line-height: 1.55; white-space: pre-wrap; }
+  .transcript.show { display: block; }
+  .transcript .interim { opacity: 0.55; }
+  .transcript-meta { text-align: center; font-size: 0.8em; color: var(--text-secondary); margin-top: 6px; }
 </style>
 </head>
 <body>
 
 <header>
 <h1>🎤 Mock Interview Simulator</h1>
-<p>Practice against the full 1,621-question bank. Time yourself, self-grade, track weak spots.</p>
+<p>Practice against the full 1,621-question bank. Have questions read aloud, answer out loud, time yourself, self-grade, and track weak spots.</p>
 </header>
 
 <nav>
@@ -159,6 +176,26 @@
   <div class="section-label" id="sectionLabel">—</div>
   <div class="question" id="questionText">Click "New Question" to start.</div>
   <div class="timer" id="timer">00:00</div>
+
+  <div class="voice-panel" id="voicePanel">
+    <div class="voice-row">
+      <label class="voice-toggle">
+        <input type="checkbox" id="ttsToggle"> 🔊 Read question aloud
+      </label>
+      <button id="speakBtn" class="voice-btn" title="Read the current question aloud">🔊 Speak</button>
+      <button id="micBtn" class="voice-btn mic" title="Answer out loud">🎙️ Answer by voice</button>
+      <select id="voiceRate" class="voice-rate" title="Speaking speed">
+        <option value="0.85">0.85×</option>
+        <option value="1" selected>1×</option>
+        <option value="1.15">1.15×</option>
+        <option value="1.3">1.3×</option>
+      </select>
+    </div>
+    <div class="voice-status" id="voiceStatus"></div>
+    <div class="transcript" id="transcript"></div>
+    <div class="transcript-meta" id="transcriptMeta"></div>
+  </div>
+
   <div style="text-align:center;">
     <button id="revealBtn">Reveal Answer</button>
   </div>
@@ -226,6 +263,7 @@ function pickQuestion() {
   document.getElementById('gradeButtons').style.display = 'none';
   document.getElementById('revealBtn').style.display = 'inline-block';
   startTimer();
+  resetVoiceForNewQuestion();
 }
 
 function startTimer() {
@@ -243,6 +281,8 @@ function startTimer() {
 document.getElementById('newQuestionBtn').addEventListener('click', pickQuestion);
 document.getElementById('revealBtn').addEventListener('click', () => {
   clearInterval(timerInterval);
+  if (typeof recording !== 'undefined' && recording) stopRecording();
+  if (typeof stopSpeaking === 'function') stopSpeaking();
   document.getElementById('answerBox').classList.add('show');
   document.getElementById('gradeButtons').style.display = 'flex';
   document.getElementById('revealBtn').style.display = 'none';
@@ -257,6 +297,182 @@ function grade(level) {
   saveStats(stats);
   renderStats();
   pickQuestion();
+}
+
+// ---------------------------------------------------------------------------
+// Voice: speech synthesis (question read aloud) + speech recognition (spoken
+// answer). Entirely client-side via the Web Speech API — no backend, no keys,
+// no audio leaves the browser. Degrades gracefully where unsupported.
+// ---------------------------------------------------------------------------
+const ttsToggle = document.getElementById('ttsToggle');
+const speakBtn = document.getElementById('speakBtn');
+const micBtn = document.getElementById('micBtn');
+const voiceRate = document.getElementById('voiceRate');
+const voiceStatus = document.getElementById('voiceStatus');
+const transcriptBox = document.getElementById('transcript');
+const transcriptMeta = document.getElementById('transcriptMeta');
+
+const ttsSupported = typeof window !== 'undefined' && 'speechSynthesis' in window;
+const SR = (typeof window !== 'undefined') &&
+  (window.SpeechRecognition || window.webkitSpeechRecognition);
+const srSupported = !!SR;
+
+let recognition = null;
+let recording = false;
+let finalTranscript = '';
+let speechStart = null;
+
+function setVoiceStatus(msg, isError) {
+  if (!voiceStatus) return;
+  voiceStatus.textContent = msg || '';
+  voiceStatus.className = 'voice-status' + (isError ? ' error' : '');
+}
+
+// --- text to speech -------------------------------------------------------
+function speakQuestion() {
+  if (!ttsSupported || !currentQ) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(currentQ.q);
+  u.rate = parseFloat(voiceRate ? voiceRate.value : '1') || 1;
+  u.pitch = 1;
+  u.onerror = function () { setVoiceStatus('Could not play audio.', true); };
+  window.speechSynthesis.speak(u);
+}
+
+function stopSpeaking() {
+  if (ttsSupported) window.speechSynthesis.cancel();
+}
+
+// --- speech to text -------------------------------------------------------
+function updateTranscriptMeta() {
+  if (!transcriptMeta) return;
+  const words = finalTranscript.trim() ? finalTranscript.trim().split(/\s+/).length : 0;
+  if (!words) { transcriptMeta.textContent = ''; return; }
+  const secs = speechStart ? Math.max(1, Math.round((Date.now() - speechStart) / 1000)) : 0;
+  const wpm = secs ? Math.round((words / secs) * 60) : 0;
+  transcriptMeta.textContent =
+    words + ' words' + (secs ? ' \u00b7 ' + secs + 's \u00b7 ~' + wpm + ' wpm' : '');
+}
+
+function renderTranscript(interim) {
+  if (!transcriptBox) return;
+  transcriptBox.classList.add('show');
+  transcriptBox.innerHTML = '';
+  transcriptBox.appendChild(document.createTextNode(finalTranscript));
+  if (interim) {
+    const span = document.createElement('span');
+    span.className = 'interim';
+    span.textContent = interim;
+    transcriptBox.appendChild(span);
+  }
+  updateTranscriptMeta();
+}
+
+function initRecognition() {
+  if (!srSupported || recognition) return;
+  recognition = new SR();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+
+  recognition.onresult = function (event) {
+    let interim = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const chunk = event.results[i][0].transcript;
+      if (event.results[i].isFinal) finalTranscript += chunk + ' ';
+      else interim += chunk;
+    }
+    renderTranscript(interim);
+  };
+
+  recognition.onerror = function (e) {
+    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+      setVoiceStatus('Microphone permission denied. Enable it in your browser settings.', true);
+    } else if (e.error === 'no-speech') {
+      setVoiceStatus('No speech detected \u2014 try again.', true);
+    } else {
+      setVoiceStatus('Speech recognition error: ' + e.error, true);
+    }
+    stopRecording();
+  };
+
+  recognition.onend = function () {
+    // Chrome ends sessions periodically; restart if the user is still recording.
+    if (recording) {
+      try { recognition.start(); } catch (err) { stopRecording(); }
+    }
+  };
+}
+
+function startRecording() {
+  if (!srSupported) return;
+  initRecognition();
+  stopSpeaking();
+  finalTranscript = '';
+  speechStart = Date.now();
+  recording = true;
+  if (micBtn) {
+    micBtn.classList.add('recording');
+    micBtn.textContent = '\u23f9 Stop recording';
+  }
+  setVoiceStatus('Listening\u2026 answer out loud, as you would in the interview.');
+  renderTranscript('');
+  try { recognition.start(); } catch (err) { /* already started */ }
+}
+
+function stopRecording() {
+  recording = false;
+  if (micBtn) {
+    micBtn.classList.remove('recording');
+    micBtn.textContent = '\ud83c\udf99\ufe0f Answer by voice';
+  }
+  if (recognition) { try { recognition.stop(); } catch (err) {} }
+  updateTranscriptMeta();
+  if (finalTranscript.trim()) {
+    setVoiceStatus('Recorded. Reveal the answer and compare it against what you said.');
+  } else {
+    setVoiceStatus('');
+  }
+}
+
+function toggleRecording() {
+  if (recording) stopRecording(); else startRecording();
+}
+
+function resetVoiceForNewQuestion() {
+  stopSpeaking();
+  if (recording) stopRecording();
+  finalTranscript = '';
+  speechStart = null;
+  if (transcriptBox) { transcriptBox.textContent = ''; transcriptBox.classList.remove('show'); }
+  if (transcriptMeta) transcriptMeta.textContent = '';
+  setVoiceStatus('');
+  if (ttsToggle && ttsToggle.checked) speakQuestion();
+}
+
+// --- wiring & capability gating ------------------------------------------
+if (speakBtn) speakBtn.addEventListener('click', speakQuestion);
+if (micBtn) micBtn.addEventListener('click', toggleRecording);
+if (ttsToggle) {
+  ttsToggle.checked = localStorage.getItem('aiPrepBuddyTTS') === '1';
+  ttsToggle.addEventListener('change', function () {
+    localStorage.setItem('aiPrepBuddyTTS', ttsToggle.checked ? '1' : '0');
+    if (ttsToggle.checked) speakQuestion(); else stopSpeaking();
+  });
+}
+
+if (!ttsSupported) {
+  if (speakBtn) speakBtn.disabled = true;
+  if (ttsToggle) ttsToggle.disabled = true;
+}
+if (!srSupported && micBtn) {
+  micBtn.disabled = true;
+  micBtn.title = 'Speech recognition is not supported in this browser';
+}
+if (!ttsSupported && !srSupported) {
+  setVoiceStatus('Voice features need Chrome, Edge, or Safari.', true);
+} else if (!srSupported) {
+  setVoiceStatus('Voice answering needs Chrome, Edge, or Safari. Read-aloud still works.');
 }
 
 renderStats();
