@@ -63,23 +63,26 @@ def sync_simulator(dataset, total, dry_run=False):
         "const QA_DATA = /*QA_DATA_START*/" + payload + "/*QA_DATA_END*/;"
     )
 
-    # Prefer the delimited form; fall back to the legacy undelimited form once
-    # so existing files get upgraded. A bare `\[.*?\];` match is unsafe because
-    # the JSON payload itself contains `];` sequences.
-    if "/*QA_DATA_START*/" in html:
-        html, n = re.subn(
-            r"const QA_DATA = /\*QA_DATA_START\*/.*?/\*QA_DATA_END\*/;",
-            lambda m: block,
-            html,
-            flags=re.DOTALL,
+    # The payload contains `];` sequences, so a bare regex cannot be trusted to
+    # find the end of the array. Only the explicitly delimited form is written
+    # or matched. A greedy `const QA_DATA = \[.*\];` fallback used to exist here
+    # and matched to the LAST `];` in the file, silently deleting every function
+    # defined after the data block. Do not reintroduce it.
+    if "/*QA_DATA_START*/" not in html:
+        print(
+            "  ! simulator.html: QA_DATA delimiters missing. Wrap the array as\n"
+            "      const QA_DATA = /*QA_DATA_START*/[...]/*QA_DATA_END*/;\n"
+            "    and re-run. Refusing to guess the array bounds.",
+            file=sys.stderr,
         )
-    else:
-        html, n = re.subn(
-            r"const QA_DATA = \[.*\];",  # greedy: legacy upgrade path only
-            lambda m: block,
-            html,
-            flags=re.DOTALL,
-        )
+        return False
+
+    html, n = re.subn(
+        r"const QA_DATA = /\*QA_DATA_START\*/.*?/\*QA_DATA_END\*/;",
+        lambda m: block,
+        html,
+        flags=re.DOTALL,
+    )
     if n == 0:
         print("  ! simulator.html: QA_DATA block not found, skipping", file=sys.stderr)
         return False

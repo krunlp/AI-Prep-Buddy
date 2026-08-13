@@ -138,6 +138,47 @@ def main() -> int:
                     f"{len(missing_a)} simulator entries have an empty answer: "
                     f"{_fmt(missing_a)}",
                 )
+
+        # The simulator's JS must survive data injection.
+        # Regression guard: a greedy `const QA_DATA = \[.*\];` substitution
+        # matched to the last `];` in the file and deleted every function
+        # defined after the data block, leaving a syntactically broken page
+        # whose data still parsed perfectly.
+        required_symbols = [
+            "function pickQuestion",
+            "function startTimer",
+            "function grade",
+            "function renderStats",
+            "function loadStats",
+            "function saveStats",
+            "getElementById('sectionFilter')",
+            "addEventListener('click', pickQuestion)",
+        ]
+        for sym in required_symbols:
+            if sym not in html:
+                fail("simulator-js", f"simulator.html is missing required code: {sym!r}")
+
+        if "/*QA_DATA_START*/" not in html or "/*QA_DATA_END*/" not in html:
+            fail(
+                "simulator-js",
+                "simulator.html QA_DATA is not delimited — sync_derived.py cannot "
+                "safely locate the array bounds",
+            )
+
+        # Rough brace/paren balance inside the script block catches truncation.
+        try:
+            script = html[html.index("<script>") + len("<script>") : html.rindex("</script>")]
+            body = re.sub(
+                r"/\*QA_DATA_START\*/.*?/\*QA_DATA_END\*/", "[]", script, flags=re.DOTALL
+            )
+            if body.count("{") != body.count("}"):
+                fail(
+                    "simulator-js",
+                    f"unbalanced braces in simulator script "
+                    f"({body.count('{')} open vs {body.count('}')} close) — likely truncated",
+                )
+        except ValueError:
+            fail("simulator-js", "simulator.html has no <script> block")
     except FileNotFoundError:
         warn("derived-simulator", "simulator.html not found")
 
