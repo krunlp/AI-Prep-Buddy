@@ -88,13 +88,39 @@
   .transcript.show { display: block; }
   .transcript .interim { opacity: 0.55; }
   .transcript-meta { text-align: center; font-size: 0.8em; color: var(--text-secondary); margin-top: 6px; }
+
+  /* --- answer evaluation --- */
+  .typed-answer { display: block; width: 100%; margin-top: 12px; min-height: 70px; padding: 10px;
+    border-radius: 6px; border: 1px solid var(--border, rgba(255,255,255,0.18));
+    background: transparent; color: var(--text-primary, inherit); font: inherit; font-size: 0.92em; resize: vertical; }
+  .voice-btn.eval { border-color: var(--accent-indigo, #6366f1); }
+  .ai-settings { display: none; margin-top: 12px; padding: 12px; border-radius: 6px;
+    border: 1px solid var(--border, rgba(255,255,255,0.18)); }
+  .ai-settings.show { display: block; }
+  .ai-settings-intro { font-size: 0.86em; color: var(--text-secondary); margin: 0 0 10px; text-align: center; }
+  .ai-settings-note { font-size: 0.78em; color: var(--text-secondary); margin: 10px 0 0; line-height: 1.5; }
+  .ai-key { flex: 1; min-width: 220px; padding: 7px 10px; border-radius: 6px;
+    border: 1px solid var(--border, rgba(255,255,255,0.18)); background: transparent;
+    color: var(--text-primary, inherit); font-size: 0.85em; }
+  .eval-result { display: none; margin-top: 14px; padding: 14px; border-radius: 8px;
+    border: 1px solid var(--border, rgba(255,255,255,0.18)); font-size: 0.92em; line-height: 1.6; }
+  .eval-result.show { display: block; }
+  .eval-score { font-size: 1.5em; font-weight: 700; text-align: center; margin-bottom: 4px; }
+  .eval-verdict { text-align: center; font-size: 0.9em; color: var(--text-secondary); margin-bottom: 12px; }
+  .eval-section { margin-top: 10px; }
+  .eval-section h4 { margin: 0 0 4px; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-secondary); }
+  .eval-section ul { margin: 0; padding-left: 20px; }
+  .chip { display: inline-block; padding: 2px 8px; margin: 3px 4px 0 0; border-radius: 12px; font-size: 0.8em; }
+  .chip.hit { background: rgba(16,185,129,0.15); color: var(--accent-emerald, #10b981); }
+  .chip.miss { background: rgba(239,68,68,0.13); color: var(--accent-rose, #ef4444); }
+  .eval-source { text-align: center; font-size: 0.75em; color: var(--text-secondary); margin-top: 12px; }
 </style>
 </head>
 <body>
 
 <header>
 <h1>🎤 Mock Interview Simulator</h1>
-<p>Practice against the full 1,621-question bank. Have questions read aloud, answer out loud, time yourself, self-grade, and track weak spots.</p>
+<p>Practice against the full 1,621-question bank. Have questions read aloud, answer out loud, get your answer evaluated, and track weak spots.</p>
 </header>
 
 <nav>
@@ -194,6 +220,38 @@
     <div class="voice-status" id="voiceStatus"></div>
     <div class="transcript" id="transcript"></div>
     <div class="transcript-meta" id="transcriptMeta"></div>
+
+    <textarea id="typedAnswer" class="typed-answer"
+      placeholder="…or type your answer here instead of speaking."></textarea>
+
+    <div class="voice-row" style="margin-top:10px;">
+      <button id="evaluateBtn" class="voice-btn eval">📊 Evaluate my answer</button>
+      <button id="aiSettingsBtn" class="voice-btn" title="Connect an LLM for detailed feedback">⚙️ AI feedback setup</button>
+    </div>
+
+    <div class="ai-settings" id="aiSettings">
+      <p class="ai-settings-intro">
+        Without a key you still get <strong>local concept-coverage scoring</strong> — no setup, nothing leaves your browser.
+        Add a free API key for detailed LLM feedback.
+      </p>
+      <div class="voice-row">
+        <select id="aiProvider" class="voice-rate">
+          <option value="openrouter">OpenRouter (free models)</option>
+          <option value="groq">Groq (free tier)</option>
+        </select>
+        <input type="password" id="aiKey" class="ai-key" placeholder="Paste API key (stored only in this browser)">
+        <button id="aiSaveBtn" class="voice-btn">Save</button>
+        <button id="aiClearBtn" class="voice-btn">Clear</button>
+      </div>
+      <p class="ai-settings-note">
+        Get a free key: <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">openrouter.ai/keys</a> ·
+        <a href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com/keys</a>.
+        The key is saved in this browser's localStorage only and sent directly to the provider — never to this site.
+        Anyone with access to this browser can read it, so use a free/limited key.
+      </p>
+    </div>
+
+    <div class="eval-result" id="evalResult"></div>
   </div>
 
   <div style="text-align:center;">
@@ -447,6 +505,7 @@ function resetVoiceForNewQuestion() {
   if (transcriptBox) { transcriptBox.textContent = ''; transcriptBox.classList.remove('show'); }
   if (transcriptMeta) transcriptMeta.textContent = '';
   setVoiceStatus('');
+  if (typeof resetEvaluation === 'function') resetEvaluation();
   if (ttsToggle && ttsToggle.checked) speakQuestion();
 }
 
@@ -473,6 +532,326 @@ if (!ttsSupported && !srSupported) {
   setVoiceStatus('Voice features need Chrome, Edge, or Safari.', true);
 } else if (!srSupported) {
   setVoiceStatus('Voice answering needs Chrome, Edge, or Safari. Read-aloud still works.');
+}
+
+// ---------------------------------------------------------------------------
+// Answer evaluation.
+//
+// Two tiers:
+//   1. Local concept-coverage scoring — always available, zero setup, nothing
+//      leaves the browser. Extracts salient terms from the reference answer and
+//      measures how many the candidate actually covered.
+//   2. Optional LLM grading — the user supplies their own API key for an
+//      OpenAI-compatible, browser-callable provider (OpenRouter or Groq).
+//      Google and Anthropic are deliberately not offered: their APIs block
+//      cross-origin browser requests, so they cannot work from a static site.
+// ---------------------------------------------------------------------------
+const typedAnswer = document.getElementById('typedAnswer');
+const evaluateBtn = document.getElementById('evaluateBtn');
+const aiSettingsBtn = document.getElementById('aiSettingsBtn');
+const aiSettings = document.getElementById('aiSettings');
+const aiProvider = document.getElementById('aiProvider');
+const aiKey = document.getElementById('aiKey');
+const aiSaveBtn = document.getElementById('aiSaveBtn');
+const aiClearBtn = document.getElementById('aiClearBtn');
+const evalResult = document.getElementById('evalResult');
+
+const AI_KEY_STORE = 'aiPrepBuddyAIKey';
+const AI_PROVIDER_STORE = 'aiPrepBuddyAIProvider';
+
+const PROVIDERS = {
+  openrouter: {
+    label: 'OpenRouter',
+    url: 'https://openrouter.ai/api/v1/chat/completions',
+    model: 'meta-llama/llama-3.3-70b-instruct:free',
+    headers: (k) => ({
+      'Authorization': 'Bearer ' + k,
+      'Content-Type': 'application/json'
+    })
+  },
+  groq: {
+    label: 'Groq',
+    url: 'https://api.groq.com/openai/v1/chat/completions',
+    model: 'llama-3.3-70b-versatile',
+    headers: (k) => ({
+      'Authorization': 'Bearer ' + k,
+      'Content-Type': 'application/json'
+    })
+  }
+};
+
+// Words too common to count as "concepts covered".
+const STOPWORDS = new Set(('a about above after again against all also am an and any are as at be because been ' +
+  'before being below between both but by can cannot could did do does doing down during each few for from further ' +
+  'had has have having he her here hers him his how i if in into is it its itself just me more most my no nor not ' +
+  'of off on once only or other our out over own same she should so some such than that the their them then there ' +
+  'these they this those through to too under until up very was we were what when where which while who whom why ' +
+  'will with would you your via use used using need needs make makes made get gets got one two three how what ' +
+  'explain describe design compare discuss would should could like across within while often usually generally ' +
+  'typically rather instead means meaning matters matter thing things way ways lot much many able ' +
+  'lets let allow allows allowing give gives given take takes taken come comes keep keeps keeping ' +
+  'vary varies widely wide narrow simply merely still even ever just also however therefore thus ' +
+  'wastes waste wasting good bad better best worse worst high low higher lower large small ' +
+  'important significant various several certain particular specific general common').split(' '));
+
+function normaliseWords(text) {
+  return (text || '')
+    .toLowerCase()
+    .replace(/[\u2010-\u2015]/g, '-')
+    .replace(/[^a-z0-9\s\-]/g, ' ')
+    .replace(/-/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean);
+}
+
+// Light suffix stripping so "quantised"/"quantisation"/"quantise" collapse to
+// one concept. Deliberately conservative: never shorten below four characters.
+function stemWord(w) {
+  // Plurals first, with the standard English rule: "es" is only a plural
+  // marker after s/x/z/ch/sh. Otherwise "wastes" would stem to "wast" while
+  // "waste" stays "waste", and the two would never match.
+  if (w.length >= 6 && w.slice(-3) === 'ies') return w.slice(0, -3) + 'y';
+  if (w.length >= 6 && w.slice(-2) === 'es' && /(s|x|z|ch|sh)$/.test(w.slice(0, -2))) {
+    return w.slice(0, -2);
+  }
+  if (w.length >= 5 && w.slice(-1) === 's' && w.slice(-2) !== 'ss') return w.slice(0, -1);
+
+  const rules = ['ations', 'ation', 'isation', 'ization', 'ising', 'izing',
+                 'ements', 'ement', 'ingly', 'ing', 'edly', 'ed',
+                 'ness', 'ally', 'ly'];
+  for (let i = 0; i < rules.length; i++) {
+    const suf = rules[i];
+    if (w.length - suf.length >= 4 && w.slice(-suf.length) === suf) {
+      return w.slice(0, w.length - suf.length);
+    }
+  }
+  return w;
+}
+
+function contentStems(text) {
+  const out = [];
+  normaliseWords(text).forEach(w => {
+    if (w.length < 4 || STOPWORDS.has(w)) return;
+    if (/^\d+$/.test(w)) return;
+    out.push(stemWord(w));
+  });
+  return out;
+}
+
+// Inverse document frequency across the whole answer bank, so scoring rewards
+// terms that are distinctive to THIS answer rather than boilerplate that shows
+// up in every answer ("model", "system", "data"). Built once, lazily.
+let _idf = null;
+function getIdf() {
+  if (_idf) return _idf;
+  const df = Object.create(null);
+  const N = QA_DATA.length || 1;
+  for (let i = 0; i < QA_DATA.length; i++) {
+    const seen = Object.create(null);
+    const stems = contentStems(QA_DATA[i].a || '');
+    for (let j = 0; j < stems.length; j++) {
+      const s = stems[j];
+      if (!seen[s]) { seen[s] = 1; df[s] = (df[s] || 0) + 1; }
+    }
+  }
+  _idf = { df: df, N: N };
+  return _idf;
+}
+
+function extractConcepts(reference, limit) {
+  const stems = contentStems(reference);
+  if (!stems.length) return [];
+  const tf = Object.create(null);
+  const display = Object.create(null);
+  const words = normaliseWords(reference);
+  for (let i = 0; i < words.length; i++) {
+    const w = words[i];
+    if (w.length < 4 || STOPWORDS.has(w) || /^\d+$/.test(w)) continue;
+    const s = stemWord(w);
+    tf[s] = (tf[s] || 0) + 1;
+    // keep the shortest surface form as the label
+    if (!display[s] || w.length < display[s].length) display[s] = w;
+  }
+  const idf = getIdf();
+  const scored = Object.keys(tf).map(s => {
+    const d = idf.df[s] || 1;
+    return { stem: s, label: display[s] || s, score: tf[s] * Math.log(idf.N / d) };
+  });
+  scored.sort((a, b) => b.score - a.score);
+  return scored.slice(0, limit || 12);
+}
+
+function localScore(userText, reference) {
+  const concepts = extractConcepts(reference, 12);
+  const userStems = {};
+  contentStems(userText).forEach(s => { userStems[s] = 1; });
+  const hit = [], miss = [];
+  concepts.forEach(c => {
+    if (userStems[c.stem]) hit.push(c.label); else miss.push(c.label);
+  });
+  const pct = concepts.length ? Math.round((hit.length / concepts.length) * 100) : 0;
+  const words = userText.trim() ? userText.trim().split(/\s+/).length : 0;
+  let verdict;
+  if (!words) verdict = 'No answer captured yet.';
+  else if (pct >= 70) verdict = 'Strong coverage of the key concepts.';
+  else if (pct >= 45) verdict = 'Partial — you hit the main idea but left gaps.';
+  else if (pct >= 20) verdict = 'Thin — several core concepts were not mentioned.';
+  else verdict = 'Most of the expected concepts are missing.';
+  return { pct: pct, hit: hit, miss: miss, words: words, verdict: verdict };
+}
+
+function renderLocalResult(res, note) {
+  const chips = (arr, cls) => arr.length
+    ? arr.map(c => '<span class="chip ' + cls + '">' + escapeHtml(c) + '</span>').join('')
+    : '<em style="opacity:.6">none</em>';
+  evalResult.innerHTML =
+    '<div class="eval-score">' + res.pct + '% concept coverage</div>' +
+    '<div class="eval-verdict">' + escapeHtml(res.verdict) +
+      (res.words ? ' · ' + res.words + ' words' : '') + '</div>' +
+    '<div class="eval-section"><h4>Covered</h4>' + chips(res.hit, 'hit') + '</div>' +
+    '<div class="eval-section"><h4>Missed</h4>' + chips(res.miss, 'miss') + '</div>' +
+    '<div class="eval-source">' + escapeHtml(note || 'Local keyword scoring — no data left your browser.') + '</div>';
+  evalResult.classList.add('show');
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+function getUserAnswerText() {
+  const spoken = (typeof finalTranscript === 'string' ? finalTranscript : '').trim();
+  const typed = typedAnswer ? typedAnswer.value.trim() : '';
+  return (spoken + ' ' + typed).trim();
+}
+
+function buildEvalPrompt(question, reference, userText) {
+  return [
+    'You are a senior interviewer grading a candidate\'s spoken answer to a technical AI/ML interview question.',
+    '',
+    'QUESTION:',
+    question,
+    '',
+    'REFERENCE ANSWER (what a strong candidate should cover):',
+    reference,
+    '',
+    'CANDIDATE ANSWER (auto-transcribed; ignore grammar, filler words and transcription errors — grade substance only):',
+    userText,
+    '',
+    'Grade the candidate on substance, not phrasing. Reward correct reasoning even if worded differently',
+    'from the reference. Penalise factual errors and missing core concepts.',
+    '',
+    'Respond with ONLY a JSON object, no markdown fences, no commentary:',
+    '{"score": <1-5 integer>, "verdict": "<one short sentence>",',
+    ' "strengths": ["<point>", "..."], "gaps": ["<point>", "..."],',
+    ' "improvement": "<the single highest-impact thing to fix>"}'
+  ].join('\n');
+}
+
+async function evaluateWithLLM(question, reference, userText, provider, key) {
+  const cfg = PROVIDERS[provider];
+  const res = await fetch(cfg.url, {
+    method: 'POST',
+    headers: cfg.headers(key),
+    body: JSON.stringify({
+      model: cfg.model,
+      messages: [{ role: 'user', content: buildEvalPrompt(question, reference, userText) }],
+      temperature: 0.2,
+      max_tokens: 700
+    })
+  });
+  if (!res.ok) {
+    let detail = '';
+    try { const j = await res.json(); detail = (j.error && (j.error.message || j.error)) || ''; } catch (e) {}
+    throw new Error('HTTP ' + res.status + (detail ? ' — ' + detail : ''));
+  }
+  const data = await res.json();
+  const raw = data.choices && data.choices[0] && data.choices[0].message
+    ? data.choices[0].message.content : '';
+  const cleaned = String(raw).replace(/```json/gi, '').replace(/```/g, '').trim();
+  const start = cleaned.indexOf('{'), end = cleaned.lastIndexOf('}');
+  if (start === -1 || end === -1) throw new Error('model did not return JSON');
+  return JSON.parse(cleaned.slice(start, end + 1));
+}
+
+function renderLLMResult(v, providerLabel, local) {
+  const list = (arr) => (arr && arr.length)
+    ? '<ul>' + arr.map(x => '<li>' + escapeHtml(x) + '</li>').join('') + '</ul>'
+    : '<em style="opacity:.6">none noted</em>';
+  const score = Math.max(1, Math.min(5, parseInt(v.score, 10) || 1));
+  evalResult.innerHTML =
+    '<div class="eval-score">' + '★'.repeat(score) + '☆'.repeat(5 - score) + ' &nbsp;' + score + '/5</div>' +
+    '<div class="eval-verdict">' + escapeHtml(v.verdict || '') + '</div>' +
+    '<div class="eval-section"><h4>What you got right</h4>' + list(v.strengths) + '</div>' +
+    '<div class="eval-section"><h4>What you missed</h4>' + list(v.gaps) + '</div>' +
+    (v.improvement ? '<div class="eval-section"><h4>Biggest fix</h4>' + escapeHtml(v.improvement) + '</div>' : '') +
+    (local ? '<div class="eval-section"><h4>Local coverage</h4>' + local.pct + '% of key concepts</div>' : '') +
+    '<div class="eval-source">Graded by ' + escapeHtml(providerLabel) + '. Your answer was sent directly to that provider.</div>';
+  evalResult.classList.add('show');
+}
+
+async function evaluateAnswer() {
+  if (!currentQ) { setVoiceStatus('Draw a question first.', true); return; }
+  const userText = getUserAnswerText();
+  if (!userText) { setVoiceStatus('Speak or type an answer first.', true); return; }
+
+  const local = localScore(userText, currentQ.a || '');
+  const key = localStorage.getItem(AI_KEY_STORE);
+  const provider = localStorage.getItem(AI_PROVIDER_STORE) || 'openrouter';
+
+  if (!key || !PROVIDERS[provider]) {
+    renderLocalResult(local);
+    return;
+  }
+
+  evaluateBtn.disabled = true;
+  const prevLabel = evaluateBtn.textContent;
+  evaluateBtn.textContent = '⏳ Grading…';
+  setVoiceStatus('Sending your answer to ' + PROVIDERS[provider].label + ' for grading…');
+  try {
+    const verdict = await evaluateWithLLM(currentQ.q, currentQ.a || '', userText, provider, key);
+    renderLLMResult(verdict, PROVIDERS[provider].label, local);
+    setVoiceStatus('');
+  } catch (err) {
+    renderLocalResult(local,
+      'LLM grading failed (' + err.message + ') — showing local scoring instead.');
+    setVoiceStatus('LLM grading failed. Check the key, the model name, or your rate limit.', true);
+  } finally {
+    evaluateBtn.disabled = false;
+    evaluateBtn.textContent = prevLabel;
+  }
+}
+
+function resetEvaluation() {
+  if (evalResult) { evalResult.innerHTML = ''; evalResult.classList.remove('show'); }
+  if (typedAnswer) typedAnswer.value = '';
+}
+
+// --- wiring ---------------------------------------------------------------
+if (evaluateBtn) evaluateBtn.addEventListener('click', evaluateAnswer);
+if (aiSettingsBtn && aiSettings) {
+  aiSettingsBtn.addEventListener('click', () => aiSettings.classList.toggle('show'));
+}
+if (aiProvider) aiProvider.value = localStorage.getItem(AI_PROVIDER_STORE) || 'openrouter';
+if (aiKey && localStorage.getItem(AI_KEY_STORE)) aiKey.placeholder = 'Key saved — paste a new one to replace';
+if (aiSaveBtn) {
+  aiSaveBtn.addEventListener('click', () => {
+    const k = aiKey.value.trim();
+    if (!k) { setVoiceStatus('Paste a key first.', true); return; }
+    localStorage.setItem(AI_KEY_STORE, k);
+    localStorage.setItem(AI_PROVIDER_STORE, aiProvider.value);
+    aiKey.value = '';
+    aiKey.placeholder = 'Key saved — paste a new one to replace';
+    setVoiceStatus('Key saved in this browser. LLM grading is now on.');
+  });
+}
+if (aiClearBtn) {
+  aiClearBtn.addEventListener('click', () => {
+    localStorage.removeItem(AI_KEY_STORE);
+    aiKey.value = '';
+    aiKey.placeholder = 'Paste API key (stored only in this browser)';
+    setVoiceStatus('Key removed. Falling back to local scoring.');
+  });
 }
 
 renderStats();

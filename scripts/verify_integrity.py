@@ -160,6 +160,12 @@ def main() -> int:
             "function resetVoiceForNewQuestion",
             "speechSynthesis",
             "webkitSpeechRecognition",
+            # answer evaluation
+            "function localScore",
+            "function extractConcepts",
+            "function evaluateWithLLM",
+            "function evaluateAnswer",
+            "openrouter.ai/api/v1/chat/completions",
         ]
         for sym in required_symbols:
             if sym not in html:
