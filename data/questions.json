@@ -1,8 +1,8 @@
 {
   "name": "AI Prep Buddy Dataset",
   "version": "2.0.0",
-  "total_questions": 1646,
-  "total_sections": 50,
+  "total_questions": 1661,
+  "total_sections": 51,
   "questions": [
     {
       "id": 1,
@@ -8233,6 +8233,81 @@
       "id": 1646,
       "section": "Section 50 — Production Incident Triage & Live Debugging",
       "question": "Write the postmortem for an LLM incident where the root cause was \"the model returned something unexpected.\" Explain why that phrasing is unacceptable and what a real root cause statement looks like."
+    },
+    {
+      "id": 1647,
+      "section": "Section 51 — Multi-Turn Interviewer Drills",
+      "question": "**429s in production.** Interviewer: \"Your LLM application suddenly returns 429s. What do you check?\" — then follows up four times as each hypothesis is eliminated."
+    },
+    {
+      "id": 1648,
+      "section": "Section 51 — Multi-Turn Interviewer Drills",
+      "question": "**RAG answers are wrong.** Interviewer: \"Users say the assistant cites the right document but gives the wrong answer.\" — drills into chunking, grounding and the eval blind spot."
+    },
+    {
+      "id": 1649,
+      "section": "Section 51 — Multi-Turn Interviewer Drills",
+      "question": "**The cost conversation.** Interviewer: \"Your feature costs $180k/month. The CFO wants it at $60k without quality loss. Where do you start?\" — pushes on each lever's real limit."
+    },
+    {
+      "id": 1650,
+      "section": "Section 51 — Multi-Turn Interviewer Drills",
+      "question": "**Agent went rogue.** Interviewer: \"An agent deleted production data. Walk me through what failed.\" — escalates from the immediate bug to the governance gap."
+    },
+    {
+      "id": 1651,
+      "section": "Section 51 — Multi-Turn Interviewer Drills",
+      "question": "**Fine-tune or not.** Interviewer: \"The team wants to fine-tune. Convince me it's the wrong call — or the right one.\" — tests whether you argue from evidence or fashion."
+    },
+    {
+      "id": 1652,
+      "section": "Section 51 — Multi-Turn Interviewer Drills",
+      "question": "**Latency budget.** Interviewer: \"Product wants sub-second responses for a RAG feature currently at 4s. Is that achievable?\" — forces honest scoping rather than agreement."
+    },
+    {
+      "id": 1653,
+      "section": "Section 51 — Multi-Turn Interviewer Drills",
+      "question": "**The eval is lying.** Interviewer: \"Your eval scores went up, your users are unhappier. Explain.\" — drills into judge calibration and set drift."
+    },
+    {
+      "id": 1654,
+      "section": "Section 51 — Multi-Turn Interviewer Drills",
+      "question": "**Provider deprecation.** Interviewer: \"Your provider deprecates the model you depend on in 30 days. Go.\" — tests incident-grade planning under a hard deadline."
+    },
+    {
+      "id": 1655,
+      "section": "Section 51 — Multi-Turn Interviewer Drills",
+      "question": "**Hallucination in a regulated context.** Interviewer: \"Your system gave a customer incorrect financial guidance. What now?\" — escalates through containment, disclosure and prevention."
+    },
+    {
+      "id": 1656,
+      "section": "Section 51 — Multi-Turn Interviewer Drills",
+      "question": "**Scaling a prototype.** Interviewer: \"The demo works. It goes to 50,000 users on Monday. What breaks first?\" — tests whether you can predict failure order."
+    },
+    {
+      "id": 1657,
+      "section": "Section 51 — Multi-Turn Interviewer Drills",
+      "question": "**The vector database question.** Interviewer: \"Why did you choose a dedicated vector DB over pgvector?\" — pushes until you either justify or concede."
+    },
+    {
+      "id": 1658,
+      "section": "Section 51 — Multi-Turn Interviewer Drills",
+      "question": "**Multi-agent scepticism.** Interviewer: \"Why not just use one agent with more tools?\" — tests whether you can defend or abandon multi-agent complexity."
+    },
+    {
+      "id": 1659,
+      "section": "Section 51 — Multi-Turn Interviewer Drills",
+      "question": "**Prompt injection in an enterprise deployment.** Interviewer: \"A user got your agent to email them another customer's data. How?\" — traces the exploit chain and the missing controls."
+    },
+    {
+      "id": 1660,
+      "section": "Section 51 — Multi-Turn Interviewer Drills",
+      "question": "**The disagreement.** Interviewer asserts something technically wrong and holds their position. Tests whether you fold, escalate badly, or disagree well."
+    },
+    {
+      "id": 1661,
+      "section": "Section 51 — Multi-Turn Interviewer Drills",
+      "question": "**Explaining to the board.** Interviewer: \"Explain in two minutes, no jargon, why the AI programme needs another $4M.\" — tests translation, not technical depth."
     }
   ]
 }

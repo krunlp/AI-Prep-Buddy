@@ -5,7 +5,7 @@ title: Study Paths
 
 # AI Interview Study Paths
 
-Welcome to the curated study paths! With over 1,646 questions in the bank, it's impossible to review everything in a short timeframe. We have created three distinct 2-week study plans tailored to specific roles. 
+Welcome to the curated study paths! With over 1,661 questions in the bank, it's impossible to review everything in a short timeframe. We have created three distinct 2-week study plans tailored to specific roles. 
 
 ## How to use this plan
 1. **Identify your target role:** Choose the path that closest matches your upcoming interview.

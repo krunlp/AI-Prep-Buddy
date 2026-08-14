@@ -3,7 +3,7 @@ layout: default
 title: Question Bank
 ---
 
-# AI Prep Buddy — Master Interview Question Bank (1,646 Questions)
+# AI Prep Buddy — Master Interview Question Bank (1,661 Questions)
 
 The complete open-source prep platform for AI/ML engineering, system design, and architecture loops. Organized into 49 structured technical sections with difficulty tags (`⭐ Standard`, `⭐⭐ Hard`, `⭐⭐⭐ Principal`).
 
@@ -2022,3 +2022,25 @@ Synthesize an end-to-end multi-region, multi-cloud enterprise GenAI serving plat
 1644. Your agent's cost per successful task has risen while its success rate stayed flat. What is happening, and why is success rate alone a misleading health metric? ⭐⭐⭐
 1645. Structure the first ten minutes of an AI incident: what you check, what you communicate, and what you deliberately do not do yet. ⭐⭐⭐
 1646. Write the postmortem for an LLM incident where the root cause was "the model returned something unexpected." Explain why that phrasing is unacceptable and what a real root cause statement looks like. ⭐⭐⭐
+
+---
+
+## Section 51 — Multi-Turn Interviewer Drills (1647–1661)
+
+Each drill is a full interviewer/candidate exchange with escalating follow-ups, in the format senior loops actually use. The answer contains the complete transcript plus the reasoning being graded at each turn. Read the opener, answer out loud, then check the chain.
+
+1647. **429s in production.** Interviewer: "Your LLM application suddenly returns 429s. What do you check?" — then follows up four times as each hypothesis is eliminated. ⭐⭐⭐
+1648. **RAG answers are wrong.** Interviewer: "Users say the assistant cites the right document but gives the wrong answer." — drills into chunking, grounding and the eval blind spot. ⭐⭐⭐
+1649. **The cost conversation.** Interviewer: "Your feature costs $180k/month. The CFO wants it at $60k without quality loss. Where do you start?" — pushes on each lever's real limit. ⭐⭐⭐
+1650. **Agent went rogue.** Interviewer: "An agent deleted production data. Walk me through what failed." — escalates from the immediate bug to the governance gap. ⭐⭐⭐
+1651. **Fine-tune or not.** Interviewer: "The team wants to fine-tune. Convince me it's the wrong call — or the right one." — tests whether you argue from evidence or fashion. ⭐⭐⭐
+1652. **Latency budget.** Interviewer: "Product wants sub-second responses for a RAG feature currently at 4s. Is that achievable?" — forces honest scoping rather than agreement. ⭐⭐⭐
+1653. **The eval is lying.** Interviewer: "Your eval scores went up, your users are unhappier. Explain." — drills into judge calibration and set drift. ⭐⭐⭐
+1654. **Provider deprecation.** Interviewer: "Your provider deprecates the model you depend on in 30 days. Go." — tests incident-grade planning under a hard deadline. ⭐⭐⭐
+1655. **Hallucination in a regulated context.** Interviewer: "Your system gave a customer incorrect financial guidance. What now?" — escalates through containment, disclosure and prevention. ⭐⭐⭐
+1656. **Scaling a prototype.** Interviewer: "The demo works. It goes to 50,000 users on Monday. What breaks first?" — tests whether you can predict failure order. ⭐⭐⭐
+1657. **The vector database question.** Interviewer: "Why did you choose a dedicated vector DB over pgvector?" — pushes until you either justify or concede. ⭐⭐⭐
+1658. **Multi-agent scepticism.** Interviewer: "Why not just use one agent with more tools?" — tests whether you can defend or abandon multi-agent complexity. ⭐⭐⭐
+1659. **Prompt injection in an enterprise deployment.** Interviewer: "A user got your agent to email them another customer's data. How?" — traces the exploit chain and the missing controls. ⭐⭐⭐
+1660. **The disagreement.** Interviewer asserts something technically wrong and holds their position. Tests whether you fold, escalate badly, or disagree well. ⭐⭐⭐
+1661. **Explaining to the board.** Interviewer: "Explain in two minutes, no jargon, why the AI programme needs another $4M." — tests translation, not technical depth. ⭐⭐⭐
