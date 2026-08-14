@@ -80,6 +80,14 @@
   button.danger { border-color: var(--rose); color: var(--rose); }
 
   .setup { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 18px; }
+  .toggle { display: inline-flex; align-items: center; gap: 7px; font-size: .9rem; color: var(--muted);
+    padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; cursor: pointer; }
+  .toggle input { width: 16px; height: 16px; cursor: pointer; }
+  .endpoint { height: 3px; width: 190px; border-radius: 3px; background: rgba(255,255,255,.10);
+    overflow: hidden; opacity: 0; transition: opacity .2s; }
+  .endpoint.on { opacity: 1; }
+  .endpoint > i { display: block; height: 100%; width: 100%; background: var(--amber);
+    transform-origin: left; transform: scaleX(1); }
   .hint { text-align: center; color: var(--muted); font-size: .84rem; margin-top: 10px; }
   .hint.err { color: var(--rose); }
 
@@ -139,6 +147,18 @@
     <option value="2" selected>2 follow-ups each</option>
     <option value="3">3 follow-ups each</option>
   </select>
+  <select id="modeSel" title="How your turn ends">
+    <option value="auto" selected>Hands-free (detects when you stop)</option>
+    <option value="manual">Press to advance</option>
+  </select>
+  <select id="silenceSel" title="Silence before it takes its turn">
+    <option value="1800">Advance after 1.8s silence</option>
+    <option value="2600" selected>Advance after 2.6s silence</option>
+    <option value="4000">Advance after 4s silence</option>
+  </select>
+  <label class="toggle" title="Let yourself interrupt the interviewer mid-sentence">
+    <input type="checkbox" id="bargeChk"> Allow interrupting
+  </label>
 </div>
 
 <div class="stage" id="stage">
@@ -149,6 +169,7 @@
   <div class="state-label" id="stateLabel">Ready</div>
   <div class="say" id="say"><span class="who">Interviewer</span>Press Begin when you're ready. I'll ask a question out loud, listen to your answer, then follow up on it.</div>
   <div class="live" id="live"></div>
+  <div class="endpoint" id="endpointBar"><i></i></div>
   <div class="controls">
     <button class="primary" id="beginBtn">▶ Begin interview</button>
     <button id="doneBtn" disabled>✔ Done answering</button>
@@ -178,7 +199,9 @@ var el = function (id) { return document.getElementById(id); };
 var orbWrap = el('orbWrap'), stateLabel = el('stateLabel'), sayBox = el('say'),
     liveBox = el('live'), logBox = el('log'), hintBox = el('hint'),
     beginBtn = el('beginBtn'), doneBtn = el('doneBtn'), skipBtn = el('skipBtn'), endBtn = el('endBtn'),
-    sectionSel = el('sectionSel'), lengthSel = el('lengthSel'), depthSel = el('depthSel');
+    sectionSel = el('sectionSel'), lengthSel = el('lengthSel'), depthSel = el('depthSel'),
+    modeSel = el('modeSel'), silenceSel = el('silenceSel'), bargeChk = el('bargeChk'),
+    endpointBar = el('endpointBar');
 
 // ---------------------------------------------------------------- capability
 var ttsOk = 'speechSynthesis' in window;
@@ -220,58 +243,142 @@ function logTurn(cls, role, text) {
 }
 
 // ---------------------------------------------------------------- speech out
+var speakingText = '';      // what is currently being spoken, for echo filtering
+var bargeResolve = null;    // resolves early when the candidate interrupts
+
+function normWords(t) {
+  return String(t || '').toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(Boolean);
+}
+
+// The mic hears the interviewer through the speakers. Without this, every
+// spoken question would be transcribed as if the candidate had said it.
+function isEcho(heard) {
+  if (!speakingText) return false;
+  var h = normWords(heard), src = new Set(normWords(speakingText));
+  if (!h.length) return true;
+  var overlap = h.filter(function (w) { return src.has(w); }).length / h.length;
+  return overlap > 0.55;
+}
+
 function speak(text) {
   return new Promise(function (resolve) {
-    if (!ttsOk) { setTimeout(resolve, 400); return; }
+    var settled = false;
+    function finish() { if (settled) return; settled = true; speakingText = ''; bargeResolve = null; resolve(); }
+    if (!ttsOk) { setTimeout(finish, 400); return; }
     window.speechSynthesis.cancel();
+    speakingText = text;
+    bargeResolve = finish;                       // barge-in can end this early
     var u = new SpeechSynthesisUtterance(text);
     u.rate = 1.0; u.pitch = 1.0;
-    u.onend = resolve;
-    u.onerror = resolve;
+    u.onend = finish; u.onerror = finish;
     setState('speaking', 'Speaking');
     window.speechSynthesis.speak(u);
-    // Safety: some browsers never fire onend on long utterances.
-    setTimeout(resolve, Math.min(30000, 2500 + text.length * 55));
+    setTimeout(finish, Math.min(30000, 2500 + text.length * 55));
   });
 }
 
+function stopSpeaking() { if (ttsOk) window.speechSynthesis.cancel(); speakingText = ''; }
+
 // ---------------------------------------------------------------- speech in
+var silenceTimer = null, endpointDeadline = 0, endpointRaf = null;
+
+function clearEndpoint() {
+  if (silenceTimer) { clearTimeout(silenceTimer); silenceTimer = null; }
+  if (endpointRaf) { cancelAnimationFrame(endpointRaf); endpointRaf = null; }
+  endpointBar.classList.remove('on');
+  endpointBar.firstElementChild.style.transform = 'scaleX(1)';
+}
+
+// Restart the countdown every time speech is heard. When it expires, the
+// candidate has stopped talking and the interviewer takes its turn.
+function armEndpoint() {
+  if (modeSel.value !== 'auto' || !session || session.aborted) return;
+  clearEndpoint();
+  var ms = parseInt(silenceSel.value, 10) || 2600;
+  endpointDeadline = Date.now() + ms;
+  endpointBar.classList.add('on');
+  (function tick() {
+    var left = endpointDeadline - Date.now();
+    var frac = Math.max(0, left / ms);
+    endpointBar.firstElementChild.style.transform = 'scaleX(' + frac + ')';
+    if (left > 0) endpointRaf = requestAnimationFrame(tick);
+  })();
+  silenceTimer = setTimeout(function () {
+    clearEndpoint();
+    if (transcript.trim() && session && session.resolveAnswer) session.resolveAnswer();
+  }, ms);
+}
+
 function initRecognition() {
   if (!srOk || recognition) return;
   recognition = new SR();
   recognition.continuous = true;
   recognition.interimResults = true;
   recognition.lang = 'en-US';
+
   recognition.onresult = function (e) {
     interim = '';
+    var finals = '';
     for (var i = e.resultIndex; i < e.results.length; i++) {
       var chunk = e.results[i][0].transcript;
-      if (e.results[i].isFinal) transcript += chunk + ' ';
+      if (e.results[i].isFinal) finals += chunk + ' ';
       else interim += chunk;
     }
+    var heard = (finals + interim).trim();
+    if (!heard) return;
+
+    // While the interviewer is speaking, most of what the mic hears is the
+    // interviewer. Drop it unless it is a genuine interruption.
+    if (speakingText) {
+      if (isEcho(heard)) { interim = ''; return; }
+      if (!bargeChk.checked) { interim = ''; return; }
+      if (normWords(heard).length < 3) { interim = ''; return; }
+      stopSpeaking();
+      hint('Interrupted — go ahead.');
+      if (bargeResolve) bargeResolve();
+      transcript = '';
+    }
+
+    if (finals) transcript += finals;
     liveBox.innerHTML = '<span class="final">' + esc(transcript) + '</span>' + esc(interim);
+    if (listening) armEndpoint();
   };
+
   recognition.onerror = function (e) {
     if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
-      hint('Microphone permission denied — you can still type nothing and press Done to skip.', true);
-    } else if (e.error !== 'no-speech') {
+      hint('Microphone permission denied — switch to "Press to advance" mode to continue.', true);
+    } else if (e.error !== 'no-speech' && e.error !== 'aborted') {
       hint('Speech error: ' + e.error, true);
     }
   };
-  recognition.onend = function () { if (listening) { try { recognition.start(); } catch (err) {} } };
+  recognition.onend = function () { if (listening || micOpen) { try { recognition.start(); } catch (err) {} } };
+}
+
+// The mic stays open across the whole session so interruption is possible;
+// `listening` marks whether the candidate's turn is active.
+var micOpen = false;
+function openMic() {
+  if (!srOk) return;
+  initRecognition();
+  micOpen = true;
+  try { recognition.start(); } catch (e) {}
+}
+function closeMic() {
+  micOpen = false; listening = false;
+  clearEndpoint();
+  if (recognition) { try { recognition.stop(); } catch (e) {} }
 }
 
 function startListening() {
   transcript = ''; interim = ''; liveBox.textContent = '';
-  if (!srOk) { hint('Speech recognition needs Chrome, Edge or Safari. Press Done to continue.', true); return; }
-  initRecognition();
+  if (!srOk) { hint('Speech recognition needs Chrome, Edge or Safari — use "Press to advance".', true); return; }
+  openMic();
   listening = true;
-  setState('listening', 'Listening');
-  try { recognition.start(); } catch (e) {}
+  setState('listening', modeSel.value === 'auto' ? 'Listening — just talk' : 'Listening');
 }
 function stopListening() {
   listening = false;
-  if (recognition) { try { recognition.stop(); } catch (e) {} }
+  clearEndpoint();
   liveBox.textContent = '';
 }
 
@@ -418,14 +525,19 @@ function startInterview() {
   if (!qs.length) { hint('No questions in that section.', true); return; }
   session = { qs: qs, i: 0, depth: parseInt(depthSel.value, 10), records: [], aborted: false, resolveAnswer: null };
   beginBtn.disabled = true; endBtn.disabled = false;
+  // Open the mic up front so even the greeting can be interrupted.
+  if (bargeChk.checked) openMic();
   var c = llmConfig();
-  hint(c ? 'Adaptive follow-ups via ' + c.label + '.' : 'No API key set — follow-ups generated locally from gaps in your answer.');
+  var modeMsg = modeSel.value === 'auto'
+    ? 'Hands-free: just talk, and pause when you\u2019re done.'
+    : 'Press \u201cDone answering\u201d to end each turn.';
+  hint((c ? 'Adaptive follow-ups via ' + c.label + '. ' : 'Local follow-ups from gaps in your answer. ') + modeMsg);
   run().catch(function (e) { hint('Interview stopped: ' + e.message, true); resetIdle(); });
 }
 
 function resetIdle() {
-  stopListening();
-  if (ttsOk) window.speechSynthesis.cancel();
+  closeMic();
+  stopSpeaking();
   setState('idle', 'Ready');
   beginBtn.disabled = false; doneBtn.disabled = true; skipBtn.disabled = true; endBtn.disabled = true;
 }
@@ -433,6 +545,8 @@ function resetIdle() {
 async function askAndListen(text, cls, role) {
   logTurn(cls, role, text);
   say(text);
+  // Mic opens before the question is spoken so an interruption is possible.
+  if (bargeChk.checked) openMic();
   await speak(text);
   if (session.aborted) throw new Error('ended');
   startListening();
@@ -547,13 +661,18 @@ async function wrapUp() {
 // ---------------------------------------------------------------- controls
 doneBtn.addEventListener('click', function () { if (session && session.resolveAnswer) session.resolveAnswer(); });
 skipBtn.addEventListener('click', function () { transcript = ''; if (session && session.resolveAnswer) session.resolveAnswer(); });
+bargeChk.addEventListener('change', function () {
+  hint(bargeChk.checked
+    ? 'Interrupting enabled \u2014 headphones recommended, or the mic may hear the interviewer.'
+    : '');
+});
 beginBtn.addEventListener('click', startInterview);
 endBtn.addEventListener('click', function () {
   if (!session) return;
   session.aborted = true;
   if (session.resolveAnswer) session.resolveAnswer();
-  if (ttsOk) window.speechSynthesis.cancel();
-  stopListening();
+  stopSpeaking();
+  closeMic();
   setState('done', 'Ended');
   say('Interview ended.');
   resetIdle();
