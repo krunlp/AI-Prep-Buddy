@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Live Interview — AI Prep Buddy</title>
+<meta name="description" content="An agentic mock interviewer that asks a question aloud, listens to your spoken answer, and pushes back with follow-ups based on what you actually said.">
+<script>
+(function () {
+  try {
+    var t = localStorage.getItem('theme');
+    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+})();
+</script>
+<style>
+  :root {
+    --bg: #0b0e14; --panel: #151924; --border: rgba(255,255,255,.12);
+    --text: #e8eaed; --muted: #98a2b3;
+    --indigo: #6366f1; --emerald: #10b981; --amber: #f59e0b; --rose: #ef4444;
+  }
+  html[data-theme="light"] {
+    --bg: #f5f7fb; --panel: #ffffff; --border: rgba(16,32,46,.14);
+    --text: #16202e; --muted: #55627a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 20px; background: var(--bg); color: var(--text); line-height: 1.6;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+  .wrap { max-width: 860px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 10px; }
+  h1 { margin: 0 0 4px; font-size: 1.7rem; }
+  header p { color: var(--muted); margin: 0; font-size: .95rem; }
+  nav { text-align: center; margin: 14px 0 22px; font-size: .87rem; }
+  nav a { color: var(--indigo); text-decoration: none; margin: 0 6px; white-space: nowrap; }
+  nav a:hover { text-decoration: underline; }
+
+  /* --- interviewer presence --- */
+  .stage { display: flex; flex-direction: column; align-items: center; gap: 14px;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 18px; padding: 26px 20px; }
+  .orb-wrap { position: relative; width: 132px; height: 132px; display: grid; place-items: center; }
+  .orb { width: 92px; height: 92px; border-radius: 50%;
+    background: radial-gradient(circle at 32% 28%, #8b8ff5, var(--indigo) 55%, #3f43c9);
+    box-shadow: 0 0 34px rgba(99,102,241,.45); transition: all .35s ease; }
+  .ring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid transparent; }
+  /* idle */
+  .state-idle .orb { animation: breathe 3.6s ease-in-out infinite; }
+  @keyframes breathe { 0%,100% { transform: scale(1); opacity: .9; } 50% { transform: scale(1.05); opacity: 1; } }
+  /* speaking */
+  .state-speaking .orb { background: radial-gradient(circle at 32% 28%, #a5f3d0, var(--emerald) 55%, #0b7a5b);
+    box-shadow: 0 0 44px rgba(16,185,129,.5); animation: speak .55s ease-in-out infinite; }
+  @keyframes speak { 0%,100% { transform: scale(1); } 50% { transform: scale(1.12); } }
+  /* listening */
+  .state-listening .orb { background: radial-gradient(circle at 32% 28%, #fbcf8a, var(--amber) 55%, #b06f06);
+    box-shadow: 0 0 44px rgba(245,158,11,.5); }
+  .state-listening .ring { border-color: var(--amber); animation: ripple 1.5s ease-out infinite; }
+  .state-listening .ring:nth-child(3) { animation-delay: .5s; }
+  @keyframes ripple { 0% { transform: scale(.75); opacity: .9; } 100% { transform: scale(1.35); opacity: 0; } }
+  /* thinking */
+  .state-thinking .orb { background: radial-gradient(circle at 32% 28%, #cbd0ff, #7c82f0 55%, #4b50c4); }
+  .state-thinking .ring { border-top-color: var(--indigo); border-right-color: var(--indigo);
+    animation: spin .9s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  /* done */
+  .state-done .orb { background: radial-gradient(circle at 32% 28%, #cfd4e0, #7c8496 55%, #4a5263); box-shadow: none; }
+
+  .state-label { font-size: .78rem; text-transform: uppercase; letter-spacing: .9px; color: var(--muted); min-height: 1em; }
+  .say { text-align: center; font-size: 1.12rem; max-width: 620px; min-height: 3.2em; }
+  .say .who { display: block; font-size: .72rem; text-transform: uppercase; letter-spacing: .8px;
+    color: var(--muted); margin-bottom: 6px; }
+
+  .live { text-align: center; color: var(--muted); font-size: .95rem; min-height: 1.5em; max-width: 620px; }
+  .live .final { color: var(--text); }
+
+  .controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 6px; }
+  button, select { padding: 10px 16px; border-radius: 10px; border: 1px solid var(--border);
+    background: transparent; color: var(--text); font-size: .95rem; cursor: pointer; }
+  button.primary { background: var(--indigo); border-color: var(--indigo); color: #fff; font-weight: 600; }
+  button.primary:hover { filter: brightness(1.1); }
+  button:disabled { opacity: .4; cursor: not-allowed; }
+  button.danger { border-color: var(--rose); color: var(--rose); }
+
+  .setup { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 18px; }
+  .hint { text-align: center; color: var(--muted); font-size: .84rem; margin-top: 10px; }
+  .hint.err { color: var(--rose); }
+
+  /* --- transcript --- */
+  .log { margin-top: 24px; }
+  .turn { border: 1px solid var(--border); border-radius: 12px; padding: 13px 15px; margin-bottom: 10px; background: var(--panel); }
+  .turn .role { font-size: .72rem; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); margin-bottom: 4px; }
+  .turn.q { border-left: 3px solid var(--indigo); }
+  .turn.a { border-left: 3px solid var(--amber); }
+  .turn.probe { border-left: 3px solid var(--emerald); }
+  .turn.verdict { border-left: 3px solid var(--emerald); background: rgba(16,185,129,.07); }
+
+  .report h3 { margin: 0 0 8px; }
+  .bar { height: 9px; border-radius: 6px; background: rgba(255,255,255,.08); overflow: hidden; margin: 6px 0 10px; }
+  .bar > i { display: block; height: 100%; background: linear-gradient(90deg, var(--indigo), var(--emerald)); }
+  .chip { display: inline-block; padding: 2px 9px; margin: 3px 4px 0 0; border-radius: 12px; font-size: .8rem; }
+  .chip.hit { background: rgba(16,185,129,.16); color: var(--emerald); }
+  .chip.miss { background: rgba(239,68,68,.14); color: var(--rose); }
+  footer { text-align: center; margin-top: 34px; font-size: .83rem; color: var(--muted); }
+  footer a { color: var(--indigo); }
+  @media (max-width: 620px) { body { padding: 14px; } .say { font-size: 1rem; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>🎙️ Live Interview</h1>
+  <p>An interviewer that asks, listens, and pushes back on what you actually said.</p>
+</header>
+
+<nav>
+  <a href="index.html">Home</a> ·
+  <a href="questions.html">Questions</a> ·
+  <a href="answers.html">Answers</a> ·
+  <a href="roles.html">🎯 By Role</a> ·
+  <a href="simulator.html">Simulator</a> ·
+  <a href="study-paths.html">Study Paths</a> ·
+  <a href="diagrams.html">Diagrams</a> ·
+  <a href="patterns.html">Patterns</a> ·
+  <a href="code-solutions.html">Code</a> ·
+  <a href="cheatsheet.html">Cheat Sheet</a> ·
+  <a href="glossary.html">Glossary</a> ·
+  <a href="company-prep.html">Companies</a> ·
+  <a href="sources.html">Sources</a>
+</nav>
+
+<div class="setup">
+  <select id="sectionSel"><option value="all">All sections</option></select>
+  <select id="lengthSel">
+    <option value="3">3 questions</option>
+    <option value="5" selected>5 questions</option>
+    <option value="8">8 questions</option>
+  </select>
+  <select id="depthSel">
+    <option value="1">1 follow-up each</option>
+    <option value="2" selected>2 follow-ups each</option>
+    <option value="3">3 follow-ups each</option>
+  </select>
+</div>
+
+<div class="stage" id="stage">
+  <div class="orb-wrap state-idle" id="orbWrap">
+    <div class="ring"></div><div class="ring"></div>
+    <div class="orb"></div>
+  </div>
+  <div class="state-label" id="stateLabel">Ready</div>
+  <div class="say" id="say"><span class="who">Interviewer</span>Press Begin when you're ready. I'll ask a question out loud, listen to your answer, then follow up on it.</div>
+  <div class="live" id="live"></div>
+  <div class="controls">
+    <button class="primary" id="beginBtn">▶ Begin interview</button>
+    <button id="doneBtn" disabled>✔ Done answering</button>
+    <button id="skipBtn" disabled>↷ Skip</button>
+    <button class="danger" id="endBtn" disabled>■ End</button>
+  </div>
+  <div class="hint" id="hint"></div>
+</div>
+
+<div class="log" id="log"></div>
+
+<footer>
+  Runs entirely in your browser. Add a free API key in the
+  <a href="simulator.html">simulator</a> for LLM-generated follow-ups; without one,
+  follow-ups are generated locally from gaps in your answer.<br>
+  <a href="https://github.com/krunlp/AI-Prep-Buddy">Source</a>
+</footer>
+
+</div>
+
+<script>
+(function () {
+'use strict';
+
+// ---------------------------------------------------------------- elements
+var el = function (id) { return document.getElementById(id); };
+var orbWrap = el('orbWrap'), stateLabel = el('stateLabel'), sayBox = el('say'),
+    liveBox = el('live'), logBox = el('log'), hintBox = el('hint'),
+    beginBtn = el('beginBtn'), doneBtn = el('doneBtn'), skipBtn = el('skipBtn'), endBtn = el('endBtn'),
+    sectionSel = el('sectionSel'), lengthSel = el('lengthSel'), depthSel = el('depthSel');
+
+// ---------------------------------------------------------------- capability
+var ttsOk = 'speechSynthesis' in window;
+var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+var srOk = !!SR;
+
+// ---------------------------------------------------------------- state
+var QA = [], recognition = null, listening = false, transcript = '', interim = '';
+var session = null;
+var AI_KEY = 'aiPrepBuddyAIKey', AI_PROVIDER = 'aiPrepBuddyAIProvider';
+var PROVIDERS = {
+  openrouter: { label: 'OpenRouter', url: 'https://openrouter.ai/api/v1/chat/completions',
+    model: 'meta-llama/llama-3.3-70b-instruct:free' },
+  groq: { label: 'Groq', url: 'https://api.groq.com/openai/v1/chat/completions',
+    model: 'llama-3.3-70b-versatile' }
+};
+
+function setState(s, label) {
+  orbWrap.className = 'orb-wrap state-' + s;
+  stateLabel.textContent = label || s;
+}
+function say(text, who) {
+  sayBox.innerHTML = '';
+  var w = document.createElement('span'); w.className = 'who'; w.textContent = who || 'Interviewer';
+  sayBox.appendChild(w);
+  sayBox.appendChild(document.createTextNode(text));
+}
+function hint(msg, isErr) { hintBox.textContent = msg || ''; hintBox.className = 'hint' + (isErr ? ' err' : ''); }
+function esc(s) { return String(s).replace(/[&<>"']/g, function (c) {
+  return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]; }); }
+
+function logTurn(cls, role, text) {
+  var d = document.createElement('div');
+  d.className = 'turn ' + cls;
+  d.innerHTML = '<div class="role">' + esc(role) + '</div>' + esc(text);
+  logBox.appendChild(d);
+  try { if (d.scrollIntoView) d.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (e) {}
+  return d;
+}
+
+// ---------------------------------------------------------------- speech out
+function speak(text) {
+  return new Promise(function (resolve) {
+    if (!ttsOk) { setTimeout(resolve, 400); return; }
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.rate = 1.0; u.pitch = 1.0;
+    u.onend = resolve;
+    u.onerror = resolve;
+    setState('speaking', 'Speaking');
+    window.speechSynthesis.speak(u);
+    // Safety: some browsers never fire onend on long utterances.
+    setTimeout(resolve, Math.min(30000, 2500 + text.length * 55));
+  });
+}
+
+// ---------------------------------------------------------------- speech in
+function initRecognition() {
+  if (!srOk || recognition) return;
+  recognition = new SR();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+  recognition.onresult = function (e) {
+    interim = '';
+    for (var i = e.resultIndex; i < e.results.length; i++) {
+      var chunk = e.results[i][0].transcript;
+      if (e.results[i].isFinal) transcript += chunk + ' ';
+      else interim += chunk;
+    }
+    liveBox.innerHTML = '<span class="final">' + esc(transcript) + '</span>' + esc(interim);
+  };
+  recognition.onerror = function (e) {
+    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+      hint('Microphone permission denied — you can still type nothing and press Done to skip.', true);
+    } else if (e.error !== 'no-speech') {
+      hint('Speech error: ' + e.error, true);
+    }
+  };
+  recognition.onend = function () { if (listening) { try { recognition.start(); } catch (err) {} } };
+}
+
+function startListening() {
+  transcript = ''; interim = ''; liveBox.textContent = '';
+  if (!srOk) { hint('Speech recognition needs Chrome, Edge or Safari. Press Done to continue.', true); return; }
+  initRecognition();
+  listening = true;
+  setState('listening', 'Listening');
+  try { recognition.start(); } catch (e) {}
+}
+function stopListening() {
+  listening = false;
+  if (recognition) { try { recognition.stop(); } catch (e) {} }
+  liveBox.textContent = '';
+}
+
+// ---------------------------------------------------------------- local scoring
+var STOP = new Set(('the a an of to in for and or is are what how why do does you your with on at as by be ' +
+ 'can when which that this it its from have has had not but if then than there their they them we our us ' +
+ 'about into over under more most some such very also just only other another each both same own more').split(' '));
+
+function stemWord(w) {
+  if (w.length >= 6 && w.slice(-3) === 'ies') return w.slice(0, -3) + 'y';
+  if (w.length >= 6 && w.slice(-2) === 'es' && /(s|x|z|ch|sh)$/.test(w.slice(0, -2))) return w.slice(0, -2);
+  if (w.length >= 5 && w.slice(-1) === 's' && w.slice(-2) !== 'ss') return w.slice(0, -1);
+  var rules = ['ations','ation','ising','izing','ement','ing','edly','ed','ness','ally','ly'];
+  for (var i = 0; i < rules.length; i++) {
+    var s = rules[i];
+    if (w.length - s.length >= 4 && w.slice(-s.length) === s) return w.slice(0, w.length - s.length);
+  }
+  return w;
+}
+function stems(text) {
+  return String(text || '').toLowerCase()
+    .replace(/[\u2010-\u2015]/g, '-').replace(/[^a-z0-9\s-]/g, ' ').replace(/-/g, ' ')
+    .split(/\s+/).filter(function (w) { return w.length >= 4 && !STOP.has(w) && !/^\d+$/.test(w); })
+    .map(stemWord);
+}
+var _df = null;
+function df() {
+  if (_df) return _df;
+  var d = Object.create(null);
+  for (var i = 0; i < QA.length; i++) {
+    var seen = Object.create(null), st = stems(QA[i].a);
+    for (var j = 0; j < st.length; j++) if (!seen[st[j]]) { seen[st[j]] = 1; d[st[j]] = (d[st[j]] || 0) + 1; }
+  }
+  _df = { d: d, N: QA.length || 1 };
+  return _df;
+}
+function keyConcepts(reference, limit) {
+  var tf = Object.create(null), label = Object.create(null);
+  var words = String(reference || '').toLowerCase().replace(/[^a-z0-9\s-]/g, ' ').split(/\s+/);
+  for (var i = 0; i < words.length; i++) {
+    var w = words[i];
+    if (w.length < 4 || STOP.has(w) || /^\d+$/.test(w)) continue;
+    var s = stemWord(w);
+    tf[s] = (tf[s] || 0) + 1;
+    if (!label[s] || w.length < label[s].length) label[s] = w;
+  }
+  var idf = df();
+  return Object.keys(tf).map(function (s) {
+    return { stem: s, label: label[s] || s, score: tf[s] * Math.log(idf.N / (idf.d[s] || 1)) };
+  }).sort(function (a, b) { return b.score - a.score; }).slice(0, limit || 12);
+}
+function coverage(answerText, reference) {
+  var cs = keyConcepts(reference, 12), mine = Object.create(null);
+  stems(answerText).forEach(function (s) { mine[s] = 1; });
+  var hit = [], miss = [];
+  cs.forEach(function (c) { (mine[c.stem] ? hit : miss).push(c.label); });
+  return { pct: cs.length ? Math.round(hit.length / cs.length * 100) : 0, hit: hit, miss: miss };
+}
+
+// ---------------------------------------------------------------- follow-ups
+var LOCAL_PROBES = [
+  'You didn\u2019t mention {x}. How does that factor in?',
+  'What about {x} \u2014 where does that fit?',
+  'I didn\u2019t hear anything on {x}. Talk me through it.',
+  'Say more about {x}.'
+];
+var GENERIC_PROBES = [
+  'What would you check first if that didn\u2019t work?',
+  'What\u2019s the tradeoff you\u2019re accepting there?',
+  'How would you know if that was the wrong call?',
+  'What breaks first when that goes to production scale?',
+  'Where does that approach fail?'
+];
+
+function localFollowUp(answerText, reference, used) {
+  var cov = coverage(answerText, reference);
+  var fresh = cov.miss.filter(function (m) { return used.indexOf(m) === -1; });
+  if (fresh.length && answerText.trim()) {
+    var concept = fresh[0];
+    used.push(concept);
+    var t = LOCAL_PROBES[used.length % LOCAL_PROBES.length];
+    return t.replace('{x}', concept);
+  }
+  return GENERIC_PROBES[used.length % GENERIC_PROBES.length];
+}
+
+function llmConfig() {
+  var key = null, prov = null;
+  try {
+    key = localStorage.getItem(AI_KEY);
+    prov = localStorage.getItem(AI_PROVIDER) || 'openrouter';
+  } catch (e) {}
+  if (!key || !PROVIDERS[prov]) return null;
+  return { key: key, cfg: PROVIDERS[prov], label: PROVIDERS[prov].label };
+}
+
+function chat(messages, maxTokens) {
+  var c = llmConfig();
+  if (!c) return Promise.reject(new Error('no key'));
+  return fetch(c.cfg.url, {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + c.key, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model: c.cfg.model, messages: messages, temperature: 0.4, max_tokens: maxTokens || 220 })
+  }).then(function (r) {
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  }).then(function (d) {
+    return (d.choices && d.choices[0] && d.choices[0].message && d.choices[0].message.content || '').trim();
+  });
+}
+
+function llmFollowUp(q, reference, answerText, priorProbes) {
+  var sys = 'You are a senior technical interviewer. Ask ONE short follow-up question ' +
+    '(max 25 words) that probes the weakest or most vague part of the candidate\u2019s answer, ' +
+    'or pushes them on a tradeoff they skipped. Do not evaluate, do not preamble, do not repeat ' +
+    'an earlier follow-up. Output only the question.';
+  var user = 'QUESTION: ' + q + '\n\nREFERENCE ANSWER (what a strong candidate covers): ' +
+    String(reference).slice(0, 1200) +
+    '\n\nCANDIDATE SAID (auto-transcribed, ignore grammar): ' + answerText +
+    (priorProbes.length ? '\n\nALREADY ASKED: ' + priorProbes.join(' | ') : '');
+  return chat([{ role: 'system', content: sys }, { role: 'user', content: user }], 90)
+    .then(function (t) { return t.replace(/^["'\s]+|["'\s]+$/g, '').split('\n')[0]; });
+}
+
+// ---------------------------------------------------------------- flow
+function pickQuestions(n) {
+  if (!n || isNaN(n) || n < 1) n = 5;
+  var filter = sectionSel.value;
+  var pool = filter === 'all' ? QA.slice() : QA.filter(function (d) { return d.section === filter; });
+  var out = [];
+  for (var i = 0; i < n && pool.length; i++) out.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+  return out;
+}
+
+function waitForDone() {
+  return new Promise(function (resolve) { session.resolveAnswer = resolve; });
+}
+
+function pause(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+function startInterview() {
+  logBox.innerHTML = '';
+  var qs = pickQuestions(parseInt(lengthSel.value, 10));
+  if (!qs.length) { hint('No questions in that section.', true); return; }
+  session = { qs: qs, i: 0, depth: parseInt(depthSel.value, 10), records: [], aborted: false, resolveAnswer: null };
+  beginBtn.disabled = true; endBtn.disabled = false;
+  var c = llmConfig();
+  hint(c ? 'Adaptive follow-ups via ' + c.label + '.' : 'No API key set — follow-ups generated locally from gaps in your answer.');
+  run().catch(function (e) { hint('Interview stopped: ' + e.message, true); resetIdle(); });
+}
+
+function resetIdle() {
+  stopListening();
+  if (ttsOk) window.speechSynthesis.cancel();
+  setState('idle', 'Ready');
+  beginBtn.disabled = false; doneBtn.disabled = true; skipBtn.disabled = true; endBtn.disabled = true;
+}
+
+async function askAndListen(text, cls, role) {
+  logTurn(cls, role, text);
+  say(text);
+  await speak(text);
+  if (session.aborted) throw new Error('ended');
+  startListening();
+  doneBtn.disabled = false; skipBtn.disabled = false;
+  await waitForDone();
+  doneBtn.disabled = true; skipBtn.disabled = true;
+  stopListening();
+  var said = transcript.trim();
+  logTurn('a', 'You', said || '(no answer captured)');
+  return said;
+}
+
+async function run() {
+  await speak('Thanks for making the time. I\u2019ll ask a few questions, and I\u2019ll follow up on your answers as we go.');
+  if (session.aborted) return;
+
+  for (session.i = 0; session.i < session.qs.length; session.i++) {
+    if (session.aborted) break;
+    var item = session.qs[session.i];
+    var intro = (session.i === 0 ? 'First question. ' : 'Next. ') + item.q;
+    var answer = await askAndListen(intro, 'q', 'Interviewer · Q' + item.n);
+    var answers = [answer];
+    var probes = [], usedConcepts = [];
+
+    for (var d = 0; d < session.depth; d++) {
+      if (session.aborted) break;
+      if (!answer) break;                       // nothing to probe
+      setState('thinking', 'Thinking');
+      var probe;
+      try {
+        probe = await llmFollowUp(item.q, item.a, answers.join(' '), probes);
+        if (!probe || probe.length < 8) throw new Error('empty');
+      } catch (e) {
+        probe = localFollowUp(answers.join(' '), item.a, usedConcepts);
+      }
+      probes.push(probe);
+      answer = await askAndListen(probe, 'probe', 'Interviewer · follow-up');
+      answers.push(answer);
+    }
+
+    session.records.push({ item: item, answers: answers, probes: probes });
+  }
+
+  await wrapUp();
+}
+
+async function wrapUp() {
+  setState('thinking', 'Reviewing');
+  say('Let me pull that together.');
+  var done = session.records.filter(function (r) { return r.answers.join('').trim(); });
+  if (!done.length) {
+    setState('done', 'Ended');
+    logTurn('verdict', 'Interviewer', 'We didn\u2019t capture any answers — nothing to review.');
+    resetIdle(); return;
+  }
+
+  // Local per-question coverage always available.
+  var rows = done.map(function (r) {
+    var cov = coverage(r.answers.join(' '), r.item.a);
+    return { n: r.item.n, q: r.item.q, cov: cov, section: r.item.section };
+  });
+  var avg = Math.round(rows.reduce(function (a, r) { return a + r.cov.pct; }, 0) / rows.length);
+
+  var html = '<div class="report"><h3>Interview summary</h3>' +
+    '<div>Average concept coverage across ' + rows.length + ' question' + (rows.length > 1 ? 's' : '') + ': <strong>' + avg + '%</strong></div>' +
+    '<div class="bar"><i style="width:' + avg + '%"></i></div>';
+  rows.forEach(function (r) {
+    html += '<div style="margin-top:12px"><strong>Q' + r.n + '</strong> — ' + esc(r.q.slice(0, 110)) +
+      '<div style="font-size:.86rem;color:var(--muted);margin-top:3px">' + r.cov.pct + '% covered</div>' +
+      (r.cov.hit.length ? r.cov.hit.slice(0, 8).map(function (c) { return '<span class="chip hit">' + esc(c) + '</span>'; }).join('') : '') +
+      (r.cov.miss.length ? r.cov.miss.slice(0, 8).map(function (c) { return '<span class="chip miss">' + esc(c) + '</span>'; }).join('') : '') +
+      '</div>';
+  });
+  html += '</div>';
+  var node = logTurn('verdict', 'Interviewer · summary', '');
+  node.innerHTML = '<div class="role">Interviewer · summary</div>' + html;
+
+  // Optional narrative verdict from the LLM.
+  if (llmConfig()) {
+    try {
+      var brief = done.map(function (r) {
+        return 'Q: ' + r.item.q + '\nCandidate: ' + r.answers.join(' ').slice(0, 700);
+      }).join('\n\n');
+      var verdict = await chat([
+        { role: 'system', content: 'You are a senior interviewer writing brief closing feedback after a mock ' +
+          'technical interview. 4 sentences maximum: what the candidate did well, the clearest weakness, ' +
+          'and one specific thing to work on. Direct, no flattery, no preamble.' },
+        { role: 'user', content: brief }
+      ], 260);
+      if (verdict) {
+        var v = document.createElement('div');
+        v.style.marginTop = '14px';
+        v.textContent = verdict;
+        node.appendChild(v);
+        await speak(verdict);
+      }
+    } catch (e) { /* local summary already shown */ }
+  } else {
+    var weakest = rows.slice().sort(function (a, b) { return a.cov.pct - b.cov.pct; })[0];
+    var closing = 'Overall coverage ' + avg + ' percent. Your weakest answer was question ' + weakest.n +
+      ', where you missed ' + (weakest.cov.miss.slice(0, 3).join(', ') || 'several key points') + '.';
+    var v2 = document.createElement('div'); v2.style.marginTop = '14px'; v2.textContent = closing;
+    node.appendChild(v2);
+    await speak(closing);
+  }
+
+  setState('done', 'Complete');
+  say('That\u2019s everything. Review the summary below.');
+  resetIdle();
+}
+
+// ---------------------------------------------------------------- controls
+doneBtn.addEventListener('click', function () { if (session && session.resolveAnswer) session.resolveAnswer(); });
+skipBtn.addEventListener('click', function () { transcript = ''; if (session && session.resolveAnswer) session.resolveAnswer(); });
+beginBtn.addEventListener('click', startInterview);
+endBtn.addEventListener('click', function () {
+  if (!session) return;
+  session.aborted = true;
+  if (session.resolveAnswer) session.resolveAnswer();
+  if (ttsOk) window.speechSynthesis.cancel();
+  stopListening();
+  setState('done', 'Ended');
+  say('Interview ended.');
+  resetIdle();
+});
+
+// ---------------------------------------------------------------- boot
+function boot(data) {
+  QA = data;
+  var seen = {};
+  data.forEach(function (d) {
+    if (seen[d.section]) return;
+    seen[d.section] = 1;
+    var o = document.createElement('option');
+    o.value = d.section; o.textContent = d.section;
+    sectionSel.appendChild(o);
+  });
+  var params = new URLSearchParams(window.location.search);
+  var want = params.get('section');
+  if (want) {
+    for (var i = 0; i < sectionSel.options.length; i++) {
+      if (new RegExp('^Section\\s+' + parseInt(want, 10) + '\\b').test(sectionSel.options[i].value)) {
+        sectionSel.value = sectionSel.options[i].value; break;
+      }
+    }
+  }
+  if (!ttsOk && !srOk) hint('Voice needs Chrome, Edge or Safari. The interview still runs as text.', true);
+  else if (!srOk) hint('Speech recognition needs Chrome, Edge or Safari. Questions will be read aloud; press Done to advance.', true);
+  setTimeout(function () { try { df(); } catch (e) {} }, 1200);
+}
+
+Promise.all([
+  fetch('data/questions.json').then(function (r) { return r.json(); }),
+  fetch('data/answers.json').then(function (r) { return r.json(); })
+]).then(function (res) {
+  var qs = res[0].questions || res[0], ans = (res[1] && res[1].answers) || res[1];
+  boot(qs.map(function (q) {
+    return { n: q.id, section: q.section, q: q.question, a: ans[q.id] || '' };
+  }));
+}).catch(function (e) {
+  hint('Could not load the question bank: ' + e.message, true);
+  beginBtn.disabled = true;
+});
+
+})();
+</script>
+</body>
+</html>

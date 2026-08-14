@@ -13,3 +13,10 @@ Thumbs.db
 .tmp/
 *.tmp
 node_modules/
+
+# local Jekyll preview
+_site/
+.jekyll-cache/
+.jekyll-metadata
+vendor/
+Gemfile.lock

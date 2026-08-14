@@ -26,6 +26,7 @@ It covers the full modern surface: classic ML and statistics through transformer
 | 📋 **[Question bank](questions.md)** | 1,716 questions across 54 sections, difficulty-tagged (⭐ Standard, ⭐⭐ Hard, ⭐⭐⭐ Principal). Hover or tap any question on the site to reveal its answer. |
 | ✅ **[Answer frameworks](answers.md)** | An answer for every question — not a definition, but what a strong candidate actually says. |
 | 🎯 **[Role-based map](https://krunlp.github.io/AI-Prep-Buddy/roles.html)** | Pick your target role (Staff MLE, Principal AI Lead, GenAI Engineer, Platform, MLOps, Research, Security, Solutions Architect, Data Scientist, EM) and see exactly which sections to complete, with progress tracking. |
+| 🎙️ **[Live Interview](https://krunlp.github.io/AI-Prep-Buddy/interview.html)** | An agentic interviewer: asks aloud, listens, then follows up on what you actually said — adaptive with an API key, gap-based without one. Ends with a scored summary. |
 | 🎤 **[Mock simulator](https://krunlp.github.io/AI-Prep-Buddy/simulator.html)** | Voice-enabled. Questions read aloud, answer out loud with live transcription, then get scored — local concept-coverage analysis built in, or LLM feedback with a free API key. |
 | 🏗️ **[Diagrams](diagrams.md)** + **[Patterns](patterns.md)** | 69 Mermaid architecture diagrams and conceptual patterns, each with flow, worked example and real-world industry usage. |
 | 💻 **[Code solutions](code-solutions.md)** | Runnable implementations for the coding round. |
@@ -130,6 +131,15 @@ The bank is available as JSON for building your own tools:
 - **Fast-moving areas go stale.** Serving frameworks, agent protocols and regulatory deadlines shift within months. Treat 2025–2026 specifics as needing a re-check.
 - **Depth is uneven.** Recently written sections are substantially deeper than some older ones; this is being addressed section by section.
 - **Company prep is community-reported**, not official, and interview processes change.
+
+## Running locally
+
+```bash
+./scripts/serve.sh          # full Jekyll build -> localhost:4000/AI-Prep-Buddy/
+./scripts/serve.sh static   # no Ruby needed   -> localhost:8000
+```
+
+A server is required — the interview and simulator pages fetch `data/*.json`, which browsers block over `file://`.
 
 ## Contributing
 

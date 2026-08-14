@@ -110,6 +110,37 @@ touches answer numbering, **import `qa_lib` rather than writing your own
 regex** — a script that knew only one of the two formats is exactly what caused
 the Section 43 numbering collision.
 
+## Running locally
+
+A local HTTP server is required: `interview.html` and `simulator.html` fetch
+`data/*.json`, and browsers block `fetch()` over `file://`, so opening the files
+directly will leave those pages blank.
+
+```bash
+# Full Jekyll build — mirrors GitHub Pages, renders the markdown pages too
+./scripts/serve.sh
+#   -> http://localhost:4000/AI-Prep-Buddy/
+
+# No Ruby? Static mode covers the hand-written HTML pages
+./scripts/serve.sh static
+#   -> http://localhost:8000
+```
+
+On macOS, if you don't have bundler:
+
+```bash
+gem install bundler
+./scripts/serve.sh
+```
+
+Static mode serves `index.html`, `interview.html`, `simulator.html` and
+`roles.html` correctly. Markdown pages (`questions`, `answers`, `diagrams`,
+`patterns`, ...) only render under full Jekyll.
+
+**Worth testing in a real browser**, because the automated checks cannot reach it:
+voice input and output, microphone permissions, the answer-reveal panel position
+near screen edges, and layout on a narrow viewport.
+
 ## Submission Process
 
 1. Fork the repository.

@@ -21,6 +21,7 @@ NAV = [
     ("index.html", "Home"),
     ("questions.html", "Questions"),
     ("answers.html", "Answers"),
+    ("interview.html", "🎙️ Live Interview"),
     ("simulator.html", "🎤 Simulator"),
     ("study-paths.html", "Study Paths"),
     ("diagrams.html", "Diagrams"),
