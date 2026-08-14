@@ -117,25 +117,19 @@ A local HTTP server is required: `interview.html` and `simulator.html` fetch
 directly will leave those pages blank.
 
 ```bash
-# Full Jekyll build — mirrors GitHub Pages, renders the markdown pages too
-./scripts/serve.sh
-#   -> http://localhost:4000/AI-Prep-Buddy/
-
-# No Ruby? Static mode covers the hand-written HTML pages
-./scripts/serve.sh static
-#   -> http://localhost:8000
+./scripts/serve.sh          # static, no dependencies -> http://localhost:8000
+./scripts/serve.sh jekyll   # full build              -> http://localhost:4000/AI-Prep-Buddy/
+PORT=9000 ./scripts/serve.sh
 ```
 
-On macOS, if you don't have bundler:
+Static mode serves every hand-written HTML page — `index`, `interview`,
+`simulator`, `roles` — which is all of the interactive surface. Markdown pages
+(`questions`, `answers`, `diagrams`, `patterns`, ...) only render under Jekyll.
 
-```bash
-gem install bundler
-./scripts/serve.sh
-```
-
-Static mode serves `index.html`, `interview.html`, `simulator.html` and
-`roles.html` correctly. Markdown pages (`questions`, `answers`, `diagrams`,
-`patterns`, ...) only render under full Jekyll.
+**macOS note:** the system Ruby at `/usr/bin/ruby` is 2.6.x, too old for the
+`github-pages` gem, and installing gems into it requires `sudo`. The script
+detects this and stops with instructions rather than failing halfway through a
+native-extension build. `brew install ruby` and adding it to `PATH` is the fix.
 
 **Worth testing in a real browser**, because the automated checks cannot reach it:
 voice input and output, microphone permissions, the answer-reveal panel position

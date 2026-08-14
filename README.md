@@ -135,11 +135,20 @@ The bank is available as JSON for building your own tools:
 ## Running locally
 
 ```bash
-./scripts/serve.sh          # full Jekyll build -> localhost:4000/AI-Prep-Buddy/
-./scripts/serve.sh static   # no Ruby needed   -> localhost:8000
+git clone https://github.com/krunlp/AI-Prep-Buddy.git
+cd AI-Prep-Buddy
+./scripts/serve.sh          # → http://localhost:8000   (no dependencies)
 ```
 
-A server is required — the interview and simulator pages fetch `data/*.json`, which browsers block over `file://`.
+That serves `index.html`, `interview.html`, `simulator.html` and `roles.html` — everything interactive. For the markdown pages too:
+
+```bash
+./scripts/serve.sh jekyll   # → http://localhost:4000/AI-Prep-Buddy/
+```
+
+**A server is required** — the interview and simulator pages fetch `data/*.json`, and browsers block `fetch()` over `file://`, so opening the files directly leaves them blank. `localhost` is a secure context, so the microphone works without HTTPS.
+
+On macOS, don't use the system Ruby at `/usr/bin/ruby` (2.6.x — too old for Jekyll and needs `sudo`). The script detects it and tells you what to do; `brew install ruby` is the fix.
 
 ## Contributing
 
