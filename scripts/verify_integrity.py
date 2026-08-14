@@ -273,6 +273,20 @@ def main() -> int:
                 f"Jekyll will drop one non-deterministically",
             )
 
+    # 8b2. README must stay a landing page, not a second copy of the bank.
+    #      Regression guard: it silently held a stale duplicate of 1,206
+    #      questions across 31 sections while the bank had 1,716 across 54.
+    readme = qa_lib.REPO_ROOT / "README.md"
+    if readme.exists():
+        rtext = readme.read_text(encoding="utf-8")
+        rq = len(set(re.findall(r"^(\d+)\.\s", rtext, re.MULTILINE)))
+        if rq > 50:
+            fail(
+                "readme-duplication",
+                f"README.md contains {rq} numbered questions — it must link to "
+                f"questions.md, not duplicate it (the copy silently goes stale)",
+            )
+
     # 8c. Diagram-count claims must match the actual number of diagrams.
     #     Regression guard: diagrams.md carried interim notes claiming "13
     #     diagrams" and "28 diagrams" long after it held 39.
