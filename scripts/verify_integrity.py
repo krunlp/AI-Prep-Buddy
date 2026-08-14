@@ -290,6 +290,33 @@ def main() -> int:
                 f"{name} claims {wrong} diagrams but contains {actual}",
             )
 
+    # 8d. Every section must be assigned to at least one role, or it is
+    #     invisible on the role map. Regression guard: Section 50 was added
+    #     without being mapped to any role.
+    try:
+        sys.path.insert(0, str(qa_lib.REPO_ROOT / "scripts"))
+        from roles_data import ROLES as _ROLES
+
+        assigned = set()
+        for r in _ROLES:
+            for t in ("core", "important", "optional"):
+                assigned |= set(r.get(t, []))
+        all_secs = set()
+        for r in qa_lib.section_ranges():
+            m = re.match(r"Section (\d+)", r["section"])
+            if m:
+                all_secs.add(int(m.group(1)))
+        unassigned = sorted(all_secs - assigned)
+        unknown = sorted(assigned - all_secs)
+        if unassigned:
+            fail("role-coverage",
+                 f"sections not assigned to any role: {_fmt(unassigned)}")
+        if unknown:
+            fail("role-coverage",
+                 f"roles_data.py references non-existent sections: {_fmt(unknown)}")
+    except ImportError:
+        warn("role-coverage", "scripts/roles_data.py not importable")
+
     # 9b. The shared layout's nav must reach every published page. It is the
     #     only navigation on markdown pages, so a page missing here is
     #     effectively unreachable while browsing.

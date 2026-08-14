@@ -3,7 +3,7 @@ layout: default
 title: Question Bank
 ---
 
-# AI Prep Buddy — Master Interview Question Bank (1,621 Questions)
+# AI Prep Buddy — Master Interview Question Bank (1,646 Questions)
 
 The complete open-source prep platform for AI/ML engineering, system design, and architecture loops. Organized into 49 structured technical sections with difficulty tags (`⭐ Standard`, `⭐⭐ Hard`, `⭐⭐⭐ Principal`).
 
@@ -1992,3 +1992,33 @@ Synthesize an end-to-end multi-region, multi-cloud enterprise GenAI serving plat
 ---
 
 <script src="assets/js/question-answers.js?v=2" defer></script>
+
+---
+
+## Section 50 — Production Incident Triage & Live Debugging (1622–1646)
+
+1622. Your LLM application suddenly returns HTTP 429s in production. Before assuming "too many requests," what distinct limits could actually be firing, and how do you identify which one in the first five minutes? ⭐⭐⭐
+1623. RPM sits at 40% of quota but you are still getting 429s. Walk through what you check next and what each signal rules in or out. ⭐⭐⭐
+1624. Retrieval starts returning 20 chunks instead of 5 after a config change. Request volume is unchanged. Trace the full blast radius of that single change through rate limits, latency, cost and answer quality. ⭐⭐⭐
+1625. Application traffic looks flat but downstream model calls have tripled. What class of change causes this, and how do you prove it from telemetry rather than guessing? ⭐⭐⭐
+1626. Your service retries every 429 with immediate retry. Explain the failure mode this creates, why it is self-reinforcing, and the specific retry policy you would replace it with. ⭐⭐⭐
+1627. Average RPM looks healthy all day yet you get 429 bursts at unpredictable moments. What metric is hiding the problem, and how do you instrument for it? ⭐⭐
+1628. A provider returns 429 with no `Retry-After` header and a vague error body. How do you build a client that behaves correctly under this uncertainty without hammering the provider? ⭐⭐
+1629. Distinguish a rate limit you are causing from a provider-side capacity incident. What evidence separates the two, and how does your response differ? ⭐⭐⭐
+1630. p50 latency is unchanged but p99 has doubled overnight. Enumerate the candidate causes specific to LLM serving and the order you would eliminate them. ⭐⭐⭐
+1631. Time to first token is fine but tokens per second has degraded. What does that split tell you about where the bottleneck is? ⭐⭐⭐
+1632. Your monthly LLM spend doubled with flat user numbers. Build the diagnostic tree that gets you from the bill to the responsible code path. ⭐⭐⭐
+1633. Users report the assistant "got worse this week." No deployment went out and no model version changed. What can still have changed, and how do you confirm it? ⭐⭐⭐
+1634. Your RAG system's answers degraded but retrieval metrics look unchanged. Where do you look, and why can retrieval metrics stay flat while quality falls? ⭐⭐⭐
+1635. An agent that normally completes a task in 6 steps is now taking 40 and sometimes never finishing. Diagnose systematically rather than by raising the step cap. ⭐⭐⭐
+1636. Streaming responses intermittently truncate mid-sentence for a subset of users. Work through the layers where this can originate. ⭐⭐
+1637. Your self-hosted vLLM deployment starts OOM-ing under traffic it previously handled. What changed characteristics of the workload would explain it, and what do you check first? ⭐⭐⭐
+1638. Vector search recall has quietly dropped over three months with no code change. Explain the mechanism and how you would have detected it earlier. ⭐⭐⭐
+1639. A single tenant's traffic is degrading latency for everyone else on shared infrastructure. Identify the isolation failure and the controls that should have prevented it. ⭐⭐⭐
+1640. Your eval suite is green but users are complaining. Reconcile the contradiction and describe what you change so the suite stops lying to you. ⭐⭐⭐
+1641. A prompt change shipped four hours ago and error rates are climbing slowly rather than spiking. Why is gradual degradation harder to attribute, and how do you handle it? ⭐⭐
+1642. Guardrail false-positive rate jumped after a model version update you did not initiate. Explain how a provider-side change surfaces this way and what your standing defence is. ⭐⭐⭐
+1643. Tool calls are failing intermittently with malformed arguments, but only for some tools. Diagnose whether the cause is the model, the schema, or the input distribution. ⭐⭐⭐
+1644. Your agent's cost per successful task has risen while its success rate stayed flat. What is happening, and why is success rate alone a misleading health metric? ⭐⭐⭐
+1645. Structure the first ten minutes of an AI incident: what you check, what you communicate, and what you deliberately do not do yet. ⭐⭐⭐
+1646. Write the postmortem for an LLM incident where the root cause was "the model returned something unexpected." Explain why that phrasing is unacceptable and what a real root cause statement looks like. ⭐⭐⭐

@@ -1,8 +1,8 @@
 {
   "name": "AI Prep Buddy Dataset",
   "version": "2.0.0",
-  "total_questions": 1621,
-  "total_sections": 49,
+  "total_questions": 1646,
+  "total_sections": 50,
   "questions": [
     {
       "id": 1,
@@ -8108,6 +8108,131 @@
       "id": 1621,
       "section": "Section 49 — Enterprise Cloud AI Deployment Architectures (AWS, Azure & GCP)",
       "question": "End-to-End Enterprise Multi-Cloud AI Architecture Blueprint"
+    },
+    {
+      "id": 1622,
+      "section": "Section 50 — Production Incident Triage & Live Debugging",
+      "question": "Your LLM application suddenly returns HTTP 429s in production. Before assuming \"too many requests,\" what distinct limits could actually be firing, and how do you identify which one in the first five minutes?"
+    },
+    {
+      "id": 1623,
+      "section": "Section 50 — Production Incident Triage & Live Debugging",
+      "question": "RPM sits at 40% of quota but you are still getting 429s. Walk through what you check next and what each signal rules in or out."
+    },
+    {
+      "id": 1624,
+      "section": "Section 50 — Production Incident Triage & Live Debugging",
+      "question": "Retrieval starts returning 20 chunks instead of 5 after a config change. Request volume is unchanged. Trace the full blast radius of that single change through rate limits, latency, cost and answer quality."
+    },
+    {
+      "id": 1625,
+      "section": "Section 50 — Production Incident Triage & Live Debugging",
+      "question": "Application traffic looks flat but downstream model calls have tripled. What class of change causes this, and how do you prove it from telemetry rather than guessing?"
+    },
+    {
+      "id": 1626,
+      "section": "Section 50 — Production Incident Triage & Live Debugging",
+      "question": "Your service retries every 429 with immediate retry. Explain the failure mode this creates, why it is self-reinforcing, and the specific retry policy you would replace it with."
+    },
+    {
+      "id": 1627,
+      "section": "Section 50 — Production Incident Triage & Live Debugging",
+      "question": "Average RPM looks healthy all day yet you get 429 bursts at unpredictable moments. What metric is hiding the problem, and how do you instrument for it?"
+    },
+    {
+      "id": 1628,
+      "section": "Section 50 — Production Incident Triage & Live Debugging",
+      "question": "A provider returns 429 with no `Retry-After` header and a vague error body. How do you build a client that behaves correctly under this uncertainty without hammering the provider?"
+    },
+    {
+      "id": 1629,
+      "section": "Section 50 — Production Incident Triage & Live Debugging",
+      "question": "Distinguish a rate limit you are causing from a provider-side capacity incident. What evidence separates the two, and how does your response differ?"
+    },
+    {
+      "id": 1630,
+      "section": "Section 50 — Production Incident Triage & Live Debugging",
+      "question": "p50 latency is unchanged but p99 has doubled overnight. Enumerate the candidate causes specific to LLM serving and the order you would eliminate them."
+    },
+    {
+      "id": 1631,
+      "section": "Section 50 — Production Incident Triage & Live Debugging",
+      "question": "Time to first token is fine but tokens per second has degraded. What does that split tell you about where the bottleneck is?"
+    },
+    {
+      "id": 1632,
+      "section": "Section 50 — Production Incident Triage & Live Debugging",
+      "question": "Your monthly LLM spend doubled with flat user numbers. Build the diagnostic tree that gets you from the bill to the responsible code path."
+    },
+    {
+      "id": 1633,
+      "section": "Section 50 — Production Incident Triage & Live Debugging",
+      "question": "Users report the assistant \"got worse this week.\" No deployment went out and no model version changed. What can still have changed, and how do you confirm it?"
+    },
+    {
+      "id": 1634,
+      "section": "Section 50 — Production Incident Triage & Live Debugging",
+      "question": "Your RAG system's answers degraded but retrieval metrics look unchanged. Where do you look, and why can retrieval metrics stay flat while quality falls?"
+    },
+    {
+      "id": 1635,
+      "section": "Section 50 — Production Incident Triage & Live Debugging",
+      "question": "An agent that normally completes a task in 6 steps is now taking 40 and sometimes never finishing. Diagnose systematically rather than by raising the step cap."
+    },
+    {
+      "id": 1636,
+      "section": "Section 50 — Production Incident Triage & Live Debugging",
+      "question": "Streaming responses intermittently truncate mid-sentence for a subset of users. Work through the layers where this can originate."
+    },
+    {
+      "id": 1637,
+      "section": "Section 50 — Production Incident Triage & Live Debugging",
+      "question": "Your self-hosted vLLM deployment starts OOM-ing under traffic it previously handled. What changed characteristics of the workload would explain it, and what do you check first?"
+    },
+    {
+      "id": 1638,
+      "section": "Section 50 — Production Incident Triage & Live Debugging",
+      "question": "Vector search recall has quietly dropped over three months with no code change. Explain the mechanism and how you would have detected it earlier."
+    },
+    {
+      "id": 1639,
+      "section": "Section 50 — Production Incident Triage & Live Debugging",
+      "question": "A single tenant's traffic is degrading latency for everyone else on shared infrastructure. Identify the isolation failure and the controls that should have prevented it."
+    },
+    {
+      "id": 1640,
+      "section": "Section 50 — Production Incident Triage & Live Debugging",
+      "question": "Your eval suite is green but users are complaining. Reconcile the contradiction and describe what you change so the suite stops lying to you."
+    },
+    {
+      "id": 1641,
+      "section": "Section 50 — Production Incident Triage & Live Debugging",
+      "question": "A prompt change shipped four hours ago and error rates are climbing slowly rather than spiking. Why is gradual degradation harder to attribute, and how do you handle it?"
+    },
+    {
+      "id": 1642,
+      "section": "Section 50 — Production Incident Triage & Live Debugging",
+      "question": "Guardrail false-positive rate jumped after a model version update you did not initiate. Explain how a provider-side change surfaces this way and what your standing defence is."
+    },
+    {
+      "id": 1643,
+      "section": "Section 50 — Production Incident Triage & Live Debugging",
+      "question": "Tool calls are failing intermittently with malformed arguments, but only for some tools. Diagnose whether the cause is the model, the schema, or the input distribution."
+    },
+    {
+      "id": 1644,
+      "section": "Section 50 — Production Incident Triage & Live Debugging",
+      "question": "Your agent's cost per successful task has risen while its success rate stayed flat. What is happening, and why is success rate alone a misleading health metric?"
+    },
+    {
+      "id": 1645,
+      "section": "Section 50 — Production Incident Triage & Live Debugging",
+      "question": "Structure the first ten minutes of an AI incident: what you check, what you communicate, and what you deliberately do not do yet."
+    },
+    {
+      "id": 1646,
+      "section": "Section 50 — Production Incident Triage & Live Debugging",
+      "question": "Write the postmortem for an LLM incident where the root cause was \"the model returned something unexpected.\" Explain why that phrasing is unacceptable and what a real root cause statement looks like."
     }
   ]
 }
