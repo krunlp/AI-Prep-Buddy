@@ -58,6 +58,12 @@ RE_BOLD_WRAP = re.compile(r"^\*\*(.+?)\*\*$")
 RE_HDR_RANGE = re.compile(r"\s*\(\d+\s*[–-]\s*\d+\)")
 
 
+def _difficulty(text: str) -> int:
+    """1 = Standard, 2 = Hard, 3 = Principal. 0 when untagged."""
+    m = RE_STARS.search(text or "")
+    return m.group(0).count("\u2b50") if m else 0
+
+
 def _clean_question_text(text: str) -> str:
     text = RE_STARS.sub("", text).strip()
     m = RE_BOLD_WRAP.match(text)
@@ -90,6 +96,7 @@ def parse_questions(path: Path = QUESTIONS_MD) -> list[dict]:
                     "section": _clean_section_name(current_section),
                     "section_raw": current_section,
                     "question": _clean_question_text(m.group(2)),
+                    "difficulty": _difficulty(m.group(2)),
                 }
             )
     return out
@@ -137,6 +144,7 @@ def build_dataset() -> list[dict]:
                 "section": q["section"],
                 "q": q["question"],
                 "a": answer_text,
+                "d": q.get("difficulty", 0),
             }
         )
     return dataset

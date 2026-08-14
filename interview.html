@@ -99,6 +99,8 @@
   .turn.a { border-left: 3px solid var(--amber); }
   .turn.probe { border-left: 3px solid var(--emerald); }
   .turn.verdict { border-left: 3px solid var(--emerald); background: rgba(16,185,129,.07); }
+  .turn.decision { border-left: 3px dashed var(--muted); font-size: .84rem; color: var(--muted);
+    padding: 8px 14px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 
   .report h3 { margin: 0 0 8px; }
   .bar { height: 9px; border-radius: 6px; background: rgba(255,255,255,.08); overflow: hidden; margin: 6px 0 10px; }
@@ -503,36 +505,153 @@ function llmFollowUp(q, reference, answerText, priorProbes) {
     .then(function (t) { return t.replace(/^["'\s]+|["'\s]+$/g, '').split('\n')[0]; });
 }
 
-// ---------------------------------------------------------------- flow
-function pickQuestions(n) {
-  if (!n || isNaN(n) || n < 1) n = 5;
+// ---------------------------------------------------------------- agent
+//
+// The interviewer is a control loop, not a script. After every answer it
+// updates a belief about the candidate and chooses the next action:
+//
+//   probe    - the answer was thin; push on the same question
+//   escalate - strong answer; ask something harder in the same area
+//   switch   - area sufficiently evidenced; move to an untested one
+//   challenge- assert something contestable and see if they hold their ground
+//   conclude - enough evidence to write an assessment
+//
+// With an API key the LLM chooses. Without one, a deterministic policy over
+// the same belief state chooses, so the behaviour is agentic either way.
+
+function newBelief() {
+  return {
+    turns: 0, budget: 0,
+    level: 2,                       // current difficulty being probed (1-3)
+    bySection: {},                  // section -> { asked, coverage[], }
+    strengths: [], gaps: [],
+    lastAction: null, actions: []
+  };
+}
+
+function noteEvidence(b, item, cov) {
+  var k = item.section;
+  if (!b.bySection[k]) b.bySection[k] = { asked: 0, coverage: [] };
+  b.bySection[k].asked++;
+  b.bySection[k].coverage.push(cov.pct);
+  cov.hit.slice(0, 3).forEach(function (h) { if (b.strengths.indexOf(h) === -1) b.strengths.push(h); });
+  cov.miss.slice(0, 3).forEach(function (m) { if (b.gaps.indexOf(m) === -1) b.gaps.push(m); });
+}
+
+function sectionScore(b, sec) {
+  var e = b.bySection[sec];
+  if (!e || !e.coverage.length) return null;
+  return Math.round(e.coverage.reduce(function (a, c) { return a + c; }, 0) / e.coverage.length);
+}
+
+// Deterministic policy — the no-key path, and the fallback when the LLM errors.
+function localPolicy(b, lastCov, probesThisQuestion, item) {
+  if (b.turns >= b.budget) return { action: 'conclude', why: 'turn budget reached' };
+  if (!lastCov) return { action: 'switch', why: 'no answer captured' };
+
+  if (lastCov.pct < 40 && probesThisQuestion < 2) {
+    return { action: 'probe', why: 'answer covered ' + lastCov.pct + '% of the key points' };
+  }
+  if (lastCov.pct >= 75 && b.level < 3) {
+    return { action: 'escalate', why: 'strong answer at level ' + b.level };
+  }
+  if (lastCov.pct >= 55 && probesThisQuestion === 0 && b.actions.indexOf('challenge') === -1) {
+    return { action: 'challenge', why: 'confident answer worth pressure-testing' };
+  }
+  return { action: 'switch', why: 'area evidenced, moving on' };
+}
+
+function llmPolicy(b, lastCov, probesThisQuestion, item, lastAnswer) {
+  var state = {
+    turns_used: b.turns, turns_left: b.budget - b.turns,
+    current_section: item.section,
+    current_difficulty: item.d || 2,
+    coverage_of_last_answer_pct: lastCov ? lastCov.pct : 0,
+    points_missed: lastCov ? lastCov.miss.slice(0, 6) : [],
+    follow_ups_on_this_question: probesThisQuestion,
+    sections_covered: Object.keys(b.bySection),
+    running_gaps: b.gaps.slice(0, 8)
+  };
+  var sys = 'You are conducting a technical interview and deciding what to do next. ' +
+    'Choose ONE action:\n' +
+    'probe - the last answer was thin or vague; push further on it\n' +
+    'escalate - they handled that well; ask something harder in the same area\n' +
+    'switch - this area is sufficiently evidenced; move to a different topic\n' +
+    'challenge - assert something contestable to test whether they hold their ground\n' +
+    'conclude - enough evidence to assess them\n' +
+    'Reply with ONLY JSON: {"action":"...","why":"<8 words>"}';
+  return chat([
+    { role: 'system', content: sys },
+    { role: 'user', content: 'Interview state:\n' + JSON.stringify(state, null, 1) +
+        '\n\nLast question: ' + item.q + '\nCandidate said: ' + String(lastAnswer).slice(0, 600) }
+  ], 90).then(function (t) {
+    var m = t.replace(/```json|```/g, '').match(/\{[\s\S]*\}/);
+    if (!m) throw new Error('no json');
+    var parsed = JSON.parse(m[0]);
+    if (['probe','escalate','switch','challenge','conclude'].indexOf(parsed.action) === -1) throw new Error('bad action');
+    return parsed;
+  });
+}
+
+function decide(b, lastCov, probes, item, lastAnswer) {
+  if (b.turns >= b.budget) return Promise.resolve({ action: 'conclude', why: 'turn budget reached' });
+  if (!llmConfig()) return Promise.resolve(localPolicy(b, lastCov, probes, item));
+  return llmPolicy(b, lastCov, probes, item, lastAnswer)
+    .catch(function () { return localPolicy(b, lastCov, probes, item); });
+}
+
+// ---------------------------------------------------------------- selection
+function pool() {
   var filter = sectionSel.value;
-  var pool = filter === 'all' ? QA.slice() : QA.filter(function (d) { return d.section === filter; });
-  var out = [];
-  for (var i = 0; i < n && pool.length; i++) out.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
-  return out;
+  return filter === 'all' ? QA : QA.filter(function (d) { return d.section === filter; });
 }
 
-function waitForDone() {
-  return new Promise(function (resolve) { session.resolveAnswer = resolve; });
+// Pick a question by target difficulty, preferring sections not yet examined.
+function selectQuestion(b, opts) {
+  opts = opts || {};
+  var cands = pool().filter(function (q) { return b.askedIds.indexOf(q.n) === -1; });
+  if (!cands.length) return null;
+
+  if (opts.sameSection) {
+    var same = cands.filter(function (q) { return q.section === opts.sameSection; });
+    if (same.length) cands = same;
+  } else if (opts.fresh) {
+    var untested = cands.filter(function (q) { return !b.bySection[q.section]; });
+    if (untested.length) cands = untested;
+  }
+  var lvl = Math.max(1, Math.min(3, opts.level || b.level));
+  var atLevel = cands.filter(function (q) { return (q.d || 2) === lvl; });
+  if (atLevel.length) cands = atLevel;
+  return cands[Math.floor(Math.random() * cands.length)];
 }
 
-function pause(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+var CHALLENGES = [
+  'Push back on me for a second \u2014 I think that approach is over-engineered for most teams. Convince me otherwise.',
+  'A lot of people would say what you just described is unnecessary complexity. What would you say to them?',
+  'I\u2019d argue the simpler option beats that in practice. Where am I wrong?'
+];
 
+// ---------------------------------------------------------------- flow
 function startInterview() {
   logBox.innerHTML = '';
-  var qs = pickQuestions(parseInt(lengthSel.value, 10));
-  if (!qs.length) { hint('No questions in that section.', true); return; }
-  session = { qs: qs, i: 0, depth: parseInt(depthSel.value, 10), records: [], aborted: false, resolveAnswer: null };
+  if (!pool().length) { hint('No questions in that section.', true); return; }
+  session = {
+    aborted: false, resolveAnswer: null,
+    b: newBelief(), records: []
+  };
+  session.b.budget = parseInt(lengthSel.value, 10) || 5;
+  session.b.askedIds = [];
   beginBtn.disabled = true; endBtn.disabled = false;
-  // Open the mic up front so even the greeting can be interrupted.
   if (bargeChk.checked) openMic();
   var c = llmConfig();
   var modeMsg = modeSel.value === 'auto'
     ? 'Hands-free: just talk, and pause when you\u2019re done.'
     : 'Press \u201cDone answering\u201d to end each turn.';
-  hint((c ? 'Adaptive follow-ups via ' + c.label + '. ' : 'Local follow-ups from gaps in your answer. ') + modeMsg);
-  run().catch(function (e) { hint('Interview stopped: ' + e.message, true); resetIdle(); });
+  hint((c ? 'Agentic interviewer via ' + c.label + '. ' : 'Agentic interviewer (local policy). ') + modeMsg);
+  run().catch(function (e) {
+    if (e.message !== 'ended') hint('Interview stopped: ' + e.message, true);
+    resetIdle();
+  });
 }
 
 function resetIdle() {
@@ -542,10 +661,13 @@ function resetIdle() {
   beginBtn.disabled = false; doneBtn.disabled = true; skipBtn.disabled = true; endBtn.disabled = true;
 }
 
+function waitForDone() {
+  return new Promise(function (resolve) { session.resolveAnswer = resolve; });
+}
+
 async function askAndListen(text, cls, role) {
   logTurn(cls, role, text);
   say(text);
-  // Mic opens before the question is spoken so an interruption is possible.
   if (bargeChk.checked) openMic();
   await speak(text);
   if (session.aborted) throw new Error('ended');
@@ -554,40 +676,84 @@ async function askAndListen(text, cls, role) {
   await waitForDone();
   doneBtn.disabled = true; skipBtn.disabled = true;
   stopListening();
+  if (session.aborted) throw new Error('ended');
   var said = transcript.trim();
   logTurn('a', 'You', said || '(no answer captured)');
   return said;
 }
 
+function logDecision(d) {
+  var el = logTurn('decision', 'Interviewer \u00b7 deciding', d.action.toUpperCase() + ' \u2014 ' + (d.why || ''));
+  el.classList.add('decision');
+}
+
 async function run() {
-  await speak('Thanks for making the time. I\u2019ll ask a few questions, and I\u2019ll follow up on your answers as we go.');
+  var b = session.b;
+  await speak('Thanks for making the time. I\u2019ll adapt as we go \u2014 if something\u2019s strong I\u2019ll push harder, if it\u2019s shaky I\u2019ll dig in.');
   if (session.aborted) return;
 
-  for (session.i = 0; session.i < session.qs.length; session.i++) {
-    if (session.aborted) break;
-    var item = session.qs[session.i];
-    var intro = (session.i === 0 ? 'First question. ' : 'Next. ') + item.q;
-    var answer = await askAndListen(intro, 'q', 'Interviewer · Q' + item.n);
-    var answers = [answer];
-    var probes = [], usedConcepts = [];
+  var item = selectQuestion(b, { fresh: true });
+  if (!item) { hint('No questions available.', true); return resetIdle(); }
 
-    for (var d = 0; d < session.depth; d++) {
-      if (session.aborted) break;
-      if (!answer) break;                       // nothing to probe
-      setState('thinking', 'Thinking');
+  var probes = 0, usedConcepts = [], firstTurn = true;
+
+  while (!session.aborted) {
+    b.askedIds.push(item.n);
+    var prefix = firstTurn ? 'First question. ' : '';
+    firstTurn = false;
+    var answer = await askAndListen(prefix + item.q, 'q', 'Interviewer \u00b7 Q' + item.n + ' \u00b7 L' + (item.d || 2));
+    b.turns++;
+
+    var cov = answer ? coverage(answer, item.a) : null;
+    if (cov) noteEvidence(b, item, cov);
+
+    setState('thinking', 'Deciding');
+    var d = await decide(b, cov, probes, item, answer);
+    b.lastAction = d.action; b.actions.push(d.action);
+    logDecision(d);
+    session.records.push({ item: item, answer: answer, cov: cov, action: d.action });
+
+    if (d.action === 'conclude') break;
+
+    if (d.action === 'probe') {
+      probes++;
       var probe;
       try {
-        probe = await llmFollowUp(item.q, item.a, answers.join(' '), probes);
+        probe = await llmFollowUp(item.q, item.a, answer, []);
         if (!probe || probe.length < 8) throw new Error('empty');
       } catch (e) {
-        probe = localFollowUp(answers.join(' '), item.a, usedConcepts);
+        probe = localFollowUp(answer, item.a, usedConcepts);
       }
-      probes.push(probe);
-      answer = await askAndListen(probe, 'probe', 'Interviewer · follow-up');
-      answers.push(answer);
+      var pa = await askAndListen(probe, 'probe', 'Interviewer \u00b7 follow-up');
+      b.turns++;
+      var pcov = pa ? coverage(pa, item.a) : null;
+      if (pcov) noteEvidence(b, item, pcov);
+      session.records.push({ item: item, answer: pa, cov: pcov, action: 'probe-answer' });
+      if (b.turns >= b.budget) break;
+      continue;                                  // stay on the same question
     }
 
-    session.records.push({ item: item, answers: answers, probes: probes });
+    if (d.action === 'challenge') {
+      var ch = CHALLENGES[b.turns % CHALLENGES.length];
+      var ca = await askAndListen(ch, 'probe', 'Interviewer \u00b7 pushback');
+      b.turns++;
+      session.records.push({ item: item, answer: ca, cov: null, action: 'challenge-answer' });
+      if (b.turns >= b.budget) break;
+    }
+
+    if (d.action === 'escalate') {
+      b.level = Math.min(3, b.level + 1);
+      var next = selectQuestion(b, { sameSection: item.section, level: b.level }) ||
+                 selectQuestion(b, { level: b.level });
+      if (!next) break;
+      item = next; probes = 0; usedConcepts = [];
+      continue;
+    }
+
+    // switch (also the path after a challenge)
+    var fresh = selectQuestion(b, { fresh: true }) || selectQuestion(b, {});
+    if (!fresh) break;
+    item = fresh; probes = 0; usedConcepts = [];
   }
 
   await wrapUp();
@@ -596,39 +762,46 @@ async function run() {
 async function wrapUp() {
   setState('thinking', 'Reviewing');
   say('Let me pull that together.');
-  var done = session.records.filter(function (r) { return r.answers.join('').trim(); });
+
+  var done = session.records.filter(function (r) { return r.cov && String(r.answer || '').trim(); });
   if (!done.length) {
     setState('done', 'Ended');
-    logTurn('verdict', 'Interviewer', 'We didn\u2019t capture any answers — nothing to review.');
+    logTurn('verdict', 'Interviewer', 'We didn\u2019t capture any answers \u2014 nothing to review.');
     resetIdle(); return;
   }
 
-  // Local per-question coverage always available.
   var rows = done.map(function (r) {
-    var cov = coverage(r.answers.join(' '), r.item.a);
-    return { n: r.item.n, q: r.item.q, cov: cov, section: r.item.section };
+    return { n: r.item.n, q: r.item.q, cov: r.cov, level: r.item.d || 2 };
   });
   var avg = Math.round(rows.reduce(function (a, r) { return a + r.cov.pct; }, 0) / rows.length);
 
   var html = '<div class="report"><h3>Interview summary</h3>' +
-    '<div>Average concept coverage across ' + rows.length + ' question' + (rows.length > 1 ? 's' : '') + ': <strong>' + avg + '%</strong></div>' +
+    '<div>Average concept coverage across ' + rows.length + ' answer' + (rows.length > 1 ? 's' : '') +
+    ': <strong>' + avg + '%</strong></div>' +
     '<div class="bar"><i style="width:' + avg + '%"></i></div>';
   rows.forEach(function (r) {
-    html += '<div style="margin-top:12px"><strong>Q' + r.n + '</strong> — ' + esc(r.q.slice(0, 110)) +
+    html += '<div style="margin-top:12px"><strong>Q' + r.n + '</strong> <span style="opacity:.6">L' + r.level + '</span> \u2014 ' +
+      esc(r.q.slice(0, 110)) +
       '<div style="font-size:.86rem;color:var(--muted);margin-top:3px">' + r.cov.pct + '% covered</div>' +
-      (r.cov.hit.length ? r.cov.hit.slice(0, 8).map(function (c) { return '<span class="chip hit">' + esc(c) + '</span>'; }).join('') : '') +
-      (r.cov.miss.length ? r.cov.miss.slice(0, 8).map(function (c) { return '<span class="chip miss">' + esc(c) + '</span>'; }).join('') : '') +
+      r.cov.hit.slice(0, 8).map(function (c) { return '<span class="chip hit">' + esc(c) + '</span>'; }).join('') +
+      r.cov.miss.slice(0, 8).map(function (c) { return '<span class="chip miss">' + esc(c) + '</span>'; }).join('') +
       '</div>';
   });
-  html += '</div>';
-  var node = logTurn('verdict', 'Interviewer · summary', '');
-  node.innerHTML = '<div class="role">Interviewer · summary</div>' + html;
 
-  // Optional narrative verdict from the LLM.
+  var trail = session.b.actions;
+  if (trail.length) {
+    html += '<div style="margin-top:14px;font-size:.84rem;color:var(--muted)">Interview path: ' +
+      esc(trail.join(' \u2192 ')) + '</div>';
+  }
+  html += '</div>';
+
+  var node = logTurn('verdict', 'Interviewer \u00b7 summary', '');
+  node.innerHTML = '<div class="role">Interviewer \u00b7 summary</div>' + html;
+
   if (llmConfig()) {
     try {
       var brief = done.map(function (r) {
-        return 'Q: ' + r.item.q + '\nCandidate: ' + r.answers.join(' ').slice(0, 700);
+        return 'Q: ' + r.item.q + '\nCandidate: ' + String(r.answer || '').slice(0, 700);
       }).join('\n\n');
       var verdict = await chat([
         { role: 'system', content: 'You are a senior interviewer writing brief closing feedback after a mock ' +
@@ -638,17 +811,17 @@ async function wrapUp() {
       ], 260);
       if (verdict) {
         var v = document.createElement('div');
-        v.style.marginTop = '14px';
-        v.textContent = verdict;
+        v.style.marginTop = '14px'; v.textContent = verdict;
         node.appendChild(v);
         await speak(verdict);
       }
-    } catch (e) { /* local summary already shown */ }
+    } catch (e) { /* local summary already rendered */ }
   } else {
     var weakest = rows.slice().sort(function (a, b) { return a.cov.pct - b.cov.pct; })[0];
     var closing = 'Overall coverage ' + avg + ' percent. Your weakest answer was question ' + weakest.n +
       ', where you missed ' + (weakest.cov.miss.slice(0, 3).join(', ') || 'several key points') + '.';
-    var v2 = document.createElement('div'); v2.style.marginTop = '14px'; v2.textContent = closing;
+    var v2 = document.createElement('div');
+    v2.style.marginTop = '14px'; v2.textContent = closing;
     node.appendChild(v2);
     await speak(closing);
   }
@@ -709,7 +882,7 @@ Promise.all([
 ]).then(function (res) {
   var qs = res[0].questions || res[0], ans = (res[1] && res[1].answers) || res[1];
   boot(qs.map(function (q) {
-    return { n: q.id, section: q.section, q: q.question, a: ans[q.id] || '' };
+    return { n: q.id, section: q.section, q: q.question, a: ans[q.id] || '', d: q.difficulty || 2 };
   }));
 }).catch(function (e) {
   hint('Could not load the question bank: ' + e.message, true);

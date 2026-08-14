@@ -39,7 +39,8 @@ def sync_questions_json(dataset, total, sections, dry_run=False):
     blob["total_questions"] = total
     blob["total_sections"] = sections
     blob["questions"] = [
-        {"id": r["n"], "section": r["section"], "question": r["q"]} for r in dataset
+        {"id": r["n"], "section": r["section"], "question": r["q"], "difficulty": r.get("d", 0)}
+        for r in dataset
     ]
 
     new_text = json.dumps(blob, indent=2, ensure_ascii=False) + "\n"
