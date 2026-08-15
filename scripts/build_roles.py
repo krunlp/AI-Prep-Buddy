@@ -27,6 +27,7 @@ NAV = [
     ("diagrams.html", "Diagrams"),
     ("patterns.html", "Patterns"),
     ("code-solutions.html", "Code"),
+    ("practicals.html", "\U0001f9ea Labs"),
     ("cheatsheet.html", "Cheat Sheet"),
     ("glossary.html", "Glossary"),
     ("company-prep.html", "Companies"),
