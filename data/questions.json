@@ -1,8 +1,8 @@
 {
   "name": "AI Prep Buddy Dataset",
   "version": "2.0.0",
-  "total_questions": 1716,
-  "total_sections": 54,
+  "total_questions": 1761,
+  "total_sections": 56,
   "questions": [
     {
       "id": 1,
@@ -10298,6 +10298,276 @@
       "id": 1716,
       "section": "Section 54 — Executive & Stakeholder Communication",
       "question": "Present a build-versus-buy recommendation to an executive committee where the technically superior option is the one you're recommending against.",
+      "difficulty": 3
+    },
+    {
+      "id": 1717,
+      "section": "Section 55 — Voice, Vision & Computer-Use Agents",
+      "question": "Compare the cascaded ASR → LLM → TTS pipeline against a native speech-to-speech model. What does each win and lose?",
+      "difficulty": 3
+    },
+    {
+      "id": 1718,
+      "section": "Section 55 — Voice, Vision & Computer-Use Agents",
+      "question": "What is endpointing in a voice agent, and why is it the single hardest part of making conversation feel natural?",
+      "difficulty": 3
+    },
+    {
+      "id": 1719,
+      "section": "Section 55 — Voice, Vision & Computer-Use Agents",
+      "question": "Explain barge-in, and the acoustic echo problem it creates. How do you build it without headphones?",
+      "difficulty": 3
+    },
+    {
+      "id": 1720,
+      "section": "Section 55 — Voice, Vision & Computer-Use Agents",
+      "question": "Design the latency budget for a voice agent targeting sub-800ms perceived response. Where does the time actually go?",
+      "difficulty": 3
+    },
+    {
+      "id": 1721,
+      "section": "Section 55 — Voice, Vision & Computer-Use Agents",
+      "question": "What is a wake word system, and why is it a separate always-on model rather than continuous ASR?",
+      "difficulty": 2
+    },
+    {
+      "id": 1722,
+      "section": "Section 55 — Voice, Vision & Computer-Use Agents",
+      "question": "How does streaming ASR differ from batch ASR, and what does partial-hypothesis instability mean for a downstream LLM?",
+      "difficulty": 3
+    },
+    {
+      "id": 1723,
+      "section": "Section 55 — Voice, Vision & Computer-Use Agents",
+      "question": "Your voice agent works in the demo and fails in a call centre. Enumerate what changed.",
+      "difficulty": 3
+    },
+    {
+      "id": 1724,
+      "section": "Section 55 — Voice, Vision & Computer-Use Agents",
+      "question": "How do you handle a caller interrupting with a correction mid-sentence (\"no, the other one\") in a voice agent's state machine?",
+      "difficulty": 3
+    },
+    {
+      "id": 1725,
+      "section": "Section 55 — Voice, Vision & Computer-Use Agents",
+      "question": "What is speaker diarization, and when does a voice agent actually need it?",
+      "difficulty": 2
+    },
+    {
+      "id": 1726,
+      "section": "Section 55 — Voice, Vision & Computer-Use Agents",
+      "question": "Design evaluation for a voice agent. Why is transcript-level accuracy insufficient?",
+      "difficulty": 3
+    },
+    {
+      "id": 1727,
+      "section": "Section 55 — Voice, Vision & Computer-Use Agents",
+      "question": "Explain the three grounding strategies for computer-use agents — screenshot pixels, DOM, and accessibility tree. Compare them.",
+      "difficulty": 3
+    },
+    {
+      "id": 1728,
+      "section": "Section 55 — Voice, Vision & Computer-Use Agents",
+      "question": "Why is a hallucinated click categorically more dangerous than a hallucinated sentence, and what follows architecturally?",
+      "difficulty": 3
+    },
+    {
+      "id": 1729,
+      "section": "Section 55 — Voice, Vision & Computer-Use Agents",
+      "question": "Design action verification for a browser agent about to submit a purchase. What must be true before the click fires?",
+      "difficulty": 3
+    },
+    {
+      "id": 1730,
+      "section": "Section 55 — Voice, Vision & Computer-Use Agents",
+      "question": "A web page changes its layout. Explain why selector-based and vision-based agents fail differently, and which recovers better.",
+      "difficulty": 3
+    },
+    {
+      "id": 1731,
+      "section": "Section 55 — Voice, Vision & Computer-Use Agents",
+      "question": "How does prompt injection work against a computer-use agent, and why is it harder to defend than in a chat product?",
+      "difficulty": 3
+    },
+    {
+      "id": 1732,
+      "section": "Section 55 — Voice, Vision & Computer-Use Agents",
+      "question": "Explain the perceive-decide-act loop latency problem for GUI agents. Why can't you just screenshot every 100ms?",
+      "difficulty": 3
+    },
+    {
+      "id": 1733,
+      "section": "Section 55 — Voice, Vision & Computer-Use Agents",
+      "question": "Design the permission model for an agent with access to a logged-in browser session.",
+      "difficulty": 3
+    },
+    {
+      "id": 1734,
+      "section": "Section 55 — Voice, Vision & Computer-Use Agents",
+      "question": "What is a set-of-marks / element-labelling approach in vision-based GUI agents, and what problem does it solve?",
+      "difficulty": 3
+    },
+    {
+      "id": 1735,
+      "section": "Section 55 — Voice, Vision & Computer-Use Agents",
+      "question": "How would you evaluate a computer-use agent, given that task success is binary and rare?",
+      "difficulty": 3
+    },
+    {
+      "id": 1736,
+      "section": "Section 55 — Voice, Vision & Computer-Use Agents",
+      "question": "Your browser agent gets stuck in a loop clicking the same element. Diagnose systematically.",
+      "difficulty": 3
+    },
+    {
+      "id": 1737,
+      "section": "Section 55 — Voice, Vision & Computer-Use Agents",
+      "question": "Compare running a computer-use agent in a sandboxed VM versus the user's real browser session.",
+      "difficulty": 3
+    },
+    {
+      "id": 1738,
+      "section": "Section 55 — Voice, Vision & Computer-Use Agents",
+      "question": "What is a multimodal document parsing pipeline (Docling/GroundX-style), and why does naive PDF text extraction fail?",
+      "difficulty": 3
+    },
+    {
+      "id": 1739,
+      "section": "Section 55 — Voice, Vision & Computer-Use Agents",
+      "question": "Explain why table extraction is disproportionately hard, and how it breaks downstream RAG.",
+      "difficulty": 3
+    },
+    {
+      "id": 1740,
+      "section": "Section 55 — Voice, Vision & Computer-Use Agents",
+      "question": "How do you handle a document where the answer lives in a chart or diagram rather than text?",
+      "difficulty": 3
+    },
+    {
+      "id": 1741,
+      "section": "Section 55 — Voice, Vision & Computer-Use Agents",
+      "question": "Design a voice-driven RAG assistant end to end, and state which component you'd expect to fail first in production.",
+      "difficulty": 3
+    },
+    {
+      "id": 1742,
+      "section": "Section 56 — Agent Memory & Context Engineering",
+      "question": "Distinguish context, working memory, and long-term memory in an agent. Which is which in a real implementation?",
+      "difficulty": 3
+    },
+    {
+      "id": 1743,
+      "section": "Section 56 — Agent Memory & Context Engineering",
+      "question": "Compare episodic, semantic, and procedural memory for agents. Give a concrete implementation of each.",
+      "difficulty": 3
+    },
+    {
+      "id": 1744,
+      "section": "Section 56 — Agent Memory & Context Engineering",
+      "question": "What is context engineering, and how does it differ from prompt engineering?",
+      "difficulty": 3
+    },
+    {
+      "id": 1745,
+      "section": "Section 56 — Agent Memory & Context Engineering",
+      "question": "Your agent's context grows every turn until it hits the window limit. Enumerate your options in order.",
+      "difficulty": 3
+    },
+    {
+      "id": 1746,
+      "section": "Section 56 — Agent Memory & Context Engineering",
+      "question": "Explain rolling summarisation, and the specific information it systematically destroys.",
+      "difficulty": 3
+    },
+    {
+      "id": 1747,
+      "section": "Section 56 — Agent Memory & Context Engineering",
+      "question": "Design a memory system that decides what is worth remembering. What is the write policy?",
+      "difficulty": 3
+    },
+    {
+      "id": 1748,
+      "section": "Section 56 — Agent Memory & Context Engineering",
+      "question": "What is a temporal knowledge graph for agent memory (Graphiti-style), and what does it solve that vector memory doesn't?",
+      "difficulty": 3
+    },
+    {
+      "id": 1749,
+      "section": "Section 56 — Agent Memory & Context Engineering",
+      "question": "How do you handle contradictory memories — the user said X in March and not-X in June?",
+      "difficulty": 3
+    },
+    {
+      "id": 1750,
+      "section": "Section 56 — Agent Memory & Context Engineering",
+      "question": "Explain memory retrieval as a ranking problem. What signals beyond semantic similarity matter?",
+      "difficulty": 3
+    },
+    {
+      "id": 1751,
+      "section": "Section 56 — Agent Memory & Context Engineering",
+      "question": "What is context rot / lost-in-the-middle, and how does it change how you order retrieved content?",
+      "difficulty": 3
+    },
+    {
+      "id": 1752,
+      "section": "Section 56 — Agent Memory & Context Engineering",
+      "question": "Design memory for a multi-user agent where memories must never leak across users.",
+      "difficulty": 3
+    },
+    {
+      "id": 1753,
+      "section": "Section 56 — Agent Memory & Context Engineering",
+      "question": "When should a fact live in memory versus be re-derived from a source of truth?",
+      "difficulty": 3
+    },
+    {
+      "id": 1754,
+      "section": "Section 56 — Agent Memory & Context Engineering",
+      "question": "Explain the difference between an agent's scratchpad and its memory, and why conflating them causes bugs.",
+      "difficulty": 3
+    },
+    {
+      "id": 1755,
+      "section": "Section 56 — Agent Memory & Context Engineering",
+      "question": "How do you evaluate a memory system? What does \"good memory\" mean measurably?",
+      "difficulty": 3
+    },
+    {
+      "id": 1756,
+      "section": "Section 56 — Agent Memory & Context Engineering",
+      "question": "What is prompt caching / prefix caching, and how should it shape the way you order your context?",
+      "difficulty": 3
+    },
+    {
+      "id": 1757,
+      "section": "Section 56 — Agent Memory & Context Engineering",
+      "question": "Your agent remembers something wrong and keeps repeating it. Design the correction path.",
+      "difficulty": 3
+    },
+    {
+      "id": 1758,
+      "section": "Section 56 — Agent Memory & Context Engineering",
+      "question": "Explain the cost model of memory: what does a memory system actually cost per turn at scale?",
+      "difficulty": 3
+    },
+    {
+      "id": 1759,
+      "section": "Section 56 — Agent Memory & Context Engineering",
+      "question": "How do you decide memory retention and deletion policy under GDPR right-to-erasure?",
+      "difficulty": 3
+    },
+    {
+      "id": 1760,
+      "section": "Section 56 — Agent Memory & Context Engineering",
+      "question": "Compare storing raw conversation turns versus extracted facts as the memory substrate.",
+      "difficulty": 3
+    },
+    {
+      "id": 1761,
+      "section": "Section 56 — Agent Memory & Context Engineering",
+      "question": "Design the memory layer for a coding agent working across a long session in a large repository.",
       "difficulty": 3
     }
   ]

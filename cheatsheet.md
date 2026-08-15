@@ -5,7 +5,7 @@ title: Cheat Sheet
 
 # AI Prep Buddy — Day-of-Interview Cheat Sheet
 
-The condensed version. Read this in the 20 minutes before your interview, not the full 1,716-question bank. Organized around the questions you're most likely to actually get.
+The condensed version. Read this in the 20 minutes before your interview, not the full 1,761-question bank. Organized around the questions you're most likely to actually get.
 
 ---
 

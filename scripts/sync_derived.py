@@ -118,14 +118,43 @@ def sync_simulator(dataset, total, dry_run=False):
 
 
 def sync_readme(total, dry_run=False):
+    """README is a landing page; every count in it is generated."""
     path = qa_lib.REPO_ROOT / "README.md"
     if not path.exists():
         return False
     text = path.read_text(encoding="utf-8")
     original = text
 
-    text = re.sub(r"\(([\d,]+) Questions\)", f"({_fmt_thousands(total)} Questions)", text, count=1)
+    sections = qa_lib.section_ranges()
+    pretty = _fmt_thousands(total)
+    num = r"(?:\d{1,3}(?:,\d{3})+|\d{3,5})"
+
+    text = re.sub(rf"\({num} Questions\)", f"({pretty} Questions)", text, count=1)
     text = re.sub(r"Questions-[\d,]+-", f"Questions-{total}-", text)
+    text = re.sub(r"Sections-\d+-", f"Sections-{len(sections)}-", text)
+    text = re.sub(rf"{num}(\s+interview questions)", rf"{pretty}\1", text)
+    text = re.sub(rf"{num}(\s+questions across)", rf"{pretty}\1", text)
+    text = re.sub(rf"(read\s+){num}(\s+questions)", rf"\g<1>{pretty}\2", text)
+    nsec = len(sections)
+    text = re.sub(r"across \d+ sections", "across {} sections".format(nsec), text)
+    text = re.sub(r"narrows \d+ sections", "narrows {} sections".format(nsec), text)
+    text = re.sub(r"\b\d+ structured technical sections", "{} structured technical sections".format(nsec), text)
+    text = re.sub(r"All \d+ sections", f"All {len(sections)} sections", text)
+
+    # Regenerate the section table so it can never drift from the bank.
+    rows = []
+    for r in sections:
+        m = re.match(r"Section (\d+)\s*[\u2014-]\s*(.+)", r["section"])
+        if not m:
+            continue
+        title = re.sub(r"\s*\(\d+\s*[\u2013-]\s*\d+\)\s*$", "", m.group(2)).strip()
+        rows.append(f"| {m.group(1)} | {title} | {r['count']} | {r['min']}\u2013{r['max']} |")
+    table = "\n".join(rows)
+    text = re.sub(
+        r"(\| # \| Section \| Questions \| Range \|\n\|[^\n]*\|\n)(?:\|[^\n]*\|\n)+",
+        lambda m: m.group(1) + table + "\n",
+        text,
+    )
 
     if text == original:
         return False

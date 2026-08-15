@@ -1,10 +1,10 @@
 # AI Prep Buddy
 
-**1,716 interview questions with answer frameworks for AI/ML engineering, system design and architecture loops.**
+**1,761 interview questions with answer frameworks for AI/ML engineering, system design and architecture loops.**
 
 [![CI Verification](https://github.com/krunlp/AI-Prep-Buddy/actions/workflows/ci.yml/badge.svg)](https://github.com/krunlp/AI-Prep-Buddy/actions/workflows/ci.yml)
-[![Questions](https://img.shields.io/badge/Questions-1716-blue?style=flat-square)](questions.md)
-[![Sections](https://img.shields.io/badge/Sections-54-green?style=flat-square)](questions.md)
+[![Questions](https://img.shields.io/badge/Questions-1761-blue?style=flat-square)](questions.md)
+[![Sections](https://img.shields.io/badge/Sections-56-green?style=flat-square)](questions.md)
 [![Diagrams](https://img.shields.io/badge/Diagrams-69-orange?style=flat-square)](diagrams.md)
 [![JSON Dataset](https://img.shields.io/badge/Dataset-JSON-orange?style=flat-square)](data/questions.json)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
@@ -23,7 +23,7 @@ It covers the full modern surface: classic ML and statistics through transformer
 
 | | |
 |---|---|
-| 📋 **[Question bank](questions.md)** | 1,716 questions across 54 sections, difficulty-tagged (⭐ Standard, ⭐⭐ Hard, ⭐⭐⭐ Principal). Hover or tap any question on the site to reveal its answer. |
+| 📋 **[Question bank](questions.md)** | 1,761 questions across 56 sections, difficulty-tagged (⭐ Standard, ⭐⭐ Hard, ⭐⭐⭐ Principal). Hover or tap any question on the site to reveal its answer. |
 | ✅ **[Answer frameworks](answers.md)** | An answer for every question — not a definition, but what a strong candidate actually says. |
 | 🎯 **[Role-based map](https://krunlp.github.io/AI-Prep-Buddy/roles.html)** | Pick your target role (Staff MLE, Principal AI Lead, GenAI Engineer, Platform, MLOps, Research, Security, Solutions Architect, Data Scientist, EM) and see exactly which sections to complete, with progress tracking. |
 | 🎙️ **[Live Interview](https://krunlp.github.io/AI-Prep-Buddy/interview.html)** | An agentic interviewer: asks aloud, listens, then follows up on what you actually said — adaptive with an API key, gap-based without one. Ends with a scored summary. |
@@ -37,9 +37,9 @@ It covers the full modern surface: classic ML and statistics through transformer
 
 ## Where to start
 
-You are not meant to read 1,716 questions.
+You are not meant to read 1,761 questions.
 
-1. **[Pick your role](https://krunlp.github.io/AI-Prep-Buddy/roles.html)** — it narrows 54 sections down to the ones your loop actually tests, split into Core / Important / Optional.
+1. **[Pick your role](https://krunlp.github.io/AI-Prep-Buddy/roles.html)** — it narrows 56 sections down to the ones your loop actually tests, split into Core / Important / Optional.
 2. **Work the Core sections**, reading questions and revealing answers as you go.
 3. **[Drill in the simulator](https://krunlp.github.io/AI-Prep-Buddy/simulator.html)** — answer out loud and self-grade. Articulation under pressure is the thing being tested, not recognition.
 4. **The week before:** [cheat sheet](cheatsheet.md), [multi-turn drills](questions.md) (Section 51), and [company prep](company-prep.md).
@@ -64,7 +64,7 @@ The bank is available as JSON for building your own tools:
 ## Sections
 
 <details>
-<summary>All 54 sections</summary>
+<summary>All 56 sections</summary>
 
 | # | Section | Questions | Range |
 |---|---|---|---|
@@ -122,6 +122,8 @@ The bank is available as JSON for building your own tools:
 | 52 | Spot the Flaw: Design & Code Critique | 20 | 1662–1681 |
 | 53 | Estimation, Capacity & Cost Arithmetic | 20 | 1682–1701 |
 | 54 | Executive & Stakeholder Communication | 15 | 1702–1716 |
+| 55 | Voice, Vision & Computer-Use Agents | 25 | 1717–1741 |
+| 56 | Agent Memory & Context Engineering | 20 | 1742–1761 |
 
 </details>
 

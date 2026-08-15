@@ -3,7 +3,7 @@ layout: default
 title: Question Bank
 ---
 
-# AI Prep Buddy — Master Interview Question Bank (1,716 Questions)
+# AI Prep Buddy — Master Interview Question Bank (1,761 Questions)
 
 The complete open-source prep platform for AI/ML engineering, system design, and architecture loops. Organized into 49 structured technical sections with difficulty tags (`⭐ Standard`, `⭐⭐ Hard`, `⭐⭐⭐ Principal`).
 
@@ -2120,3 +2120,58 @@ Translation, not technical depth. The failure modes are jargon, false certainty,
 1714. Your AI system caused a customer-visible incident. Draft the customer-facing communication. ⭐⭐⭐
 1715. Explain to an engineering team why their elegant technical solution is being deprioritised for business reasons, without losing their trust. ⭐⭐⭐
 1716. Present a build-versus-buy recommendation to an executive committee where the technically superior option is the one you're recommending against. ⭐⭐⭐
+
+---
+
+## Section 55 — Voice, Vision & Computer-Use Agents (1717–1741)
+
+1717. Compare the cascaded ASR → LLM → TTS pipeline against a native speech-to-speech model. What does each win and lose? ⭐⭐⭐
+1718. What is endpointing in a voice agent, and why is it the single hardest part of making conversation feel natural? ⭐⭐⭐
+1719. Explain barge-in, and the acoustic echo problem it creates. How do you build it without headphones? ⭐⭐⭐
+1720. Design the latency budget for a voice agent targeting sub-800ms perceived response. Where does the time actually go? ⭐⭐⭐
+1721. What is a wake word system, and why is it a separate always-on model rather than continuous ASR? ⭐⭐
+1722. How does streaming ASR differ from batch ASR, and what does partial-hypothesis instability mean for a downstream LLM? ⭐⭐⭐
+1723. Your voice agent works in the demo and fails in a call centre. Enumerate what changed. ⭐⭐⭐
+1724. How do you handle a caller interrupting with a correction mid-sentence ("no, the other one") in a voice agent's state machine? ⭐⭐⭐
+1725. What is speaker diarization, and when does a voice agent actually need it? ⭐⭐
+1726. Design evaluation for a voice agent. Why is transcript-level accuracy insufficient? ⭐⭐⭐
+1727. Explain the three grounding strategies for computer-use agents — screenshot pixels, DOM, and accessibility tree. Compare them. ⭐⭐⭐
+1728. Why is a hallucinated click categorically more dangerous than a hallucinated sentence, and what follows architecturally? ⭐⭐⭐
+1729. Design action verification for a browser agent about to submit a purchase. What must be true before the click fires? ⭐⭐⭐
+1730. A web page changes its layout. Explain why selector-based and vision-based agents fail differently, and which recovers better. ⭐⭐⭐
+1731. How does prompt injection work against a computer-use agent, and why is it harder to defend than in a chat product? ⭐⭐⭐
+1732. Explain the perceive-decide-act loop latency problem for GUI agents. Why can't you just screenshot every 100ms? ⭐⭐⭐
+1733. Design the permission model for an agent with access to a logged-in browser session. ⭐⭐⭐
+1734. What is a set-of-marks / element-labelling approach in vision-based GUI agents, and what problem does it solve? ⭐⭐⭐
+1735. How would you evaluate a computer-use agent, given that task success is binary and rare? ⭐⭐⭐
+1736. Your browser agent gets stuck in a loop clicking the same element. Diagnose systematically. ⭐⭐⭐
+1737. Compare running a computer-use agent in a sandboxed VM versus the user's real browser session. ⭐⭐⭐
+1738. What is a multimodal document parsing pipeline (Docling/GroundX-style), and why does naive PDF text extraction fail? ⭐⭐⭐
+1739. Explain why table extraction is disproportionately hard, and how it breaks downstream RAG. ⭐⭐⭐
+1740. How do you handle a document where the answer lives in a chart or diagram rather than text? ⭐⭐⭐
+1741. Design a voice-driven RAG assistant end to end, and state which component you'd expect to fail first in production. ⭐⭐⭐
+
+---
+
+## Section 56 — Agent Memory & Context Engineering (1742–1761)
+
+1742. Distinguish context, working memory, and long-term memory in an agent. Which is which in a real implementation? ⭐⭐⭐
+1743. Compare episodic, semantic, and procedural memory for agents. Give a concrete implementation of each. ⭐⭐⭐
+1744. What is context engineering, and how does it differ from prompt engineering? ⭐⭐⭐
+1745. Your agent's context grows every turn until it hits the window limit. Enumerate your options in order. ⭐⭐⭐
+1746. Explain rolling summarisation, and the specific information it systematically destroys. ⭐⭐⭐
+1747. Design a memory system that decides what is worth remembering. What is the write policy? ⭐⭐⭐
+1748. What is a temporal knowledge graph for agent memory (Graphiti-style), and what does it solve that vector memory doesn't? ⭐⭐⭐
+1749. How do you handle contradictory memories — the user said X in March and not-X in June? ⭐⭐⭐
+1750. Explain memory retrieval as a ranking problem. What signals beyond semantic similarity matter? ⭐⭐⭐
+1751. What is context rot / lost-in-the-middle, and how does it change how you order retrieved content? ⭐⭐⭐
+1752. Design memory for a multi-user agent where memories must never leak across users. ⭐⭐⭐
+1753. When should a fact live in memory versus be re-derived from a source of truth? ⭐⭐⭐
+1754. Explain the difference between an agent's scratchpad and its memory, and why conflating them causes bugs. ⭐⭐⭐
+1755. How do you evaluate a memory system? What does "good memory" mean measurably? ⭐⭐⭐
+1756. What is prompt caching / prefix caching, and how should it shape the way you order your context? ⭐⭐⭐
+1757. Your agent remembers something wrong and keeps repeating it. Design the correction path. ⭐⭐⭐
+1758. Explain the cost model of memory: what does a memory system actually cost per turn at scale? ⭐⭐⭐
+1759. How do you decide memory retention and deletion policy under GDPR right-to-erasure? ⭐⭐⭐
+1760. Compare storing raw conversation turns versus extracted facts as the memory substrate. ⭐⭐⭐
+1761. Design the memory layer for a coding agent working across a long session in a large repository. ⭐⭐⭐

@@ -21,7 +21,7 @@ ROLES = [
         "blurb": "Builds and ships production ML models. Loop is weighted to classic ML depth, "
                  "practical system design, and coding.",
         "core": [3, 4, 5, 14, 17, 18, 26, 52],
-        "important": [2, 6, 7, 15, 16, 19, 24, 25, 39, 50, 51, 53],
+        "important": [2, 6, 7, 15, 16, 19, 24, 25, 39, 50, 51, 53, 55, 56],
         "optional": [8, 21, 34, 40, 41, 54],
     },
     {
@@ -30,7 +30,7 @@ ROLES = [
         "level": "Staff",
         "blurb": "Owns end-to-end ML systems and sets technical direction for a team. "
                  "Expect deep system design plus cross-functional judgement.",
-        "core": [2, 3, 4, 5, 14, 15, 16, 17, 18, 26, 27, 50, 51, 52, 53],
+        "core": [2, 3, 4, 5, 14, 15, 16, 17, 18, 26, 27, 50, 51, 52, 53, 55, 56],
         "important": [1, 6, 7, 8, 19, 20, 21, 24, 25, 39, 41, 54],
         "optional": [10, 13, 23, 34, 40, 42],
     },
@@ -40,8 +40,8 @@ ROLES = [
         "level": "Principal",
         "blurb": "Sets AI strategy and architecture across an org. The loop tests breadth, "
                  "tradeoff judgement, governance and executive communication as much as depth.",
-        "core": [1, 2, 8, 10, 12, 13, 16, 21, 22, 23, 27, 28, 29, 51, 53, 54],
-        "important": [3, 5, 9, 11, 15, 18, 19, 20, 30, 31, 43, 48, 49, 50, 52],
+        "core": [1, 2, 8, 10, 12, 13, 16, 21, 22, 23, 27, 28, 29, 51, 53, 54, 56],
+        "important": [3, 5, 9, 11, 15, 18, 19, 20, 30, 31, 43, 48, 49, 50, 52, 55],
         "optional": [14, 17, 32, 33, 34, 45, 46, 47],
     },
     {
@@ -50,7 +50,7 @@ ROLES = [
         "level": "Senior / Staff",
         "blurb": "Builds LLM-powered product features. Heavy on transformers, RAG, agents, "
                  "prompting and evaluation.",
-        "core": [8, 9, 10, 11, 12, 13, 21, 43, 48, 50, 51, 52],
+        "core": [8, 9, 10, 11, 12, 13, 21, 43, 48, 50, 51, 52, 55, 56],
         "important": [5, 15, 16, 22, 26, 30, 32, 33, 46, 53, 54],
         "optional": [2, 19, 23, 35, 36, 45, 49],
     },
@@ -61,7 +61,7 @@ ROLES = [
         "blurb": "Owns the serving and training substrate. Performance, hardware, distributed "
                  "systems and cost are the whole job.",
         "core": [15, 16, 18, 19, 20, 38, 44, 46, 50, 52, 53],
-        "important": [5, 8, 13, 17, 26, 31, 37, 49, 51, 54],
+        "important": [5, 8, 13, 17, 26, 31, 37, 49, 51, 54, 55, 56],
         "optional": [2, 21, 27, 43, 48],
     },
     {
@@ -72,7 +72,7 @@ ROLES = [
                  "drift and rollback.",
         "core": [16, 17, 18, 19, 20, 21, 39, 50, 52],
         "important": [3, 5, 14, 15, 23, 34, 38, 51, 53, 54],
-        "optional": [2, 13, 22, 26, 31, 49],
+        "optional": [2, 13, 22, 26, 31, 49, 55, 56],
     },
     {
         "id": "research-engineer",
@@ -81,7 +81,7 @@ ROLES = [
         "blurb": "Trains and improves models. Deepest maths and architecture bar of any track, "
                  "plus strong coding.",
         "core": [3, 4, 5, 8, 26, 33, 38, 46],
-        "important": [6, 7, 21, 32, 35, 44, 51, 52, 53],
+        "important": [6, 7, 21, 32, 35, 44, 51, 52, 53, 55, 56],
         "optional": [9, 12, 22, 36, 42, 47, 50, 54],
     },
     {
@@ -91,7 +91,7 @@ ROLES = [
         "blurb": "Attacks and defends AI systems: jailbreaks, prompt injection, agent abuse, "
                  "adversarial ML and guardrail design.",
         "core": [22, 23, 34, 45, 52],
-        "important": [8, 9, 10, 12, 13, 20, 29, 30, 43, 50, 51, 54],
+        "important": [8, 9, 10, 12, 13, 20, 29, 30, 43, 50, 51, 54, 55, 56],
         "optional": [2, 16, 21, 31, 48, 49, 53],
     },
     {
@@ -101,7 +101,7 @@ ROLES = [
         "blurb": "Designs AI systems inside enterprise constraints: cloud, compliance, "
                  "integration, procurement and cost.",
         "core": [13, 19, 23, 27, 29, 30, 31, 49, 51, 53, 54],
-        "important": [1, 2, 10, 12, 16, 20, 22, 48, 50, 52],
+        "important": [1, 2, 10, 12, 16, 20, 22, 48, 50, 52, 55, 56],
         "optional": [8, 11, 15, 18, 21, 43],
     },
     {
@@ -112,7 +112,7 @@ ROLES = [
                  "more weight than serving infrastructure.",
         "core": [3, 4, 24, 25, 26, 39, 41],
         "important": [5, 14, 18, 21, 34, 40, 51, 52],
-        "optional": [2, 16, 17, 42, 50, 53, 54],
+        "optional": [2, 16, 17, 42, 50, 53, 54, 55, 56],
     },
     {
         "id": "ai-manager",
@@ -122,6 +122,6 @@ ROLES = [
                  "dominate; technical depth is tested for credibility, not recall.",
         "core": [1, 2, 23, 27, 29, 51, 54],
         "important": [13, 16, 21, 22, 31, 49, 53],
-        "optional": [3, 8, 10, 12, 19, 30, 50, 52],
+        "optional": [3, 8, 10, 12, 19, 30, 50, 52, 55, 56],
     },
 ]
