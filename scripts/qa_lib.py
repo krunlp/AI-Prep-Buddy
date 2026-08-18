@@ -54,6 +54,12 @@ RE_STARS = re.compile(r"\s*⭐+\s*$")
 # Bold-wrapped question title: "**Some Topic**"
 RE_BOLD_WRAP = re.compile(r"^\*\*(.+?)\*\*$")
 
+# Liquid raw guards. answers.md wraps code blocks containing Liquid-looking
+# syntax (e.g. Semantic Kernel's {{$input}}) in {% raw %} tags so Jekyll can
+# build the site. They must never reach derived artifacts.
+RE_LIQUID_RAW = re.compile(r"\{%-?\s*(?:end)?raw\s*-?%\}")
+
+
 # Numeric range in a section header: "(451–495)"
 RE_HDR_RANGE = re.compile(r"\s*\(\d+\s*[–-]\s*\d+\)")
 
@@ -137,7 +143,8 @@ def build_dataset() -> list[dict]:
         a = answers.get(q["n"])
         answer_text = ""
         if a:
-            answer_text = re.sub(r"\s+", " ", f"{a['title']} {a['body']}").strip()
+            answer_text = RE_LIQUID_RAW.sub(" ", f"{a['title']} {a['body']}")
+            answer_text = re.sub(r"\s+", " ", answer_text).strip()
         dataset.append(
             {
                 "n": q["n"],

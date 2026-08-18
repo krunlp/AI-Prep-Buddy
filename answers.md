@@ -7431,15 +7431,18 @@ Inside the plugin directory `Plugins/SummaryPlugin/SummarizeText/`:
 ```
 
 `skprompt.txt`:
+{% raw %}
 ```
 Summarize the following customer transactions concisely:
 {{$input}}
 Provide a bulleted list of key outlays.
 ```
+{% endraw %}
 
 #### 3. Invocation Pipeline & `KernelArguments` Parameter Binding
 At runtime, functions are invoked by passing parameter dictionaries wrapped in a `KernelArguments` instance:
 
+{% raw %}
 ```python
 # Create Prompt Plugin dynamically or load from directory
 prompt_function = kernel.add_function(
@@ -7455,6 +7458,7 @@ args = KernelArguments(customer_id="CUST-9921", balance="$14,250.00 USD")
 result = await kernel.invoke(prompt_function, args)
 print(result)
 ```
+{% endraw %}
 
 ---
 

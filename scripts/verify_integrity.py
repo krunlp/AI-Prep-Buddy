@@ -385,6 +385,57 @@ def main() -> int:
                 f"{', '.join(p + '.html' for p in unlinked)}",
             )
 
+    # 11. Jekyll builds every front-matter file through Liquid BEFORE markdown,
+    #     so template syntax inside a fenced code block still gets parsed. A
+    #     code sample containing {{$input}} (Semantic Kernel) or {% ... %} is a
+    #     Liquid syntax error and breaks the GitHub Pages build silently — the
+    #     site keeps serving the last good commit while pushes appear to work.
+    #     Regression guard: this broke Pages for 30+ builds undetected.
+    RE_FENCE = re.compile(r"^(?:```|~~~)")
+    RE_RAW_OPEN = re.compile(r"\{%-?\s*raw\s*-?%\}")
+    RE_RAW_CLOSE = re.compile(r"\{%-?\s*endraw\s*-?%\}")
+
+    for path in sorted(qa_lib.REPO_ROOT.glob("*.md")) + sorted(
+        qa_lib.REPO_ROOT.glob("*.html")
+    ):
+        text = path.read_text(encoding="utf-8")
+        if not text.startswith("---"):
+            continue  # no front matter: Jekyll copies it verbatim, Liquid never runs
+        lines = text.split("\n")
+        in_fence = False
+        in_raw = False
+        opens = closes = 0
+        for lineno, line in enumerate(lines, 1):
+            if RE_RAW_OPEN.search(line):
+                in_raw, opens = True, opens + 1
+            if RE_RAW_CLOSE.search(line):
+                in_raw, closes = False, closes + 1
+            if RE_FENCE.match(line):
+                in_fence = not in_fence
+                continue
+            if in_fence and not in_raw and ("{{" in line or "{%" in line):
+                fail(
+                    "liquid-safety",
+                    f"{path.name}:{lineno} has Liquid syntax in an unguarded code "
+                    f"block — wrap the block in {{% raw %}} / {{% endraw %}} or the "
+                    f"Jekyll build fails",
+                )
+        if opens != closes:
+            fail(
+                "liquid-safety",
+                f"{path.name}: unbalanced raw guards ({opens} raw, {closes} endraw)",
+            )
+
+    # 12. Liquid raw guards are a Jekyll build concern only; they must never
+    #     leak into derived artifacts that the simulator and JSON consumers read.
+    for rec in qa_lib.build_dataset():
+        if RE_RAW_OPEN.search(rec["a"]) or RE_RAW_CLOSE.search(rec["a"]):
+            fail(
+                "liquid-safety",
+                f"Q{rec['n']}: derived answer text contains a Liquid raw guard — "
+                f"qa_lib must strip these",
+            )
+
     # --- report -----------------------------------------------------------
     print()
     for w in WARNINGS:
