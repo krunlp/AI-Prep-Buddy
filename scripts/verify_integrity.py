@@ -10,6 +10,7 @@ Run locally:  python3 scripts/verify_integrity.py
 
 import json
 import re
+import subprocess
 import sys
 from collections import Counter
 
@@ -434,6 +435,34 @@ def main() -> int:
                 "liquid-safety",
                 f"Q{rec['n']}: derived answer text contains a Liquid raw guard — "
                 f"qa_lib must strip these",
+            )
+
+    # 13. No tracked symlinks. GitHub Pages builds Jekyll in safe mode, which
+    #     calls File.realpath on entries in the source tree; a symlink whose
+    #     target does not exist on the runner raises
+    #       Error: No such file or directory @ rb_check_realpath_internal
+    #     and the build fails while git pushes still appear to succeed.
+    #     Regression guard: a `node_modules -> /home/claude/node_modules`
+    #     symlink was committed accidentally and broke Pages for 30+ builds.
+    try:
+        tracked = subprocess.run(
+            ["git", "ls-files", "-s"],
+            cwd=qa_lib.REPO_ROOT,
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout
+    except (OSError, subprocess.CalledProcessError):
+        tracked = ""
+        warn("symlink-safety", "could not run git ls-files; symlink check skipped")
+    for line in tracked.splitlines():
+        parts = line.split(maxsplit=3)
+        if len(parts) == 4 and parts[0] == "120000":
+            fail(
+                "symlink-safety",
+                f"tracked symlink '{parts[3]}' — Jekyll safe mode calls realpath on "
+                f"it and the Pages build fails if the target is absent on the runner; "
+                f"remove it with: git rm --cached '{parts[3]}'",
             )
 
     # --- report -----------------------------------------------------------

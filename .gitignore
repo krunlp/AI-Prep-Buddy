@@ -12,6 +12,7 @@ Thumbs.db
 # Local agent & temporary scratch files
 .tmp/
 *.tmp
+node_modules
 node_modules/
 
 # local Jekyll preview
@@ -20,3 +21,9 @@ _site/
 .jekyll-metadata
 vendor/
 Gemfile.lock
+
+# Never commit a symlink here. A `node_modules` symlink pointing at an absolute
+# sandbox path was committed once and broke the GitHub Pages build for 30+
+# builds: Jekyll runs in safe mode and calls realpath on it, which raises
+# ENOENT on the runner where the target does not exist. verify_integrity.py
+# now fails on any tracked symlink.
